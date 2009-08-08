@@ -1,0 +1,525 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head>
+
+
+
+  <title>Trick Benchmark Perla</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <style type="text/css">
+  #g_title p, #g_footer p, #g_description p {
+    margin: 0;
+  }
+  /*
+
+  	-- -- -- -- -- -- --
+  	Browser Fixes
+  	-- -- -- -- -- -- --
+  	
+  	This file uses CSS filtering methods to fix various
+  	layout bugs.
+
+  	Each of the following three imported files is a 
+  	separate, browser-specific CSS file that keeps all 
+  	hacks out of the main style sheet.
+  	
+  	Over time, as supporting these browsers no longer
+  	remains a priority, cleaning up the hacks is as
+  	easy as deleting the @import statement below, or
+  	simply no longer linking this file from the HTML.
+  	
+  */
+
+  /* 
+    fix ie6 "peekaboo bug" using the "holly hack". 
+    Note, this style only gets applied to ie6
+  */
+  * html .wrapper {
+    height: 0.1%;
+  }
+
+  /* 
+   * IE5 mac - overrides the IE/Win hack 
+   */
+
+  /*\*//*/
+
+  * html #threecolumn div {
+  	height: auto;
+  }
+
+  /**/
+
+
+  /* 
+   * IE5/Win-specific CSS -ensures #container wraps all content on window resize
+   */
+
+  @media tty {
+   i{content:"\";/*" "*/}} * html #container { height: 1%; } /*";}
+  }/* */
+  /* Styling for editable elements. Eventually, this will be part of the style. */
+  .editable {
+    border: 1px dashed blue;
+  }
+  
+  #footer {
+    clear: both;
+  }
+  
+  /* Extra divs hidden by default. The custom CSS can override this though */
+  #extraDiv1, #extraDiv2, #extraDiv3, #extraDiv4, #extraDiv5, #extraDiv6 {
+    display: none;
+  }
+  
+  a img,:link img,:visited img {border: none;}
+
+
+  body {
+    text-align: center;
+  }
+  #container {
+    width: 718px;
+    text-align: left;
+    margin: 0 auto;
+  }
+  /** BEGIN CUSTOM SKIN **/
+  /*
+
+  	-- -- -- -- -- -- --
+  	Base CSS
+  	-- -- -- -- -- -- --
+  	
+  	This file simply removes default styling on most HTML elements in 
+  	order to reduce the need to later override them.
+  	
+  */
+
+  h1,h2,h3,h4,h5,h6,pre,code,p {font-size: 1em;}
+  dl,li,dt,dd,h1,h2,h3,h4,h5,h6,pre,form,body,html,p,blockquote,fieldset,input {margin: 0; padding: 0;}
+  a img,:link img,:visited img {border: none;}
+  address {font-style: normal;}/*
+
+  	-- -- -- -- -- -- --
+  	Type Scheme: Deco
+  	-- -- -- -- -- -- --
+  	
+  */
+
+  body {
+  	font: 76% Verdana, sans-serif;
+  }	
+
+  h1, h2, h3, h4, h5, h6, p.description {
+  	font-family: "Trebuchet MS", Trebuchet, sans-serif;
+  }
+  h1 {
+  	font-size: 3em;
+  	font-weight: bold;
+  	letter-spacing: 2px;
+  }
+  h2 {
+  	font-size: 2em;
+  	font-weight: normal;
+  }
+  h3 {
+  	font-size: 1.5em;
+  }
+  h4 {
+  	font-size: 1.2em;
+  	letter-spacing: 0.2em;
+  }
+  h5 {
+  	font-size: 1.2em;
+  }
+  h6 {
+  	font-size: 1em;
+  	font-weight: bold;
+  }
+
+  p, td {
+  	line-height: 1.8em;
+  }
+  code, kbd {
+  	font-size: 1.25em;
+  }/*
+
+  	-- -- -- -- -- -- --
+  	STYLE: Solitude
+  	-- -- -- -- -- -- --
+  */
+
+  /* ie6win */
+  * html #sidebar a {
+      height: 1px;
+  }
+
+  /* ie5mac */
+
+  /*\*//*/
+  * html #sidebar a { height: auto; }
+  /**/
+
+
+  /* Basic HTML style
+  ----------------------------------------------- */
+  a:link {
+  	font-weight: bold;
+  	margin: -1px -2px -2px;
+  	padding: 1px 2px 2px; 
+  }
+  a:visited {
+  	color: #666;
+  	font-weight: bold;
+  	margin: -1px -2px -2px;
+  	padding: 1px 2px 2px; 
+  }
+  a:hover, a:active {
+  	color: #333;
+  	background: #E7E7E7;
+  }
+  body {
+  	font: 71% "Lucida Grande","Lucida Sans",Verdana, Arial, sans-serif;
+  	color: #333;
+  	margin: 10px;
+  	padding: 0;
+  }
+  blockquote {
+  	margin: 1em 2em;
+  	color: #666;
+  }
+  blockquote p {
+  	line-height: 1.2;
+  }
+  caption {
+  	font-weight: bold;
+  	background: #ccc;
+  	padding: .5em;
+  }
+  dd {
+  	margin: 1em 2em;
+  }
+  dt {
+  	font-weight: bold;
+  }
+  hr {
+  	margin: 1em 6em;
+  }
+  /*
+  li {
+  	margin: 1em 0;
+  */
+  }
+  table {
+  	border: 1px solid #ccc;
+  }
+  td {
+  	vertical-align: top;
+  	padding: 0.5em;
+  }
+  th {
+  	text-align: left;
+  	padding: .5em;
+  }
+
+
+
+  /* Nested HTML elements
+  ----------------------------------------------- */
+  ol li {
+  	margin-left: 2em;
+  	list-style-type: decimal;	
+  }
+  ol, ul {
+  	margin: 1em 0;
+  	padding-left: 1.7em;
+  }
+  ul li {
+  	list-style-type: disc;
+  }
+
+
+
+  /* Custom font definitions for style
+  ----------------------------------------------- */
+  p {
+  	margin: 1em 0;
+  	line-height: 1.8em;
+  }
+  p.description {
+  	margin: .2em 0 1.5em;
+  	line-height: 1.5;
+  	color: #999;
+  }
+  h1 {
+  	font-family: "Palatino","Palatino Linotype", serif;
+  	font-size: 2.75em;
+  	font-weight: normal;
+  	letter-spacing: 3px;
+  	text-shadow: #999 2px 2px 2px;
+  	padding: 5px 35px;
+  }
+
+  h2 {
+  	margin: .9em 0 .5em;
+  	font-family: "Palatino","Palatino Linotype", serif;
+  	font-size: 1.8em;
+  	font-weight: normal;
+  	text-shadow: #999 2px 2px 2px;
+  }
+  h3 {
+  	font-family: "Palatino","Palatino Linotype", serif;
+  	font-size: 1.5em;
+  	font-weight: normal;
+  	margin-top: 1em;
+  }
+  h4 {
+  	font-size: 1.2em;
+  }
+  h5 {
+  	font-size: 1em;
+  }
+  h6 {
+  	font-size: 1em;
+  	font-weight: normal;
+  	color: #515151;
+  }
+
+
+
+  /* Header style
+  ----------------------------------------------- */
+  #header {
+  	text-align: center;
+  	padding: 90px 0 1px;
+  }
+
+
+  /* Content column tweaks
+  ----------------------------------------------- */
+  #main-content {
+  	margin-top: 1em;
+  }
+  #main-content .wrapper {
+  	padding: 0 2em;
+  }
+  .content-item {
+  	border-top: 1px dotted #878787;
+  }
+
+
+
+  /* Sidebar style
+  ----------------------------------------------- */
+  #sidebar .links {
+  	background: #F7F7F7; 
+  	position: relative;
+  }
+  #sidebar li a:link, #sidebar li a:visited {
+  	background: none;
+  	font-weight: normal;
+  	display: block;
+  	border-bottom: 1px solid #fff;
+  	padding: .5em 1em;
+  }
+  #sidebar li a:hover {
+  	background: #fff;
+  }
+  #sidebar h3, #sidebar-alternate h3 {
+  	margin: 1em 0;
+  	font-family: "Lucida Grande","Lucida Sans",Verdana, Arial, sans-serif;
+  	line-height: 1;
+  	font-size: 1em;
+  	padding: 6px 0;
+  	border-top: 1px dotted #878787;
+  	border-bottom: 1px dotted #878787;
+  	font-weight: normal;
+  }
+  #sidebar h4, #sidebar-alternate h4 {
+  	margin: 1em 0;
+  	font-family: "Lucida Grande","Lucida Sans",Verdana, Arial, sans-serif;
+  	line-height: 1;
+  	font-size: 1em;
+  	padding: 6px 0;
+  	color: #515151;
+  	border-top: 1px dotted #878787;
+  	border-bottom: 1px dotted #878787;
+  	font-weight: normal;
+  }
+  #sidebar h5, #sidebar-alternate h5 {
+  	margin: 1em 0;
+  	font-family: "Lucida Grande","Lucida Sans",Verdana, Arial, sans-serif;
+  	line-height: 1;
+  	font-size: .9em;
+  	padding: 6px 0;
+  	color: #515151;
+  	border-top: 1px dotted #878787;
+  	border-bottom: 1px dotted #878787;
+  	font-weight: normal;
+  }
+  #sidebar h6, #sidebar-alternate h6 {
+  	margin: 1em 0;
+  	font-family: "Lucida Grande","Lucida Sans",Verdana, Arial, sans-serif;
+  	line-height: 1;
+  	font-size: .8em;
+  	padding: 6px 0;
+  	color: #515151;
+  	border-top: 1px dotted #878787;
+  	border-bottom: 1px dotted #878787;
+  	font-weight: normal;
+  }
+  #adsense {
+  	margin: 30px 14px;
+  }
+
+
+
+  /* Footer style
+  ----------------------------------------------- */
+  #footer {
+  	margin-bottom: 10px;
+  }
+  #footer hr {
+  	display: none;
+  }
+  #footer .wrapper {
+  	padding: 5px 20px;
+  }
+
+
+
+  /* Tweaks for Three-column layout
+  ----------------------------------------------- */
+  #threecolumn #sidebar .links {
+  	background: #F7F7F7;
+  }
+  #sidebar-alternate .alternate-content .wrapper {
+  	padding: 1px 10px;
+  }
+  #sidebar-alternate blockquote {
+  	margin: 0;
+  }
+
+
+
+  /* Tweaks for Two-column Left layout
+  ----------------------------------------------- */
+
+
+  /* Tweaks for Two-column Right layout
+  ----------------------------------------------- */
+
+
+  /* Tweaks for Two-column Liquid layout
+  ----------------------------------------------- */
+
+
+  /* Tweaks for One-column Liquid layout
+  ----------------------------------------------- */
+  /*
+
+  	-- -- -- -- -- -- --
+  	STYLE: Solitude (cherry)
+  	-- -- -- -- -- -- --
+
+
+  /* Basic HTML style
+  ----------------------------------------------- */
+  a:link {
+  	color: #A90707;
+  	background: url(/-/includes/style/solitude/cherry/bg_link.gif); 
+  }
+  a:visited {
+  	background: url(/-/includes/style/solitude/cherry/bg_link.gif); 
+  }
+  body {
+  	background: #fff url(/-/includes/style/solitude/cherry/bg_top.gif) top center repeat-x;
+  }
+  th {
+  	background: url(/-/includes/style/solitude/cherry/bg_pattern.gif); 
+  }
+
+
+
+  /* Custom font definitions for cherry style
+  ----------------------------------------------- */
+  h1 {
+  	color: #A90707;
+  }
+  h2 {
+  	color: #A90707;
+  }
+  h3 {
+  	color: #A90707;
+  }
+
+
+
+  /* Header style
+  ----------------------------------------------- */
+  #header {
+  	background: url(/-/includes/style/solitude/cherry/bg_mast.gif) center center repeat-x;
+  }
+
+
+
+  /* Sidebar style
+  ----------------------------------------------- */
+  #sidebar h3, #sidebar-alternate h3 {
+  	color: #A90707;
+  }
+
+
+
+  /* Tweaks for Three-column layout
+  ----------------------------------------------- */
+  #sidebar-alternate .alternate-content {
+  	background: url(/-/includes/style/solitude/cherry/bg_pattern.gif); 
+  }
+
+
+  /** END CUSTOM SKIN **/
+  </style>
+
+  <!-- Hack to avoid flash of unstyled content in IE -->
+  <script> </script>
+</head><body id="onecolumn">
+  <div id="container">
+    <div class="wrapper">
+      <div id="header">
+        <div class="wrapper">
+          <h1 id="page-title"><div id="g_title">Trick Benchmark - Hotel Perla</div></h1>
+          <div style="clear: both;"></div>
+          <p class="description"></p><div id="g_description"><p>(c) Jakub Adámek, 2009 <br></p></div>
+          <div style="clear: both;"></div>
+        </div>
+      </div>
+      <!-- /editable --><!-- /wrapper --><!-- /header -->
+      <div id="main-content">
+        
+        <div class="wrapper">
+          <div class="content-item"><div id="g_body"><p style="text-align: center; clear: both;" class="separator"><a style="border: 0pt none ; background-color: transparent; clear: left; margin-bottom: 1em; float: left; margin-right: 1em;" href="perla.php" imageanchor="1">
+			  <img src="DubaiHotel.jpg" style="border: 0pt none ;" width="298" height="454"></a></p>
+				  <p><font size="2">Program pro stažení cen hotelových pokojů a zobrazení stažených výsledků v Excelu. 
+				  </font></p><p><font size="2">Klepněte na obrázek pro stažení a spuštění.&nbsp;</font>
+			  </p><p><font size="2">Pokud počítač nebude vědět, v jakém programu otevřít JNLP,  
+				  nemáte nainstalovanou Javu.&nbsp;</font></p>
+				  <p><font size="2">V tom případě stáhněte a nainstalujte <a href="http://www.java.com/en/download/windows_xpi.jsp?locale=en&amp;host=www.java.com:80">Java JRE</a></font><br></p></div></div>
+          <div style="clear: both;"></div>
+        </div>
+      </div>
+      <!-- /wrapper --><!-- /main-content -->
+      <div id="footer"><div class="wrapper">
+        <hr>
+        <p></p><div id="g_footer">&nbsp;</div>
+        <div style="clear: both;"></div>
+      </div></div>
+      <!-- /wrapper --><!-- /footer -->
+    </div>
+  </div>
+<!-- /wrapper --><!-- /container -->
+
+<div id="extraDiv1"><span></span></div><div id="extraDiv2"><span></span></div>
+<div id="extraDiv3"><span></span></div><div id="extraDiv4"><span></span></div>
+<div id="extraDiv5"><span></span></div><div id="extraDiv6"><span></span></div>
+
+</body></html>
