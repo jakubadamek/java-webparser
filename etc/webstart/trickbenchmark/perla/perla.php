@@ -4,10 +4,10 @@
   codebase="http://jakubadamek.me.cz/trickbenchmark/perla"
   href="perla.php">
   <information>
-    <title>Robot Emil</title>
+    <title>Trick Benchmark</title>
     <vendor>Jakub Adámek</vendor>
     <!--homepage href="docs/help.html"/-->
-    <description>Robot, který načte ceny hotelových pokojů v daném období</description>
+    <description>Benchmark cen hotelových pokojů</description>
     <!--description kind="short">A demo of the capabilities of the Swing Graphical User Interface.</description-->
     <icon href="robot.jpg"/>
     <icon kind="splash" href="robot.jpg"/>
@@ -18,7 +18,7 @@
   </security>
   <resources>
     <j2se version="1.5+" max-heap-size="512M"/>
-    <property name="customer" value="PERLA"/> 
+    <property name="customer" value="PERLA"/>
     <jar href="robotemil.jar"/>
     <jar href="lib/commons-codec-1.3.jar"/>
     <jar href="lib/commons-collections-3.2.jar"/>
@@ -39,4 +39,4 @@
     <jar href="lib/xml-apis-1.0.b2.jar"/>
   </resources>
   <application-desc main-class="com.jakubadamek.robotemil.App"/>
-</jnlp> 
+</jnlp>

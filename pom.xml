@@ -31,6 +31,16 @@
 	</repositories>
 	<dependencies>
 		<dependency>
+			<groupId>jdbc</groupId>
+			<artifactId>sqlite-werner</artifactId>
+			<version>1.6.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.gcware</groupId>
+			<artifactId>dll-loader</artifactId>
+			<version>1.2.1</version>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>3.8.1</version>
