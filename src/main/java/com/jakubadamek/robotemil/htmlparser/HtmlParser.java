@@ -11,7 +11,7 @@ import com.jakubadamek.robotemil.WorkUnit;
 
 /**
  * Ancestor to the parsing classes
- * 
+ *
  * @author Jakub
  */
 public abstract class HtmlParser {
@@ -22,12 +22,12 @@ public abstract class HtmlParser {
 	private int order;
 	private App app;
 	private WorkUnit workUnit;
-	
+
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param aWorkUnit
-	 * @param aApp 
+	 * @param aApp
 	 */
 	public void init(WorkUnit aWorkUnit, App aApp) {
 		this.date = aWorkUnit.date;
@@ -35,20 +35,20 @@ public abstract class HtmlParser {
 		this.prices = new Prices();
 		this.app = aApp;
 		this.order = 0;
-	}	
-	
+	}
+
 	/**
 	 * Runs the real job
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public abstract void run() throws Exception;
-	
+
 	private DateFormat dateFormat = DateFormat.getDateInstance();
-	
+
 	/**
 	 * Adds price to the inner structure
-	 * 
+	 *
 	 * @param aHotel
 	 * @param aDate
 	 * @param price
@@ -56,22 +56,15 @@ public abstract class HtmlParser {
 	protected void addPrice(String aHotel, Date aDate, String price) {
 		this.order ++;
 		String hotel = DiacriticsRemover.removeDiacritics(aHotel.replace("&amp;", "&"));
-		final String logRow = getClass().getSimpleName() + " " + this.order + " " + hotel + " " + price + " " 
+		final String logRow = getClass().getSimpleName() + " " + this.order + " " + hotel + " " + price + " "
 			+ this.dateFormat.format(aDate);
 		System.out.println(logRow);
-		if(this.app != null && ! this.app.shell.isDisposed()) {
-			this.app.shell.getDisplay().asyncExec(new Runnable() {
-				@SuppressWarnings("synthetic-access")
-				public void run() {
-					if(! HtmlParser.this.app.txtLog.isDisposed()) {
-						HtmlParser.this.app.txtLog.setText(logRow);
-					}
-				}
-			});
+		if(this.app != null) {
+			this.app.showLog(logRow);
 		}
 		this.prices.addPrice(hotel, aDate, price, this.order);
 	}
-	
+
 	/**
 	 * @return the stop
 	 */
