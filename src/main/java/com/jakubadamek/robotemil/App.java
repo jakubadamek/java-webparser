@@ -93,7 +93,7 @@ public class App
     	webStruct.excelName = "Booking";
     	webStruct.parserClass = BookingCom.class;
     	webStruct.iconName = "bookingcom.gif";
-    	webStructs.add(webStruct); // */
+    	webStructs.add(webStruct);
 
     	webStruct = new WebStruct();
     	webStruct.label = "lastminute.es";
@@ -109,7 +109,7 @@ public class App
     	webStruct.excelName = "Hrs";
     	webStruct.parserClass = HrsCom.class;
     	webStruct.iconName = "hrscom.gif";
-    	webStructs.add(webStruct);// */
+    	webStructs.add(webStruct);
 
    		return webStructs;
     }

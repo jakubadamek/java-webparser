@@ -103,7 +103,14 @@ public class ExportExcel {
 			this.redPriceFont.setColour(Colour.RED);
 		}
 
-		String filename = "robotemil.xls";
+		String filename;
+		switch(app.getCustomer()) {
+		case JALTA: filename = "robotemil"; break;
+		default: filename = "trick_benchmark"; break;
+		}
+		SimpleDateFormat format = new SimpleDateFormat("_yyyyMMdd_HHmm");
+		filename += format.format(new Date()) + ".xls";
+		System.out.println(filename);
 		WritableWorkbook workbook = Workbook.createWorkbook(new File(filename));
 		boolean retval = writeXlsPrices(workbook);
 		//serialize();

@@ -12,7 +12,7 @@
       </includes>
     </fileSet>
     <fileSet>
-      <directory>.</directory>
+      <directory>bin</directory>
       <outputDirectory>/</outputDirectory>
       <includes>
       	<include>**/*.txt</include>

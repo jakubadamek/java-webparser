@@ -69,8 +69,10 @@ class DownloadThread extends Thread {
 	            throw new RuntimeException(e);
 	        }
 	        try {
+	        	String columns =
+	        		"Web, Hotel, Today, DaysBefore, Date, Price, HotelOrder";
 		        PreparedStatement stat = connection.prepareStatement(
-		        	"CREATE TABLE IF NOT EXISTS Prices(Web, Hotel, Today, Date, Price, HotelOrder)");
+		        	"CREATE TABLE IF NOT EXISTS Prices(" + columns + ")");
 		        try {
 		        	stat.executeUpdate();
 		        } finally {
@@ -78,13 +80,14 @@ class DownloadThread extends Thread {
 		        }
 		        try {
 			        stat = connection.prepareStatement(
-			        	"INSERT INTO Prices(Web, Hotel, Today, Date, Price, HotelOrder) VALUES(?, ?, ?, ?, ?, ?)");
+			        	"INSERT INTO Prices(" + columns + ") VALUES(?, ?, ?, ?, ?, ?, ?)");
 			        for(String hotel : prices.data.keySet()) {
 			        	for(Date date : prices.data.get(hotel).keySet()) {
 			        		int icol = 1;
 			        		stat.setString(icol ++, web);
 			        		stat.setString(icol ++, hotel);
 			        		stat.setTimestamp(icol ++, new java.sql.Timestamp(new Date().getTime()));
+			        		stat.setInt(icol ++, (int) Math.round(((date.getTime() - new Date().getTime()) / (24.0*60*60*1000))));
 			        		stat.setDate(icol ++, new java.sql.Date(date.getTime()));
 			        		PriceAndOrder priceAndOrder = prices.data.get(hotel).get(date);
 			        		stat.setDouble(icol ++, priceAndOrder.price);
