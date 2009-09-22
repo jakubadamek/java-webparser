@@ -18,7 +18,6 @@
   </security>
   <resources>
     <j2se version="1.5+" max-heap-size="512M"/>
-    <jar href="lib/robotemil.jar"/>
     <jar href="lib/commons-codec-1.4.jar"/>
     <jar href="lib/commons-collections-3.2.1.jar"/>
     <jar href="lib/commons-httpclient-3.1.jar"/>
