@@ -75,10 +75,14 @@ public class App
     		/* Args: - count of days since today, when to start
     		 *       - count of days including the start date
     		 */
-    		app.startDate = new Date(new Date().getTime() + Long.valueOf(args[0]) * 24*60*60*1000);
-    		app.dayCount = Integer.valueOf(args[1]);
-        	app.startWork();
-        	app.workBody();
+    		if(new Scheduler().isScheduled("automatic " + args[0] + " " + args[1])) {
+	    		app.startDate = new Date(new Date().getTime() + Long.valueOf(args[0]) * 24*60*60*1000);
+	    		app.dayCount = Integer.valueOf(args[1]);
+	        	app.startWork();
+	        	app.workBody();
+    		} else {
+    			System.out.println(new Date() + " task is not scheduled now");
+    		}
     	} else {
     		throw new IllegalArgumentException("Error: " + args.length + " args: " + Arrays.toString(args));
     	}

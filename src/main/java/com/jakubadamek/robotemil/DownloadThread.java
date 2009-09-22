@@ -1,7 +1,6 @@
 package com.jakubadamek.robotemil;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -60,14 +59,7 @@ class DownloadThread extends Thread {
 
 	private void persistPrices(String web, Prices prices) throws SQLException {
 		synchronized(databaseLock) {
-			Connection connection;
-	        try {
-	            Class.forName("SQLite.JDBCDriver");
-	            connection = DriverManager.getConnection("jdbc:sqlite:/prices.sqlite", "", "");
-	            connection.setAutoCommit(false);
-	        } catch (Exception e) {
-	            throw new RuntimeException(e);
-	        }
+			Connection connection = Database.getConnection();
 	        try {
 	        	String columns =
 	        		"Web, Hotel, Today, DaysBefore, Date, Price, HotelOrder";
