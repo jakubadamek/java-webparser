@@ -83,8 +83,8 @@ public class HrsCom extends HtmlParser
 	    if(isStop()) return;
 
 	    fillTextField(page, "location", "Praha");
-	    fillTextField(page, "singleRooms", "0");
-	    fillTextField(page, "doubleRooms", "1");
+	    fillTextField(page, "singleRooms", "1");
+	    fillTextField(page, "doubleRooms", "0");
 	    fillTextField(page, "adults", "1");
 
 	    selectOption(page, "//select[@name='perimeter']", "32");
@@ -131,7 +131,7 @@ public class HrsCom extends HtmlParser
 	    page = (HtmlPage) page.getFrameByName("hotellist").getEnclosedPage();
 	    if(isStop()) return;
 	    String hotelXPath = "//td[@class='hn']/a[@class='pu']";
-	    //savePage(page);
+	    savePage(page);
 	    for(Object o : page.getByXPath(hotelXPath)) {
 		    if(isStop()) return;
 	    	HtmlAnchor a = (HtmlAnchor) o;
@@ -140,8 +140,8 @@ public class HrsCom extends HtmlParser
 		    	if(anchors.size() > 0) {
 			    	Object anchor = anchors.get(0);
 			    	String price1 = ((DomNode) anchor).getTextContent();
-			    	if(price1.contains("DP")) {
-				    	price1 = price1.substring(price1.indexOf("DP"));
+			    	if(price1.contains("JP")) {
+				    	price1 = price1.substring(price1.indexOf("JP"));
 				    	//System.out.println(price1);
 				    	String price = "";
 				    	for(int i=0; i < price1.length(); i ++) {

@@ -115,6 +115,7 @@ public class ExportExcel {
 		boolean retval = writeXlsPrices(workbook);
 		//serialize();
 		writeXlsHotelNames(workbook);
+		writeXlsSettings(workbook);
         workbook.write();
         workbook.close();
         Runtime.getRuntime().exec("cmd /c \"" + filename + "\"");
@@ -297,6 +298,21 @@ public class ExportExcel {
 			sheet.addCell(new jxl.write.Label(icol, 0, webStruct.label));
 			this.irow = 1;
 			for(String hotel : new TreeSet<String>(webStruct.prices.data.keySet())) {
+				sheet.addCell(new jxl.write.Label(icol, this.irow, hotel));
+				this.irow ++;
+			}
+			icol ++;
+		}
+	}
+
+	private void writeXlsSettings(WritableWorkbook workbook) throws RowsExceededException, WriteException {
+		WritableSheet sheet = workbook.createSheet("nastaveni", 3);
+		int icol = 0;
+		for(WebStruct webStruct : this.ourHotel.webStructs) {
+			sheet.setColumnView(icol, 40);
+			sheet.addCell(new jxl.write.Label(icol, 0, webStruct.label));
+			this.irow = 1;
+			for(String hotel : webStruct.hotelList) {
 				sheet.addCell(new jxl.write.Label(icol, this.irow, hotel));
 				this.irow ++;
 			}
