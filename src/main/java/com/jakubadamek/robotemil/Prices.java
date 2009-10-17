@@ -13,20 +13,20 @@ public class Prices implements Serializable {
 	private static final long serialVersionUID = 4924511073557468113L;
 	/** Data */
 	public Map<String, Map<Date, PriceAndOrder>> data = new HashMap<String, Map<Date, PriceAndOrder>>();
-	
+
 	/**
 	 * Adds a price
-	 * 
+	 *
 	 * @param hotel
 	 * @param date
 	 * @param price
-	 * @param order 
+	 * @param order
 	 */
 	public void addPrice(String hotel, Date date, String price, int order) {
 		addPrice(hotel, date, Double.valueOf(price), order);
 	}
 
-	private synchronized void addPrice(String hotel, Date date, Double price, int order) {
+	public synchronized void addPrice(String hotel, Date date, Double price, int order) {
 		if(! this.data.containsKey(hotel)) {
 			this.data.put(hotel, new HashMap<Date, PriceAndOrder>());
 		}
@@ -35,10 +35,10 @@ public class Prices implements Serializable {
 		priceAndOrder.order = order;
 		this.data.get(hotel).put(date, priceAndOrder);
 	}
-	
+
 	/**
 	 * Adds all prices
-	 * 
+	 *
 	 * @param prices
 	 */
 	public void addAll(Prices prices) {
@@ -49,5 +49,13 @@ public class Prices implements Serializable {
 				addPrice(hotel, date, priceAndOrder.price, priceAndOrder.order);
 			}
 		}
+	}
+
+	public long size() {
+		long retval = 0;
+		for(String hotel : data.keySet()) {
+			retval += data.get(hotel).size();
+		}
+		return retval;
 	}
 }

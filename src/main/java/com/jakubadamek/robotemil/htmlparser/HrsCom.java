@@ -131,7 +131,7 @@ public class HrsCom extends HtmlParser
 	    page = (HtmlPage) page.getFrameByName("hotellist").getEnclosedPage();
 	    if(isStop()) return;
 	    String hotelXPath = "//td[@class='hn']/a[@class='pu']";
-	    savePage(page);
+	    //savePage(page);
 	    for(Object o : page.getByXPath(hotelXPath)) {
 		    if(isStop()) return;
 	    	HtmlAnchor a = (HtmlAnchor) o;

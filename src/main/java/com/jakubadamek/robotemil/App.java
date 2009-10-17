@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -39,12 +40,15 @@ public class App
 	/** restart the same work unit when no response for as long */
 	static final int RESTART_AFTER_SECONDS = 30;
 	/** concurrent thread count */
-	static final int THREAD_COUNT = 4;
+	static int threadCount;
+	/** default for the GUI version */
+	private static final int GUI_THREAD_COUNT = 4;
 	//private static final boolean TEST = false;
 	private ResourceBundle bundle = ResourceBundle.getBundle("robotemil");
 	private final String CUSTOMER = System.getProperty("customer", Customer.JALTA.toString());
 	enum Customer { JALTA, PERLA };
 	private AppFrame appFrame;
+	private boolean useCache;
 
 	/**
 	 * List of all our hotels
@@ -67,26 +71,64 @@ public class App
 	 */
     public static void main( String[] args ) throws IOException
     {
-    	App app = new App();
     	if(args.length == 0) {
-    		app.appFrame = new AppFrame(app);
-        	app.startWork();
+	    	runWithGui();
     	} else if(args.length == 2) {
-    		/* Args: - count of days since today, when to start
-    		 *       - count of days including the start date
-    		 */
-    		if(new Scheduler().isScheduled("automatic " + args[0] + " " + args[1])) {
-	    		app.startDate = new Date(new Date().getTime() + Long.valueOf(args[0]) * 24*60*60*1000);
-	    		app.dayCount = Integer.valueOf(args[1]);
-	        	app.startWork();
-	        	app.workBody();
-    		} else {
-    			System.out.println(new Date() + " task is not scheduled now");
-    		}
+    		runWithoutGui(args);
+    	} else if(args.length == 3 && args[2].equals("runPeriodically")) {
+    		runPeriodically(args);
     	} else {
     		throw new IllegalArgumentException("Error: " + args.length + " args: " + Arrays.toString(args));
     	}
     }
+
+	private static void runWithGui() {
+		App app = new App();
+		app.appFrame = new AppFrame(app);
+		threadCount = GUI_THREAD_COUNT;
+		app.startWork();
+	}
+
+	private static void runWithoutGui(String[] args) {
+		/* Args: - count of days since today, when to start
+		 *       - count of days including the start date
+		 */
+		//if(new Scheduler().isScheduled("automatic " + args[0] + " " + args[1])) {
+	    	App app = new App();
+	    	threadCount = 1;
+			app.startDate = new Date(new Date().getTime() + Long.valueOf(args[0]) * 24*60*60*1000);
+			app.dayCount = Integer.valueOf(args[1]);
+			app.useCache = true;
+			app.startWork();
+			app.workBody();
+		/*} else {
+			System.out.println(new Date() + " task is not scheduled now");
+		}*/
+	}
+
+	private static void runPeriodically(String[] args) {
+		Date lastRun = new Date();
+		int waitMinutes = 10;
+		while(true) {
+			try {
+				runWithoutGui(args);
+				Calendar lastRunCalendar = Calendar.getInstance();
+				lastRunCalendar.setTime(lastRun);
+				Calendar nowCalendar = Calendar.getInstance();
+				nowCalendar.setTime(new Date());
+				if(lastRunCalendar.get(Calendar.DATE) == nowCalendar.get(Calendar.DATE)) {
+					waitMinutes *= 2;
+				} else {
+					waitMinutes = 10;
+				}
+				lastRun = new Date();
+				System.out.println("waitMinutes: " + waitMinutes);
+				Thread.sleep(waitMinutes * 60 * 1000);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
     private List<WebStruct> initWebStructs() {
     	List<WebStruct> webStructs = new ArrayList<WebStruct>();
@@ -188,7 +230,7 @@ public class App
 			}
 		} else {*/
 			List<DownloadThread> downloadThreads = new ArrayList<DownloadThread>();
-	        for(int i=0; i < THREAD_COUNT; i ++) {
+	        for(int i=0; i < threadCount; i ++) {
 	        	DownloadThread thread = new DownloadThread(this);
 	        	thread.start();
 	        	downloadThreads.add(thread);
@@ -284,10 +326,28 @@ public class App
 		return this.ourHotels.get(this.ourHotelIndex);
 	}
 
+	private DateFormat timeFormat = DateFormat.getTimeInstance();
+
 	public void showLog(String row) {
+		String logRow = timeFormat.format(new Date()) + " " + row;
+		System.out.println(logRow);
 		if(this.appFrame != null) {
-			this.appFrame.showLog(row);
+			this.appFrame.showLog(logRow);
 		}
+	}
+
+	/**
+	 * @return the useCache
+	 */
+	public boolean isUseCache() {
+		return useCache;
+	}
+
+	/**
+	 * @param useCache the useCache to set
+	 */
+	public void setUseCache(boolean useCache) {
+		this.useCache = useCache;
 	}
 
 	/**

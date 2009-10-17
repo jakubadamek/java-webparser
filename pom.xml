@@ -6,7 +6,7 @@
 	<groupId>com.jakubadamek.robotemil</groupId>
 	<artifactId>robotemil</artifactId>
 	<name>robotemil</name>
-	<version>1.9</version>
+	<version>1.10</version>
 	<url>http://maven.apache.org</url>
 		<dependencies>
 			 <dependency>

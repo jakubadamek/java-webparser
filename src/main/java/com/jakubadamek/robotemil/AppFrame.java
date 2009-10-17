@@ -51,10 +51,12 @@ public class AppFrame
 	private Spinner spinnerDays;
 	private Text txtDuration;
 	private Button btnRun;
+	private Button useCache;
 	private App app;
 	private Date start;
 	private boolean shellDisposed;
 	private int progress;
+	private boolean showDuration;
 
     public AppFrame(App app) {
 		this.app = app;
@@ -141,12 +143,25 @@ public class AppFrame
         this.btnRun.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
         // new row
+        Composite row4 = new Composite(cmp, SWT.NONE);
+        GridLayout row4Layout = new GridLayout();
+        row4Layout.numColumns = 2;
+        row4.setLayout(row4Layout);
+        Label useCacheLabel = new Label(row4, SWT.NONE);
+        useCacheLabel.setText(app.getBundleString("Pouzit cache"));
+        useCacheLabel.setFont(biggerFont);
+        this.useCache = new Button(row4, SWT.CHECK);
+        this.useCache.setFont(biggerFont);
+        this.useCache.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        this.useCache.setSelection(true);
+
+        // new row
         initTabFolder(cmp);
 
         // new row
         Composite rowLog = new Composite(cmp, SWT.NONE);
         GridLayout rowLogLayout = new GridLayout();
-        rowLogLayout.numColumns = 3;
+        rowLogLayout.numColumns = 2;
         rowLog.setLayout(rowLogLayout);
         rowLog.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false));
         this.txtDuration = new Text(rowLog, SWT.BORDER | SWT.READ_ONLY);
@@ -155,8 +170,15 @@ public class AppFrame
         this.progressBar.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
         //this.txtDuration.setFont(biggerFont);
 
-        this.txtLog = new Text(rowLog, SWT.BORDER | SWT.READ_ONLY);
-        this.txtLog.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        // new row
+        Composite rowLog2 = new Composite(cmp, SWT.NONE);
+        GridLayout rowLog2Layout = new GridLayout();
+        rowLog2.setLayout(rowLog2Layout);
+        rowLog2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        this.txtLog = new Text(rowLog2, SWT.BORDER | SWT.READ_ONLY | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
+        GridData txtLogGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+        txtLogGridData.heightHint = 60;
+        this.txtLog.setLayoutData(txtLogGridData);
 
         initListeners();
 
@@ -324,7 +346,9 @@ public class AppFrame
         	public void run() {
         		if(! AppFrame.this.progressBar.isDisposed()) {
         			progress(AppFrame.this.progress);
-        			AppFrame.this.shell.getDisplay().timerExec(1, this);
+        			if(showDuration) {
+        				AppFrame.this.shell.getDisplay().timerExec(1, this);
+        			}
         		}
         	}
 		};
@@ -336,12 +360,14 @@ public class AppFrame
 	        if(App.stop) {
 	        	return;
 	        }
+	        showDuration = true;
 	        final Calendar start = Calendar.getInstance();
 	        this.shell.getDisplay().syncExec(new Runnable() {
 	        	public void run() {
 	    	        start.set(dateTime.getYear(), dateTime.getMonth(), dateTime.getDay());
 	    	        app.startDate = start.getTime();
 	    	        app.dayCount = spinnerDays.getSelection();
+	    	        app.setUseCache(useCache.getSelection());
 	        	}
 	        });
 	        this.app.workBody();
@@ -349,21 +375,21 @@ public class AppFrame
 			this.shell.getDisplay().syncExec(new Runnable() {
 				@SuppressWarnings("synthetic-access")
 				public void run() {
-					boolean retval = false;
 			        while(true) {
 			    		try {
 			    			ExportExcel exportExcel = new ExportExcel(app.getOurHotel(), app);
-			    			retval = exportExcel.createXls();
+			    			exportExcel.createXls();
 			    			break;
 			    		} catch(Exception e) {
 			    			e.printStackTrace();
 			    			displayException(app.getBundleString("Doslo k chybe Excel"), e);
 			    		}
 			        }
-					if(retval) {
+			        showDuration = false;
+					/*if(retval) {
 						AppFrame.this.shell.dispose();
 						AppFrame.this.shellDisposed = true;
-					}
+					}*/
 				}
 			});
 		} finally {
@@ -393,7 +419,7 @@ public class AppFrame
 		if(! this.shell.isDisposed()) {
 			this.shell.getDisplay().asyncExec(new Runnable() {
 				public void run() {
-					txtLog.setText(row);
+					txtLog.append(row + "\n");
 				}
 			});
 		}

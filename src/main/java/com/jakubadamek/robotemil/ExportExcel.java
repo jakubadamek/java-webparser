@@ -108,7 +108,7 @@ public class ExportExcel {
 		case JALTA: filename = "robotemil"; break;
 		default: filename = "trick_benchmark"; break;
 		}
-		SimpleDateFormat format = new SimpleDateFormat("_yyyyMMdd_HHmm");
+		SimpleDateFormat format = new SimpleDateFormat("_yyyyMMdd_HHmmss");
 		filename += format.format(new Date()) + ".xls";
 		System.out.println(filename);
 		WritableWorkbook workbook = Workbook.createWorkbook(new File(filename));

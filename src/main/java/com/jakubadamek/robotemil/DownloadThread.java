@@ -2,6 +2,7 @@ package com.jakubadamek.robotemil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -34,22 +35,43 @@ class DownloadThread extends Thread {
 			if(this.workUnit != null) {
     			System.out.println("Starting thread for " + this.workUnit.web.parserClass.getSimpleName() + " " +
     					DateFormat.getDateInstance().format(this.workUnit.date));
-				try {
-					this.htmlParser = this.workUnit.web.parserClass.newInstance();
-	    			this.htmlParser.init(this.workUnit, this.app);
-	    			this.htmlParser.run();
-	    			if(! this.htmlParser.isStop()) {
-	    				this.app.progress ++;
-	    				this.workUnit.web.prices.addAll(this.htmlParser.getPrices());
-	    				persistPrices(this.workUnit.web.excelName, this.htmlParser.getPrices());
-	    				cleanWorkQueue();
-	    			} else {
+    			int readFromCache = 0;
+				if(this.app.isUseCache()) {
+					try {
+						readFromCache = readPrices(this.workUnit.web.excelName, this.workUnit.web.prices, this.workUnit.date);
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				DateFormat dateFormat = DateFormat.getDateInstance();
+				String workUnitDesc = this.workUnit.web.label + " " + dateFormat.format(this.workUnit.date);
+				if(readFromCache > 0) {
+					this.app.showLog("Cache " + workUnitDesc);
+    				cleanWorkQueue();
+				} else {
+					try {
+						Date start = new Date();
+						this.app.showLog("Start " + workUnitDesc);
+						this.htmlParser = this.workUnit.web.parserClass.newInstance();
+		    			this.htmlParser.init(this.workUnit, this.app);
+		    			this.htmlParser.run();
+		    			if(! this.htmlParser.isStop()) {
+		    				this.app.progress ++;
+		    				this.workUnit.web.prices.addAll(this.htmlParser.getPrices());
+		    				persistPrices(this.workUnit.web.excelName, this.htmlParser.getPrices(), this.workUnit.date);
+		    				cleanWorkQueue();
+		    			} else {
+		    				this.workUnit.lastResponseTime = null;
+		    			}
+						this.app.showLog("Hotovo " + workUnitDesc + ", " + this.htmlParser.getPrices().size()
+								+ " hotelu za " + (new Date().getTime() - start.getTime()) / 1000 + " s");
+					} catch (Exception e) {
+						e.printStackTrace();
 	    				this.workUnit.lastResponseTime = null;
-	    			}
-				} catch (Exception e) {
-					e.printStackTrace();
-    				this.workUnit.lastResponseTime = null;
-					//throw new RuntimeException(e);
+	    				this.app.showLog("Chyba " + workUnitDesc);
+						//throw new RuntimeException(e);
+					}
 				}
 			}
 		}
@@ -57,35 +79,60 @@ class DownloadThread extends Thread {
 
 	private static final Object databaseLock = new Object();
 
-	private void persistPrices(String web, Prices prices) throws SQLException {
+	private int readPrices(String web, Prices prices, Date date) throws SQLException {
+		synchronized(databaseLock) {
+			Connection connection = Database.getConnection();
+			int rows = 0;
+	        try {
+		        PreparedStatement stat = connection.prepareStatement(
+		        	"SELECT * FROM Prices WHERE Date=? AND Web=? AND DaysBefore=?");
+		        int icol = 1;
+		        stat.setDate(icol ++, new java.sql.Date(date.getTime()));
+		        stat.setString(icol ++, web);
+		        stat.setInt(icol ++, daysBefore(date, new Date()));
+		        ResultSet resultSet = stat.executeQuery();
+		        while(resultSet.next()) {
+		        	String hotel = resultSet.getString("Hotel");
+		        	Double price = resultSet.getDouble("Price");
+		        	int order = resultSet.getInt("HotelOrder");
+		        	prices.addPrice(hotel, date, price, order);
+		        	rows ++;
+		        }
+	        } finally {
+	        	connection.close();
+	        }
+	        return rows;
+		}
+	}
+
+   	private static final String PRICES_COLUMNS = "Web, Hotel, Today, DaysBefore, Date, Price, HotelOrder";
+
+	private void persistPrices(String web, Prices prices, Date date) throws SQLException {
 		synchronized(databaseLock) {
 			Connection connection = Database.getConnection();
 	        try {
-	        	String columns =
-	        		"Web, Hotel, Today, DaysBefore, Date, Price, HotelOrder";
 		        PreparedStatement stat = connection.prepareStatement(
-		        	"CREATE TABLE IF NOT EXISTS Prices(" + columns + ")");
+		        	"CREATE TABLE IF NOT EXISTS Prices(" + PRICES_COLUMNS + ")");
 		        try {
 		        	stat.executeUpdate();
 		        } finally {
 		        	stat.close();
 		        }
 		        try {
+					deleteRefreshedData(web, date, connection);
 			        stat = connection.prepareStatement(
-			        	"INSERT INTO Prices(" + columns + ") VALUES(?, ?, ?, ?, ?, ?, ?)");
+			        	"INSERT INTO Prices(" + PRICES_COLUMNS + ") VALUES(?, ?, ?, ?, ?, ?, ?)");
 			        for(String hotel : prices.data.keySet()) {
-			        	for(Date date : prices.data.get(hotel).keySet()) {
-			        		int icol = 1;
-			        		stat.setString(icol ++, web);
-			        		stat.setString(icol ++, hotel);
-			        		stat.setTimestamp(icol ++, new java.sql.Timestamp(new Date().getTime()));
-			        		stat.setInt(icol ++, (int) Math.round(((date.getTime() - new Date().getTime()) / (24.0*60*60*1000))));
-			        		stat.setDate(icol ++, new java.sql.Date(date.getTime()));
-			        		PriceAndOrder priceAndOrder = prices.data.get(hotel).get(date);
-			        		stat.setDouble(icol ++, priceAndOrder.price);
-			        		stat.setInt(icol ++, priceAndOrder.order);
-			        		stat.executeUpdate();
-			        	}
+		        		int icol = 1;
+		        		stat.setString(icol ++, web);
+		        		stat.setString(icol ++, hotel);
+		        		stat.setTimestamp(icol ++, new java.sql.Timestamp(new Date().getTime()));
+		        		stat.setInt(icol ++, daysBefore(date, new Date()));
+		        		stat.setDate(icol ++, new java.sql.Date(date.getTime()));
+		        		PriceAndOrder priceAndOrder = prices.data.get(hotel).get(date);
+		        		stat.setDouble(icol ++, priceAndOrder.price);
+		        		stat.setInt(icol ++, priceAndOrder.order);
+		        		stat.executeUpdate();
 			        }
 		        } finally {
 		        	stat.close();
@@ -95,6 +142,22 @@ class DownloadThread extends Thread {
 	        	connection.close();
 	        }
 		}
+	}
+
+	private void deleteRefreshedData(String web, Date date, Connection connection) throws SQLException {
+		PreparedStatement stat;
+		stat = connection.prepareStatement(
+			"DELETE FROM Prices WHERE Date=? AND Web=? AND DaysBefore=?");
+		int icol = 1;
+		stat.setDate(icol ++, new java.sql.Date(date.getTime()));
+		stat.setString(icol ++, web);
+		stat.setInt(icol ++, daysBefore(date, new Date()));
+		int deleted = stat.executeUpdate();
+		System.out.println("Deleted " + deleted + " rows");
+	}
+
+	private int daysBefore(Date date1, Date date2) {
+		return (int) Math.round((date1.getTime() - date2.getTime()) / (24.0*60*60*1000));
 	}
 
 	private void cleanWorkQueue() {

@@ -60,7 +60,7 @@ public abstract class HtmlParser {
 			+ this.dateFormat.format(aDate);
 		System.out.println(logRow);
 		if(this.app != null) {
-			this.app.showLog(logRow);
+			//this.app.showLog(logRow);
 		}
 		this.prices.addPrice(hotel, aDate, price, this.order);
 	}
