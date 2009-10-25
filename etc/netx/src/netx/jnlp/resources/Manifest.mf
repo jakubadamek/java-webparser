@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Created-By: jnlp.sourceforge.net
+Specification-Title: netx JNLP client
+Main-Class: netx.jnlp.runtime.Boot13
+
