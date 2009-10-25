@@ -1,0 +1,14 @@
+bin
+classes
+dll
+./java-service-wrapper
+./java-service-wrapper.jar
+./backup
+./dist
+./inputSubmit.html
+./lib
+./prices.sqlite
+./trick_*.xls
+./sqlite-werner-1.6.3.dll
+./target
+etc/netx/*.jar
