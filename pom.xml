@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.jakubadamek.robotemil</groupId>
-	<artifactId>robotemil</artifactId>
+	<artifactId>trickbenchmark</artifactId>
 	<name>robotemil</name>
 	<version>1.10</version>
 	<url>http://maven.apache.org</url>
@@ -181,7 +181,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
-					<finalName>robotemil</finalName>
+					<finalName>trickbenchmark</finalName>
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
@@ -189,20 +189,14 @@
 						</manifest>
 						<manifestSections>
 							<manifestSection>
-								<name>com.jakubadamek.robotemil.robotemil</name>
+								<name>com.jakubadamek.robotemil</name>
 								<manifestEntries>
-									<Specification-Title> Robot
-										Emil</Specification-Title>
-									<Specification-Vendor>Jakub
-										Adamek</Specification-Vendor>
-									<Specification-Version>
-										${pom.version}</Specification-Version>
-									<Implementation-Version>
-										${pom.version}</Implementation-Version>
-									<Implementation-Build>
-										${buildNumber}</Implementation-Build>
-									<Main-Class>
-										com.jakubadamek.robotemil.App</Main-Class>
+									<Specification-Title>Trick Benchmark</Specification-Title>
+									<Specification-Vendor>Jakub Adamek</Specification-Vendor>
+									<Specification-Version>${pom.version}</Specification-Version>
+									<Implementation-Version>${pom.version}</Implementation-Version>
+									<Implementation-Build>${buildNumber}</Implementation-Build>
+									<Main-Class>com.jakubadamek.robotemil.App</Main-Class>
 								</manifestEntries>
 							</manifestSection>
 						</manifestSections>

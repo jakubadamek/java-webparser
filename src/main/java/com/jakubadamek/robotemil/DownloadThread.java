@@ -47,7 +47,10 @@ class DownloadThread extends Thread {
 				DateFormat dateFormat = DateFormat.getDateInstance();
 				String workUnitDesc = this.workUnit.web.label + " " + dateFormat.format(this.workUnit.date);
 				if(readFromCache > 0) {
-					this.app.showLog("Cache " + workUnitDesc);
+					this.app.progress ++;
+					if(isInWorkQueue()) {
+						this.app.showLog("Cache " + workUnitDesc + ": " + readFromCache + " " + this.app.getBundleString("data nalezena v cache"));
+					}
     				cleanWorkQueue();
 				} else {
 					try {
@@ -60,12 +63,15 @@ class DownloadThread extends Thread {
 		    				this.app.progress ++;
 		    				this.workUnit.web.prices.addAll(this.htmlParser.getPrices());
 		    				persistPrices(this.workUnit.web.excelName, this.htmlParser.getPrices(), this.workUnit.date);
+		    				if(isInWorkQueue()) {
+								this.app.showLog("Hotovo " + workUnitDesc + ": " + this.htmlParser.getPrices().size()
+										+ " hotelu za " + (new Date().getTime() - start.getTime()) / 1000 + " s");
+		    				}
 		    				cleanWorkQueue();
 		    			} else {
+							this.app.showLog("Vyprsel casovy limit " + workUnitDesc + ": " + (new Date().getTime() - start.getTime()) / 1000 + " s bez odezvy");
 		    				this.workUnit.lastResponseTime = null;
 		    			}
-						this.app.showLog("Hotovo " + workUnitDesc + ", " + this.htmlParser.getPrices().size()
-								+ " hotelu za " + (new Date().getTime() - start.getTime()) / 1000 + " s");
 					} catch (Exception e) {
 						e.printStackTrace();
 	    				this.workUnit.lastResponseTime = null;
@@ -82,6 +88,7 @@ class DownloadThread extends Thread {
 	private int readPrices(String web, Prices prices, Date date) throws SQLException {
 		synchronized(databaseLock) {
 			Connection connection = Database.getConnection();
+			createTablePrices(connection);
 			int rows = 0;
 	        try {
 		        PreparedStatement stat = connection.prepareStatement(
@@ -107,21 +114,25 @@ class DownloadThread extends Thread {
 
    	private static final String PRICES_COLUMNS = "Web, Hotel, Today, DaysBefore, Date, Price, HotelOrder";
 
+   	private void createTablePrices(Connection connection) throws SQLException {
+        PreparedStatement stat = connection.prepareStatement(
+        	"CREATE TABLE IF NOT EXISTS Prices(" + PRICES_COLUMNS + ")");
+        try {
+        	stat.executeUpdate();
+        } finally {
+        	stat.close();
+        }
+   	}
+
 	private void persistPrices(String web, Prices prices, Date date) throws SQLException {
 		synchronized(databaseLock) {
 			Connection connection = Database.getConnection();
 	        try {
-		        PreparedStatement stat = connection.prepareStatement(
-		        	"CREATE TABLE IF NOT EXISTS Prices(" + PRICES_COLUMNS + ")");
+	        	createTablePrices(connection);
+				deleteRefreshedData(web, date, connection);
+				PreparedStatement stat = connection.prepareStatement(
+		        	"INSERT INTO Prices(" + PRICES_COLUMNS + ") VALUES(?, ?, ?, ?, ?, ?, ?)");
 		        try {
-		        	stat.executeUpdate();
-		        } finally {
-		        	stat.close();
-		        }
-		        try {
-					deleteRefreshedData(web, date, connection);
-			        stat = connection.prepareStatement(
-			        	"INSERT INTO Prices(" + PRICES_COLUMNS + ") VALUES(?, ?, ?, ?, ?, ?, ?)");
 			        for(String hotel : prices.data.keySet()) {
 		        		int icol = 1;
 		        		stat.setString(icol ++, web);
@@ -160,6 +171,12 @@ class DownloadThread extends Thread {
 		return (int) Math.round((date1.getTime() - date2.getTime()) / (24.0*60*60*1000));
 	}
 
+	private boolean isInWorkQueue() {
+		synchronized(this.app.workQueue) {
+			return this.app.workQueue.contains(this.workUnit);
+		}
+	}
+
 	private void cleanWorkQueue() {
 		synchronized(this.app.workQueue) {
 			List<WorkUnit> delete = new ArrayList<WorkUnit>();
@@ -167,6 +184,7 @@ class DownloadThread extends Thread {
 			for(WorkUnit iWorkUnit : this.app.workQueue) {
 				if(iWorkUnit.miniEquals(this.workUnit)) {
 					delete.add(iWorkUnit);
+					this.app.progress ++;
 				}
 			}
 			this.app.workQueue.removeAll(delete);

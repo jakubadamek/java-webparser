@@ -14,31 +14,31 @@
   	-- -- -- -- -- -- --
   	Browser Fixes
   	-- -- -- -- -- -- --
-  	
+
   	This file uses CSS filtering methods to fix various
   	layout bugs.
 
-  	Each of the following three imported files is a 
-  	separate, browser-specific CSS file that keeps all 
+  	Each of the following three imported files is a
+  	separate, browser-specific CSS file that keeps all
   	hacks out of the main style sheet.
-  	
+
   	Over time, as supporting these browsers no longer
   	remains a priority, cleaning up the hacks is as
   	easy as deleting the @import statement below, or
   	simply no longer linking this file from the HTML.
-  	
+
   */
 
-  /* 
-    fix ie6 "peekaboo bug" using the "holly hack". 
+  /*
+    fix ie6 "peekaboo bug" using the "holly hack".
     Note, this style only gets applied to ie6
   */
   * html .wrapper {
     height: 0.1%;
   }
 
-  /* 
-   * IE5 mac - overrides the IE/Win hack 
+  /*
+   * IE5 mac - overrides the IE/Win hack
    */
 
   /*\*//*/
@@ -50,7 +50,7 @@
   /**/
 
 
-  /* 
+  /*
    * IE5/Win-specific CSS -ensures #container wraps all content on window resize
    */
 
@@ -61,16 +61,16 @@
   .editable {
     border: 1px dashed blue;
   }
-  
+
   #footer {
     clear: both;
   }
-  
+
   /* Extra divs hidden by default. The custom CSS can override this though */
   #extraDiv1, #extraDiv2, #extraDiv3, #extraDiv4, #extraDiv5, #extraDiv6 {
     display: none;
   }
-  
+
   a img,:link img,:visited img {border: none;}
 
 
@@ -88,10 +88,10 @@
   	-- -- -- -- -- -- --
   	Base CSS
   	-- -- -- -- -- -- --
-  	
-  	This file simply removes default styling on most HTML elements in 
+
+  	This file simply removes default styling on most HTML elements in
   	order to reduce the need to later override them.
-  	
+
   */
 
   h1,h2,h3,h4,h5,h6,pre,code,p {font-size: 1em;}
@@ -102,12 +102,12 @@
   	-- -- -- -- -- -- --
   	Type Scheme: Deco
   	-- -- -- -- -- -- --
-  	
+
   */
 
   body {
   	font: 76% Verdana, sans-serif;
-  }	
+  }
 
   h1, h2, h3, h4, h5, h6, p.description {
   	font-family: "Trebuchet MS", Trebuchet, sans-serif;
@@ -165,13 +165,13 @@
   a:link {
   	font-weight: bold;
   	margin: -1px -2px -2px;
-  	padding: 1px 2px 2px; 
+  	padding: 1px 2px 2px;
   }
   a:visited {
   	color: #666;
   	font-weight: bold;
   	margin: -1px -2px -2px;
-  	padding: 1px 2px 2px; 
+  	padding: 1px 2px 2px;
   }
   a:hover, a:active {
   	color: #333;
@@ -227,7 +227,7 @@
   ----------------------------------------------- */
   ol li {
   	margin-left: 2em;
-  	list-style-type: decimal;	
+  	list-style-type: decimal;
   }
   ol, ul {
   	margin: 1em 0;
@@ -311,7 +311,7 @@
   /* Sidebar style
   ----------------------------------------------- */
   #sidebar .links {
-  	background: #F7F7F7; 
+  	background: #F7F7F7;
   	position: relative;
   }
   #sidebar li a:link, #sidebar li a:visited {
@@ -426,16 +426,16 @@
   ----------------------------------------------- */
   a:link {
   	color: #A90707;
-  	background: url(/-/includes/style/solitude/cherry/bg_link.gif); 
+  	background: url(/-/includes/style/solitude/cherry/bg_link.gif);
   }
   a:visited {
-  	background: url(/-/includes/style/solitude/cherry/bg_link.gif); 
+  	background: url(/-/includes/style/solitude/cherry/bg_link.gif);
   }
   body {
   	background: #fff url(/-/includes/style/solitude/cherry/bg_top.gif) top center repeat-x;
   }
   th {
-  	background: url(/-/includes/style/solitude/cherry/bg_pattern.gif); 
+  	background: url(/-/includes/style/solitude/cherry/bg_pattern.gif);
   }
 
 
@@ -473,7 +473,7 @@
   /* Tweaks for Three-column layout
   ----------------------------------------------- */
   #sidebar-alternate .alternate-content {
-  	background: url(/-/includes/style/solitude/cherry/bg_pattern.gif); 
+  	background: url(/-/includes/style/solitude/cherry/bg_pattern.gif);
   }
 
 
@@ -495,13 +495,13 @@
       </div>
       <!-- /editable --><!-- /wrapper --><!-- /header -->
       <div id="main-content">
-        
+
         <div class="wrapper">
           <div class="content-item"><div id="g_body"><p style="text-align: center; clear: both;" class="separator"><a style="border: 0pt none ; background-color: transparent; clear: left; margin-bottom: 1em; float: left; margin-right: 1em;" href="perla.php" imageanchor="1">
 			  <img src="DubaiHotel.jpg" style="border: 0pt none ;" width="298" height="454"></a></p>
-				  <p><font size="2">Program pro stažení cen hotelových pokojů a zobrazení stažených výsledků v Excelu. 
+				  <p><font size="2">Program pro stažení cen hotelových pokojů a zobrazení stažených výsledků v Excelu.
 				  </font></p><p><font size="2">Klepněte na obrázek pro stažení a spuštění.&nbsp;</font>
-			  </p><p><font size="2">Pokud počítač nebude vědět, v jakém programu otevřít JNLP,  
+			  </p><p><font size="2">Pokud počítač nebude vědět, v jakém programu otevřít JNLP,
 				  nemáte nainstalovanou Javu.&nbsp;</font></p>
 				  <p><font size="2">V tom případě stáhněte a nainstalujte <a href="http://www.java.com/en/download/windows_xpi.jsp?locale=en&amp;host=www.java.com:80">Java JRE</a></font><br></p></div></div>
           <div style="clear: both;"></div>

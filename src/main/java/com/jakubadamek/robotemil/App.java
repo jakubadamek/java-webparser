@@ -23,22 +23,13 @@ import com.jakubadamek.robotemil.htmlparser.HrsCom;
 import com.jakubadamek.robotemil.htmlparser.LastminuteEs;
 
 /**
- * TODO: seznam hotelu se aktualizuje az pri pristim spusteni
- *
- * hrs.com parseCSS 35 s
- *         getByXPath 26 s
- *         HTML parse 24 s
- *              loadExternalJavaScriptFile 10 s
- *         setSelectedAttrib 69 s
- * booking.com extractAllNodesThatMatch 189 s
- *                 Lexer.nextNode       151 s
- * lastminute.es extractAllNodesThatMatch 82 s
- *
  */
 public class App
 {
+	private static final String DEFAULT_CACHE_LENGTH = "0";
+	private static final String CACHE_LENGTH = "cacheLength";
 	/** restart the same work unit when no response for as long */
-	static final int RESTART_AFTER_SECONDS = 30;
+	static final int RESTART_AFTER_SECONDS = 60;
 	/** concurrent thread count */
 	static int threadCount;
 	/** default for the GUI version */
@@ -46,7 +37,7 @@ public class App
 	//private static final boolean TEST = false;
 	private ResourceBundle bundle = ResourceBundle.getBundle("robotemil");
 	private final String CUSTOMER = System.getProperty("customer", Customer.JALTA.toString());
-	enum Customer { JALTA, PERLA };
+	enum Customer { JALTA, PERLA }
 	private AppFrame appFrame;
 	private boolean useCache;
 
@@ -73,13 +64,17 @@ public class App
     {
     	if(args.length == 0) {
 	    	runWithGui();
+    	} else if(args.length == 1 && args[0].equals("runPeriodically")) {
+    		runPeriodically();
     	} else if(args.length == 2) {
     		runWithoutGui(args);
-    	} else if(args.length == 3 && args[2].equals("runPeriodically")) {
-    		runPeriodically(args);
     	} else {
     		throw new IllegalArgumentException("Error: " + args.length + " args: " + Arrays.toString(args));
     	}
+    }
+
+    private App() {
+    	JavaServiceWrapper.setApp(this);
     }
 
 	private static void runWithGui() {
@@ -89,7 +84,7 @@ public class App
 		app.startWork();
 	}
 
-	private static void runWithoutGui(String[] args) {
+	private static void runWithoutGui(String ... args) {
 		/* Args: - count of days since today, when to start
 		 *       - count of days including the start date
 		 */
@@ -99,6 +94,7 @@ public class App
 			app.startDate = new Date(new Date().getTime() + Long.valueOf(args[0]) * 24*60*60*1000);
 			app.dayCount = Integer.valueOf(args[1]);
 			app.useCache = true;
+			System.out.println("startDate " + args[0] + " dayCount " + app.dayCount);
 			app.startWork();
 			app.workBody();
 		/*} else {
@@ -106,12 +102,12 @@ public class App
 		}*/
 	}
 
-	private static void runPeriodically(String[] args) {
+	private static void runPeriodically() {
 		Date lastRun = new Date();
-		int waitMinutes = 10;
+		int waitMinutes = 5;
 		while(true) {
 			try {
-				runWithoutGui(args);
+				runWithoutGui("0", "" + getCacheLength());
 				Calendar lastRunCalendar = Calendar.getInstance();
 				lastRunCalendar.setTime(lastRun);
 				Calendar nowCalendar = Calendar.getInstance();
@@ -350,6 +346,19 @@ public class App
 		this.useCache = useCache;
 	}
 
+	public void setCacheLength(int cacheLength) {
+		Database.storeSetting(CACHE_LENGTH, "" + cacheLength);
+		if(cacheLength == 0) {
+			JavaServiceWrapper.stop();
+		} else {
+			JavaServiceWrapper.start();
+		}
+	}
+
+	public static int getCacheLength() {
+		return Integer.valueOf(Database.readSetting(CACHE_LENGTH, DEFAULT_CACHE_LENGTH));
+	}
+
 	/**
 	private void serialize() throws FileNotFoundException, IOException {
 		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("webStructs.ser"));
@@ -364,4 +373,13 @@ public class App
 		in.close();
 	}
 	*/
+
+	public static File netxDir() {
+		File retval = new File(System.getenv("ALLUSERSPROFILE"),
+				"netx\\cache\\http\\jakubadamek.me.cz\\trickbenchmark");
+		if(! retval.exists()) {
+			retval.mkdirs();
+		}
+		return retval;
+	}
 }

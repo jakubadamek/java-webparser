@@ -132,7 +132,6 @@ public class ExportExcel {
         //sheet.addCell(new jxl.write.Label(0, this.irow, "Www", new WritableCellFormat(font)));
         int icol = 1;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd. M. EEEE");
-        OurHotel ourHotel = this.ourHotel;
         // column widths
         for(icol = 1; icol < 1 + this.app.getDates().size() * ourHotel.webStructs.size() * 2; icol += 2) {
         	sheet.setColumnView(icol, 6);
@@ -158,10 +157,15 @@ public class ExportExcel {
         }
         // hotel names
         for(int ihotel = 0; ihotel <= this.lastHotel; ihotel ++) {
-        	WebStruct webStruct = ourHotel.webStructs.get(0);
-    		String hotelName = webStruct.hasHotel(ihotel) ? webStruct.hotelTexts.get(ihotel).getText() : "";
-        	sheet.addCell(new jxl.write.Label(0, this.irow + ihotel, hotelName,
-        			getCellFormat(null, ihotel, 0, this.irow + ihotel, null)));
+        	String hotelName = "";
+        	for(WebStruct webStruct : ourHotel.webStructs) {
+        		if(webStruct.hasHotel(ihotel)) {
+            		hotelName = webStruct.hotelTexts.get(ihotel).getText();
+            		break;
+        		}
+        	}
+    		sheet.addCell(new jxl.write.Label(0, this.irow + ihotel, hotelName,
+    				getCellFormat(null, ihotel, 0, this.irow + ihotel, null)));
         }
         icol = 1;
         // order and price
@@ -222,7 +226,6 @@ public class ExportExcel {
 	 * @throws WriteException
 	 */
 	private void splitDates(WritableSheet sheet) throws RowsExceededException, WriteException {
-		OurHotel ourHotel = this.ourHotel;
 		int moveWidth = ourHotel.webStructs.size() * 2 * DAYS_PER_ROW;
 		WritableCellFormat cellFormat = new WritableCellFormat();
 		cellFormat.setBorder(Border.TOP, BorderLineStyle.MEDIUM);

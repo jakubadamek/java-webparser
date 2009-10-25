@@ -37,26 +37,28 @@ import org.eclipse.swt.widgets.Text;
 public class AppFrame
 {
 	private static final int MIN_HOTEL_ROWS = 15;
+	private static final int ADDITIONAL_ROWS = 10;
 	/** shell */
 	public Shell shell;
 	/** progress bar */
 	ProgressBar progressBar;
-	private Font searchFont;
+	Font searchFont;
     /** text box showing log */
 	public Text txtLog;
 	/** tab folder (our hotels) */
 	TabFolder tabFolder;
-	private Font biggerFont;
-	private DateTime dateTime;
-	private Spinner spinnerDays;
+	Font biggerFont;
+	DateTime dateTime;
+	Spinner spinnerDays;
 	private Text txtDuration;
 	private Button btnRun;
-	private Button useCache;
-	private App app;
+	Button useCache;
+	App app;
 	private Date start;
 	private boolean shellDisposed;
-	private int progress;
-	private boolean showDuration;
+	boolean showDuration;
+	Text txtCacheLength;
+	private Button btnCacheLength;
 
     public AppFrame(App app) {
 		this.app = app;
@@ -90,8 +92,8 @@ public class AppFrame
         }
     }
 
-    private void initWidgets(Shell shell) {
-    	this.shell = shell;
+    private void initWidgets(Shell aShell) {
+    	this.shell = aShell;
     	this.shell.setLayout(new GridLayout());
         Composite cmp = new Composite(this.shell, SWT.NONE);
         GridLayout cmpLayout = new GridLayout();
@@ -156,6 +158,28 @@ public class AppFrame
         this.useCache.setSelection(true);
 
         // new row
+        Composite row5 = new Composite(cmp, SWT.NONE);
+        GridLayout row5Layout = new GridLayout();
+        row5Layout.numColumns = 4;
+        row5.setLayout(row5Layout);
+        Label cacheLengthLabel = new Label(row5, SWT.NONE);
+        cacheLengthLabel.setText(app.getBundleString("Vytvaret cache"));
+        cacheLengthLabel.setFont(biggerFont);
+        this.txtCacheLength = new Text(row5, SWT.BORDER);
+        this.shell.getDisplay().asyncExec(new Runnable() {
+        	public void run() {
+        		txtCacheLength.setText("" + App.getCacheLength());
+        	}
+        });
+		this.txtCacheLength.setFont(biggerFont);
+        Label cacheLengthLabel2 = new Label(row5, SWT.NONE);
+        cacheLengthLabel2.setText(app.getBundleString("Vytvaret cache 2"));
+        cacheLengthLabel2.setFont(biggerFont);
+        this.btnCacheLength = new Button(row5, SWT.BORDER);
+        this.btnCacheLength.setText(app.getBundleString("Zmenit"));
+        this.btnCacheLength.setFont(biggerFont);
+
+        // new row
         initTabFolder(cmp);
 
         // new row
@@ -210,12 +234,38 @@ public class AppFrame
 	             searchFont.dispose();
 			}
         });
+
+        this.btnCacheLength.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				boolean ok = false;
+				try {
+					final Long cacheLength = Long.valueOf(txtCacheLength.getText());
+					if(cacheLength >= 0 && cacheLength < 100) {
+						Runnable runnable = new Runnable() {
+							public void run() {
+								app.setCacheLength(cacheLength.intValue());
+							}
+						};
+						new Thread(runnable).start();
+						ok = true;
+					}
+				} catch (Exception e) {
+					// do nothing
+				}
+				if(! ok) {
+					txtCacheLength.setText("" + App.getCacheLength());
+				}
+			}
+        });
 	}
 
 	private void initTabFolder(Composite cmp) {
 		if(app.ourHotels.size() > 1) {
 			this.tabFolder = new TabFolder(cmp, SWT.NONE);
-	        this.tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+			GridData tabFolderData = new GridData(SWT.FILL, SWT.TOP, true, false);
+			tabFolderData.heightHint = 250;
+	        this.tabFolder.setLayoutData(tabFolderData);
 	        this.tabFolder.addSelectionListener(new SelectionListener() {
 				public void widgetDefaultSelected(SelectionEvent arg0) {
 					app.ourHotelIndex = AppFrame.this.tabFolder.getSelectionIndex();
@@ -227,21 +277,23 @@ public class AppFrame
 	        this.tabFolder.setFont(biggerFont);
 		}
         for(OurHotel ourHotel : app.ourHotels) {
-        	Composite cmpWebs;
+        	ScrolledCompositeWrapper scrolled;
         	if(app.ourHotels.size() > 1) {
 	        	TabItem tabItem = new TabItem(this.tabFolder, SWT.NONE);
 	        	tabItem.setText(ourHotel.ourHotelName);
-		        cmpWebs = new Composite(this.tabFolder, SWT.NONE);
-		        tabItem.setControl(cmpWebs);
+	        	scrolled = new ScrolledCompositeWrapper(this.tabFolder);
+		        tabItem.setControl(scrolled.getParent());
         	} else {
-        		cmpWebs = new Composite(cmp, SWT.NONE);
+        		scrolled = new ScrolledCompositeWrapper(cmp);
         	}
+    		Composite cmpWebs = scrolled.getComposite();
 	        GridLayout glWebs = new GridLayout();
 	        glWebs.numColumns = ourHotel.webStructs.size() * 2;
 	        //glWebs.marginWidth = glWebs.marginHeight = 0;
 	        cmpWebs.setLayout(glWebs);
-	        GridData gdWebs = new GridData(SWT.FILL, SWT.TOP, true, false);
-	        cmpWebs.setLayoutData(gdWebs);
+	        GridData gdWebs = new GridData(SWT.LEFT, SWT.TOP, false, false);
+	        gdWebs.heightHint = 300;
+	        scrolled.getParent().setLayoutData(gdWebs);
 
 	        // row 2
 	        for(WebStruct webStruct : ourHotel.webStructs) {
@@ -251,7 +303,6 @@ public class AppFrame
 	        }
 
 	        KeyListener hotelsListener =  new KeyAdapter() {
-				@SuppressWarnings("synthetic-access")
 				@Override
 				public void keyReleased(KeyEvent arg0) {
 					app.saveHotels();
@@ -259,13 +310,19 @@ public class AppFrame
 	        };
 
 	        // row 3
-	        int nhotels = ourHotel.webStructs.get(0).hotelList.size() + 3;
+	        int nhotels = 0;
+	        for(WebStruct webStruct : ourHotel.webStructs) {
+	        	if(webStruct.hotelList.size() > nhotels) {
+	        		nhotels = webStruct.hotelList.size();
+	        	}
+	        }
 	        if(nhotels < MIN_HOTEL_ROWS) {
 	        	nhotels = MIN_HOTEL_ROWS;
 	        }
-	        for(int i=0; i < nhotels; i ++) {
+
+	        for(int i=0; i < nhotels + ADDITIONAL_ROWS; i ++) {
 	        	for(WebStruct webStruct : ourHotel.webStructs) {
-		        	Text text = new Text(cmpWebs, SWT.BORDER);
+		        	Text text = new Text(cmpWebs, SWT.NONE);
 		        	GridData gridData = new GridData(SWT.FILL, SWT.TOP, true, false);
 		        	gridData.horizontalSpan = 2;
 		        	text.setLayoutData(gridData);
@@ -276,16 +333,17 @@ public class AppFrame
 		        	webStruct.hotelTexts.add(text);
 	        	}
 	        }
+	        scrolled.setSize();
         }
 	}
 
     /** show the progress
      * @param finishedCount */
-    void progress(final int finishedCount) {
+    void progress() {
 		this.shell.getDisplay().syncExec(new Runnable() {
 			@SuppressWarnings("synthetic-access")
 			public void run() {
-				AppFrame.this.progressBar.setSelection(finishedCount + 1);
+				AppFrame.this.progressBar.setSelection(progressBar.getMaximum() - app.workQueue.size());
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(new Date(new Date().getTime() - AppFrame.this.start.getTime()));
 				final Formatter formatter = new Formatter(new StringBuilder(), Locale.getDefault());
@@ -298,7 +356,6 @@ public class AppFrame
     	// is the usage authorized?
     	boolean authorized = false;
 
-		@Override
 		public void run() {
 			authorized = true;
 	    	for(OurHotel ourHotel : app.ourHotels) {
@@ -317,7 +374,8 @@ public class AppFrame
 		}
     }
 
-    private boolean authorize() {
+    @SuppressWarnings("synthetic-access")
+	private boolean authorize() {
     	Authorizer authorizer = new Authorizer();
     	this.shell.getDisplay().syncExec(authorizer);
     	return authorizer.authorized;
@@ -332,7 +390,6 @@ public class AppFrame
 		this.shellDisposed = false;
         this.start = new Date();
         App.stop = false;
-        this.progress = 0;
 		this.shell.getDisplay().syncExec(new Runnable() {
 			public void run() {
 				AppFrame.this.progressBar.setMaximum(AppFrame.this.app.workQueue.size() + 1);
@@ -345,7 +402,7 @@ public class AppFrame
         Runnable runnableProgress = new Runnable() {
         	public void run() {
         		if(! AppFrame.this.progressBar.isDisposed()) {
-        			progress(AppFrame.this.progress);
+        			progress();
         			if(showDuration) {
         				AppFrame.this.shell.getDisplay().timerExec(1, this);
         			}
@@ -361,11 +418,11 @@ public class AppFrame
 	        	return;
 	        }
 	        showDuration = true;
-	        final Calendar start = Calendar.getInstance();
+	        final Calendar startCalendar = Calendar.getInstance();
 	        this.shell.getDisplay().syncExec(new Runnable() {
 	        	public void run() {
-	    	        start.set(dateTime.getYear(), dateTime.getMonth(), dateTime.getDay());
-	    	        app.startDate = start.getTime();
+	    	        startCalendar.set(dateTime.getYear(), dateTime.getMonth(), dateTime.getDay());
+	    	        app.startDate = startCalendar.getTime();
 	    	        app.dayCount = spinnerDays.getSelection();
 	    	        app.setUseCache(useCache.getSelection());
 	        	}
@@ -373,7 +430,6 @@ public class AppFrame
 	        this.app.workBody();
 	    	// dispose shell
 			this.shell.getDisplay().syncExec(new Runnable() {
-				@SuppressWarnings("synthetic-access")
 				public void run() {
 			        while(true) {
 			    		try {

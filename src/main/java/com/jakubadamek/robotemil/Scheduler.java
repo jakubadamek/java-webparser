@@ -23,7 +23,7 @@ public class Scheduler {
 		}
 	}
 
-	public static void main(String... args) throws SQLException {
+	public static void main(String... args) {
 		System.out.println(new Scheduler().isScheduled("test1"));
 		System.out.println(new Scheduler().isScheduled("test2"));
 		System.out.println(new Scheduler().isScheduled("test1"));
@@ -57,12 +57,11 @@ public class Scheduler {
 	        		Timestamp nextRun = resultSet.getTimestamp("NextRun");
 	        		if(nextRun.after(new java.util.Date())) {
 	        			return false;
-	        		} else {
-	        			stat = connection.prepareStatement(
-	        				"DELETE FROM Scheduler WHERE Task=?");
-	        			stat.setString(1, task);
-	        	        executeUpdate(stat);
 	        		}
+        			stat = connection.prepareStatement(
+        				"DELETE FROM Scheduler WHERE Task=?");
+        			stat.setString(1, task);
+        	        executeUpdate(stat);
 	        	}
 	        } finally {
 	        	resultSet.close();

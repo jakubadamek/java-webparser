@@ -6,16 +6,17 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
+import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSelect;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
-import com.gargoylesoftware.htmlunit.html.HtmlTextInput;
 import com.jakubadamek.robotemil.WorkUnit;
 
 /**
@@ -60,7 +61,7 @@ public class HrsCom extends HtmlParser
 	private void fillTextField(HtmlPage page, String fieldName, String value) {
 		System.out.println("Setting " + fieldName + " to " + value);
 	    String xPath = "//input[@name='" + fieldName + "']";
-	    HtmlTextInput input = (HtmlTextInput) page.getByXPath(xPath).get(0);
+	    HtmlInput input = (HtmlInput) page.getByXPath(xPath).get(0);
 	    input.setValueAttribute(value);
 		System.out.println("Finished setting " + fieldName + " to " + value);
 	}
@@ -68,6 +69,7 @@ public class HrsCom extends HtmlParser
 	@SuppressWarnings("unused")
 	private void savePage(HtmlPage page) throws IOException {
 	    File htmlFile = new File("backup.html");
+		System.out.println("Saving html page to " + htmlFile.getCanonicalPath());
 	    if(htmlFile.exists()) {
 	    	htmlFile.delete();
 	    }
@@ -76,22 +78,23 @@ public class HrsCom extends HtmlParser
 
 	@Override
 	public void run() throws FailingHttpStatusCodeException, IOException {
-		WebClient webClient = new WebClient(BrowserVersion.FIREFOX_2);
+		WebClient webClient = new WebClient(BrowserVersion.FIREFOX_3);
 	    URL url = new URL("http://www.hrs.com");
 	    //final URL url = new URL("file:///D:/jakub/Kravinky/robotemil/search.do.htm");
 	    HtmlPage page = (HtmlPage)webClient.getPage(url);
 	    if(isStop()) return;
+	    selectOption(page, "//select[@name='localeString']", "cs");
 
 	    fillTextField(page, "location", "Praha");
 	    fillTextField(page, "singleRooms", "1");
 	    fillTextField(page, "doubleRooms", "0");
 	    fillTextField(page, "adults", "1");
-
+	    // Toto se stane pri vyberu "Praha (Hlavni mesto)" z kontextove napovedy:
+	    fillTextField(page, "suggestedID", "%49370");
 	    selectOption(page, "//select[@name='perimeter']", "32");
-	    selectOption(page, "//select[@name='localeString']", "cs");
 	    Calendar calendar = Calendar.getInstance();
 	    calendar.setTime(this.date);
-	    DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
+	    DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.GERMAN);
 	    fillTextField(page, "stayPeriod.start.date", dateFormat.format(calendar.getTime()));
 	    System.out.println(dateFormat.format(calendar.getTime()));
 	    calendar.add(Calendar.DATE, 1);
@@ -101,9 +104,17 @@ public class HrsCom extends HtmlParser
 	    System.out.println("Clicking on " + inputSubmit);
 	    page = (HtmlPage) inputSubmit.click();
 	    if(isStop()) return;
+	    /*savePage(page);
+	    try {
+			Thread.sleep(100000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
 
-	    boolean prahaFound = false;
+	    /*boolean prahaFound = false;
 	    String prahaXPath = "//a";
+	    String anchorTexts = "";
 	    for(Object o : page.getByXPath(prahaXPath)) {
 		    if(isStop()) return	;
 	    	HtmlAnchor a = (HtmlAnchor) o;
@@ -113,10 +124,11 @@ public class HrsCom extends HtmlParser
     	    	page = (HtmlPage) a.click();
 	    		prahaFound = true;
 	    	}
+	    	anchorTexts += a.getTextContent() + " ";
 	    }
 	    if(! prahaFound) {
-	    	throw new RuntimeException("Praha not found");
-	    }
+	    	throw new RuntimeException("Praha not found in " + anchorTexts);
+	    }*/
 
 	    System.out.println("Downloading hotellist. Frames on this page: " + page.getFrames());
 	    if(isStop())
