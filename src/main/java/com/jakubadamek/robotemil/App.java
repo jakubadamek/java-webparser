@@ -14,6 +14,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.eclipse.swt.widgets.Text;
@@ -128,7 +129,7 @@ public class App
 
     private List<WebStruct> initWebStructs() {
     	List<WebStruct> webStructs = new ArrayList<WebStruct>();
-
+// /*
     	WebStruct webStruct = new WebStruct();
     	webStruct.label = "booking.com";
     	webStruct.fileName = "booking_com_1.1.txt";
@@ -144,7 +145,7 @@ public class App
     	webStruct.parserClass = LastminuteEs.class;
     	webStruct.iconName = "lastminutees.gif";
     	webStructs.add(webStruct);
-
+// */
     	webStruct = new WebStruct();
     	webStruct.label = "hrs.com";
     	webStruct.fileName = "hrs_com_1.1.txt";

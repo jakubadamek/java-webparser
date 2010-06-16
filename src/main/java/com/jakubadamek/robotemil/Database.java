@@ -1,5 +1,6 @@
 package com.jakubadamek.robotemil;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -21,18 +22,25 @@ public class Database {
 		}
 	}
 
+	private static String filename() {
+		return App.netxDir().getPath().replace("\\","/") + "/prices.sqlite";
+	}
+
 	public static Connection getConnection() {
 		Connection connection;
         try {
             Class.forName("SQLite.JDBCDriver");
-            String filename = App.netxDir().getPath().replace("\\","/") + "/prices.sqlite";
-            System.out.println("Opening database " + filename);
-            connection = DriverManager.getConnection("jdbc:sqlite:/" + filename, "", "");
+            System.out.println("Opening database " + filename());
+            connection = DriverManager.getConnection("jdbc:sqlite:/" + filename(), "", "");
             connection.setAutoCommit(false);
             return connection;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+	}
+
+	public static void deleteDatabaseFile() {
+		new File(filename()).delete();
 	}
 
 	private static void createSettingsTable(Connection connection) throws SQLException {

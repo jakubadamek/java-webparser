@@ -149,6 +149,9 @@ class DownloadThread extends Thread {
 		        	stat.close();
 		        }
 		        connection.commit();
+	        } catch (SQLException e) {
+	        	connection.close();
+	        	Database.deleteDatabaseFile();
 	        } finally {
 	        	connection.close();
 	        }

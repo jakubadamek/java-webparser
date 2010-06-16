@@ -13,6 +13,7 @@ import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
+import com.gargoylesoftware.htmlunit.html.HtmlImageInput;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSelect;
@@ -79,22 +80,23 @@ public class HrsCom extends HtmlParser
 	@Override
 	public void run() throws FailingHttpStatusCodeException, IOException {
 		WebClient webClient = new WebClient(BrowserVersion.FIREFOX_3);
+		webClient.setJavaScriptEnabled(false);
 	    URL url = new URL("http://www.hrs.com");
 	    //final URL url = new URL("file:///D:/jakub/Kravinky/robotemil/search.do.htm");
 	    HtmlPage page = (HtmlPage)webClient.getPage(url);
 	    if(isStop()) return;
-	    selectOption(page, "//select[@name='localeString']", "cs");
+	    //selectOption(page, "//select[@name='localeString']", "cs");
 
-	    fillTextField(page, "location", "Praha");
+	    fillTextField(page, "location", "Prague (Praha)");
 	    fillTextField(page, "singleRooms", "1");
 	    fillTextField(page, "doubleRooms", "0");
 	    fillTextField(page, "adults", "1");
 	    // Toto se stane pri vyberu "Praha (Hlavni mesto)" z kontextove napovedy:
-	    fillTextField(page, "suggestedID", "%49370");
-	    selectOption(page, "//select[@name='perimeter']", "32");
+	    //fillTextField(page, "suggestedID", "%49370");
+	    //selectOption(page, "//select[@name='perimeter']", "16");
 	    Calendar calendar = Calendar.getInstance();
 	    calendar.setTime(this.date);
-	    DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.GERMAN);
+	    DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.ENGLISH);
 	    fillTextField(page, "stayPeriod.start.date", dateFormat.format(calendar.getTime()));
 	    System.out.println(dateFormat.format(calendar.getTime()));
 	    calendar.add(Calendar.DATE, 1);
@@ -104,6 +106,8 @@ public class HrsCom extends HtmlParser
 	    System.out.println("Clicking on " + inputSubmit);
 	    page = (HtmlPage) inputSubmit.click();
 	    if(isStop()) return;
+	    //savePage(page);
+	    //if(true) return;
 	    /*savePage(page);
 	    try {
 			Thread.sleep(100000);
@@ -112,14 +116,14 @@ public class HrsCom extends HtmlParser
 			e.printStackTrace();
 		}*/
 
-	    /*boolean prahaFound = false;
+	    boolean prahaFound = false;
 	    String prahaXPath = "//a";
 	    String anchorTexts = "";
 	    for(Object o : page.getByXPath(prahaXPath)) {
 		    if(isStop()) return	;
 	    	HtmlAnchor a = (HtmlAnchor) o;
 	    	//System.out.println(a.getTextContent());
-	    	if(a.getTextContent().startsWith("Praha (Hlavn")) {
+	    	if(a.getTextContent().startsWith("Prague (Praha)")) {
 	    	    System.out.println("Clicking on " + a);
     	    	page = (HtmlPage) a.click();
 	    		prahaFound = true;
@@ -128,7 +132,7 @@ public class HrsCom extends HtmlParser
 	    }
 	    if(! prahaFound) {
 	    	throw new RuntimeException("Praha not found in " + anchorTexts);
-	    }*/
+	    }
 
 	    System.out.println("Downloading hotellist. Frames on this page: " + page.getFrames());
 	    if(isStop())
@@ -140,6 +144,11 @@ public class HrsCom extends HtmlParser
 	    	System.out.println(((HtmlDivision) o).getTextContent());
 	    }*/
 	    selectOption(page, "//select[@name='currency']", "EUR");
+	    sumbitXPath = "//form[@name='currencyForm']/noscript/input";
+	    HtmlImageInput inputImage = (HtmlImageInput) page.getByXPath(sumbitXPath).get(0);
+	    System.out.println("Clicking on " + inputImage);
+	    page = (HtmlPage) inputImage.click();
+
 	    page = (HtmlPage) page.getFrameByName("hotellist").getEnclosedPage();
 	    if(isStop()) return;
 	    String hotelXPath = "//td[@class='hn']/a[@class='pu']";
@@ -152,14 +161,14 @@ public class HrsCom extends HtmlParser
 		    	if(anchors.size() > 0) {
 			    	Object anchor = anchors.get(0);
 			    	String price1 = ((DomNode) anchor).getTextContent();
-			    	if(price1.contains("JP")) {
-				    	price1 = price1.substring(price1.indexOf("JP"));
+			    	if(price1.contains("Sgl.")) {
+				    	price1 = price1.substring(price1.indexOf("Sgl.") + 4);
 				    	//System.out.println(price1);
 				    	String price = "";
 				    	for(int i=0; i < price1.length(); i ++) {
 				    		if(Character.isDigit(price1.charAt(i)))
 				    			price += price1.charAt(i);
-				    		if(price1.charAt(i) == ',')
+				    		if(price1.charAt(i) == '.')
 				    			price += ".";
 				    	}
 				    	//HtmlTable htmlTable = (HtmlTable) a.getParentNode().getParentNode().getParentNode().getParentNode().getParentNode();
