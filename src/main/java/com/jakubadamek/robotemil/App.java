@@ -14,7 +14,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.eclipse.swt.widgets.Text;
@@ -129,8 +128,9 @@ public class App
 
     private List<WebStruct> initWebStructs() {
     	List<WebStruct> webStructs = new ArrayList<WebStruct>();
+    	WebStruct
 // /*
-    	WebStruct webStruct = new WebStruct();
+    	webStruct = new WebStruct();
     	webStruct.label = "booking.com";
     	webStruct.fileName = "booking_com_1.1.txt";
     	webStruct.excelName = "Booking";

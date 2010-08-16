@@ -94,6 +94,7 @@ public class HrsCom extends HtmlParser
 	    // Toto se stane pri vyberu "Praha (Hlavni mesto)" z kontextove napovedy:
 	    //fillTextField(page, "suggestedID", "%49370");
 	    //selectOption(page, "//select[@name='perimeter']", "16");
+	    //selectOption(page, "//select[@name='localeString']", "de");
 	    Calendar calendar = Calendar.getInstance();
 	    calendar.setTime(this.date);
 	    DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.ENGLISH);
@@ -149,7 +150,11 @@ public class HrsCom extends HtmlParser
 	    System.out.println("Clicking on " + inputImage);
 	    page = (HtmlPage) inputImage.click();
 
-	    page = (HtmlPage) page.getFrameByName("hotellist").getEnclosedPage();
+		System.out.println("Downloading hotellist 2. Frames on this page: " + page.getFrames());
+	    // 16.8.2010
+		if(page.getFrames().toString().contains("hotellist")) {
+			page = (HtmlPage) page.getFrameByName("hotellist").getEnclosedPage();
+		}
 	    if(isStop()) return;
 	    String hotelXPath = "//td[@class='hn']/a[@class='pu']";
 	    //savePage(page);
