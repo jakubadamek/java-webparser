@@ -13,7 +13,7 @@ import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
-import com.gargoylesoftware.htmlunit.html.HtmlImageInput;
+import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSelect;
@@ -144,11 +144,16 @@ public class HrsCom extends HtmlParser
 	    for(Object o : head.getByXPath("//div")) {
 	    	System.out.println(((HtmlDivision) o).getTextContent());
 	    }*/
+	    //savePage(page);
 	    selectOption(page, "//select[@name='currency']", "EUR");
-	    sumbitXPath = "//form[@name='currencyForm']/noscript/input";
-	    HtmlImageInput inputImage = (HtmlImageInput) page.getByXPath(sumbitXPath).get(0);
-	    System.out.println("Clicking on " + inputImage);
-	    page = (HtmlPage) inputImage.click();
+	    //sumbitXPath = "//form[@name='currencyForm']/noscript/input";
+	    //HtmlImageInput inputImage = (HtmlImageInput) page.getByXPath(sumbitXPath).get(0);
+	    //System.out.println("Clicking on " + inputImage);
+	    //page = (HtmlPage) inputImage.click();
+	    sumbitXPath = "//form[@name='currencyForm']";
+	    HtmlForm currencyForm = (HtmlForm) page.getByXPath(sumbitXPath).get(0);
+	    System.out.println("Submitting " + currencyForm);
+	    page = (HtmlPage) currencyForm.submit(null);
 
 		System.out.println("Downloading hotellist 2. Frames on this page: " + page.getFrames());
 	    // 16.8.2010
@@ -162,7 +167,7 @@ public class HrsCom extends HtmlParser
 		    if(isStop()) return;
 	    	HtmlAnchor a = (HtmlAnchor) o;
 	    	if(! a.getTextContent().contains("Podrobnosti")) {
-		    	List<?> anchors = a.getByXPath("../../td/div/span[@class='hp']/a");
+		    	List<?> anchors = a.getByXPath("../../td/div/div[@class='hp']/a");
 		    	if(anchors.size() > 0) {
 			    	Object anchor = anchors.get(0);
 			    	String price1 = ((DomNode) anchor).getTextContent();
