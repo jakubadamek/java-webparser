@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+    <bean id="app" class="com.jakubadamek.robotemil.App" init-method="startWork">
+        <property name="threadCount" value="4"/>
+    </bean>
+    
+    <bean id="settingsModel" class="com.jakubadamek.robotemil.SettingsModel">
+        <property name="customer" value="Jalta"/>
+        <property name="appTitle" value="Robot Emil"/>
+        <property name="excelFile" value="robotemil"/>
+        <property name="ourHotelNames">
+            <list>
+                <value>Jalta</value>
+                <value>Alta</value>
+            </list>
+        </property>
+        <property name="webStructs">
+            <list>
+                <ref bean="bookingCom"/>
+                <ref bean="lastminuteEs"/>
+                <ref bean="hrsCom"/>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="bookingCom" class="com.jakubadamek.robotemil.WebStruct">
+        <property name="label" value="booking.com"/>
+        <property name="fileName" value="booking_com_1.1.txt"/>
+        <property name="excelName" value="Booking"/>
+        <property name="parserClass" value="com.jakubadamek.robotemil.htmlparser.BookingCom"/>
+        <property name="iconName" value="bookingcom.gif"/>
+    </bean>
+
+    <bean id="lastminuteEs" class="com.jakubadamek.robotemil.WebStruct">
+        <property name="label" value="lastminute.es"/>
+        <property name="fileName" value="lastminute_1.1.txt"/>
+        <property name="excelName" value="Lastminute"/>
+        <property name="parserClass" value="com.jakubadamek.robotemil.htmlparser.LastminuteEs"/>
+        <property name="iconName" value="lastminutees.gif"/>
+    </bean>
+
+    <bean id="hrsCom" class="com.jakubadamek.robotemil.WebStruct">
+        <property name="label" value="hrs.com"/>
+        <property name="fileName" value="hrs_com_1.1.txt"/>
+        <property name="excelName" value="Hrs"/>
+        <property name="parserClass" value="com.jakubadamek.robotemil.htmlparser.HrsCom"/>
+        <property name="iconName" value="hrscom.gif"/>
+    </bean>
+        
+</beans>
