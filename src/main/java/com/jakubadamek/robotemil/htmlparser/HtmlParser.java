@@ -38,11 +38,12 @@ public abstract class HtmlParser {
 	}
 
 	/**
-	 * Runs the real job
+	 * Runs the real job. Returns true if it runs to the end,
+	 * false if stopped in the middle.
 	 *
 	 * @throws Exception
 	 */
-	public abstract void run() throws Exception;
+	public abstract boolean run() throws Exception;
 
 	private DateFormat dateFormat = DateFormat.getDateInstance();
 

@@ -9,6 +9,42 @@
 	<version>1.10</version>
 	<url>http://maven.apache.org</url>
 		<dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>org.springframework.jdbc</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>org.springframework.core</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>org.springframework.aop</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>org.springframework.beans</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>org.springframework.context</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>org.springframework.core</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>com.springsource.org.hsqldb</artifactId>
+            <version>1.8.0.9</version>
+        </dependency>
 			 <dependency>
 				 <groupId>commons-codec</groupId>
 				 <artifactId>commons-codec</artifactId>
@@ -130,6 +166,11 @@
 			 </dependency>
 		</dependencies>
 	<repositories>
+        <repository>
+            <id>com.springsource.repository.bundles.release</id>
+            <name>SpringSource Enterprise Bundle Repository - SpringSource Releases</name>
+            <url>http://repository.springsource.com/maven/bundles/release</url>
+        </repository>
 		<repository>
 			<snapshots/>
 			<id>gcware</id>
@@ -165,8 +206,8 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
+					<source>1.6</source>
+					<target>1.6</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -193,8 +234,8 @@
 								<manifestEntries>
 									<Specification-Title>Trick Benchmark</Specification-Title>
 									<Specification-Vendor>Jakub Adamek</Specification-Vendor>
-									<Specification-Version>${pom.version}</Specification-Version>
-									<Implementation-Version>${pom.version}</Implementation-Version>
+									<Specification-Version>${project.version}</Specification-Version>
+									<Implementation-Version>${project.version}</Implementation-Version>
 									<Implementation-Build>${buildNumber}</Implementation-Build>
 									<Main-Class>com.jakubadamek.robotemil.App</Main-Class>
 								</manifestEntries>
@@ -215,4 +256,7 @@
 			</plugin>
 		</plugins>
 	</build>
+    <properties>
+        <spring.version>3.0.3.RELEASE</spring.version>
+    </properties>
 </project>

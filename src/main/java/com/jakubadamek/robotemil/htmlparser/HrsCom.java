@@ -18,7 +18,6 @@ import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSelect;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
-import com.jakubadamek.robotemil.WorkUnit;
 
 /**
  * Parses hrs.com
@@ -32,17 +31,6 @@ import com.jakubadamek.robotemil.WorkUnit;
  */
 public class HrsCom extends HtmlParser
 {
-	/**
-	 * @param args
-	 * @throws FailingHttpStatusCodeException
-	 * @throws IOException
-	 */
-	public static void main(String[] args) throws FailingHttpStatusCodeException, IOException {
-		HrsCom hrsCom = new HrsCom();
-		hrsCom.init(new WorkUnit(), null);
-		hrsCom.run();
-	}
-
 	private void selectOption(HtmlPage page, String selectXPath, String optionValue) throws IOException {
 		System.out.println("Setting " + selectXPath + " to " + optionValue);
 		HtmlSelect select = null;
@@ -78,13 +66,13 @@ public class HrsCom extends HtmlParser
 	}
 
 	@Override
-	public void run() throws FailingHttpStatusCodeException, IOException {
+	public boolean run() throws FailingHttpStatusCodeException, IOException {
 		WebClient webClient = new WebClient(BrowserVersion.FIREFOX_3);
 		webClient.setJavaScriptEnabled(false);
 	    URL url = new URL("http://www.hrs.com");
 	    //final URL url = new URL("file:///D:/jakub/Kravinky/robotemil/search.do.htm");
 	    HtmlPage page = (HtmlPage)webClient.getPage(url);
-	    if(isStop()) return;
+	    if(isStop()) return false;
 	    //selectOption(page, "//select[@name='localeString']", "cs");
 
 	    fillTextField(page, "location", "Prague (Praha)");
@@ -106,7 +94,7 @@ public class HrsCom extends HtmlParser
 	    HtmlSubmitInput inputSubmit = (HtmlSubmitInput) page.getByXPath(sumbitXPath).get(0);
 	    System.out.println("Clicking on " + inputSubmit);
 	    page = (HtmlPage) inputSubmit.click();
-	    if(isStop()) return;
+	    if(isStop()) return false;
 	    //savePage(page);
 	    //if(true) return;
 	    /*savePage(page);
@@ -121,7 +109,7 @@ public class HrsCom extends HtmlParser
 	    String prahaXPath = "//a";
 	    String anchorTexts = "";
 	    for(Object o : page.getByXPath(prahaXPath)) {
-		    if(isStop()) return	;
+		    if(isStop()) return	false;
 	    	HtmlAnchor a = (HtmlAnchor) o;
 	    	//System.out.println(a.getTextContent());
 	    	if(a.getTextContent().startsWith("Prague (Praha)")) {
@@ -136,11 +124,10 @@ public class HrsCom extends HtmlParser
 	    }
 
 	    System.out.println("Downloading hotellist. Frames on this page: " + page.getFrames());
-	    if(isStop())
-	    	return;
+	    if(isStop()) return false;
 	    //HtmlPage page = (HtmlPage)webClient.getPage("file:///D:/temp/search.do%3bjsessionid=7B1084050944D9BA183E226EB60CD6D7_soubory/showPage_003.htm");
 	    /*HtmlPage head = (HtmlPage) page.getFrameByName("head").getEnclosedPage();
-	    if(isStop()) return;
+	    if(isStop()) return false;
 	    for(Object o : head.getByXPath("//div")) {
 	    	System.out.println(((HtmlDivision) o).getTextContent());
 	    }*/
@@ -160,11 +147,11 @@ public class HrsCom extends HtmlParser
 		if(page.getFrames().toString().contains("hotellist")) {
 			page = (HtmlPage) page.getFrameByName("hotellist").getEnclosedPage();
 		}
-	    if(isStop()) return;
+	    if(isStop()) return false;
 	    String hotelXPath = "//td[@class='hn']/a[@class='pu']";
 	    //savePage(page);
 	    for(Object o : page.getByXPath(hotelXPath)) {
-		    if(isStop()) return;
+		    if(isStop()) return false;
 	    	HtmlAnchor a = (HtmlAnchor) o;
 	    	if(! a.getTextContent().contains("Podrobnosti")) {
 		    	List<?> anchors = a.getByXPath("../../td/div/div[@class='hp']/a");
@@ -189,6 +176,7 @@ public class HrsCom extends HtmlParser
 		    	}
 	    	}
 	    }
+	    return true;
 	}
 
 }

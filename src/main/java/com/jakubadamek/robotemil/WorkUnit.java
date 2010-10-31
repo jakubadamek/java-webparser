@@ -1,21 +1,28 @@
 package com.jakubadamek.robotemil;
 
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /** thread work unit */
 public class WorkUnit {
 	/** date */
-	public Date date;
+	public final Date date;
 	/** web */
-	public WebStruct web;
+	public final WebStruct web;
 	/** last response time */
-	public Date lastResponseTime;
+	public volatile Date lastResponseTime;
 	/** work finished */
-	public boolean finished = false;
+	public volatile boolean finished = false;
 	/** trial count */
-	public int trials = 0;
+	public AtomicInteger trials = new AtomicInteger(0);
 	
+	public WorkUnit(Date date, WebStruct web) {
+		super();
+		this.date = date;
+		this.web = web;
+	}
+
 	/**
 	 * Compares two work units
 	 * @param other

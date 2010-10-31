@@ -11,16 +11,17 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutorService;
 
 import org.eclipse.swt.widgets.Text;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.jakubadamek.robotemil.htmlparser.BookingCom;
-import com.jakubadamek.robotemil.htmlparser.HrsCom;
-import com.jakubadamek.robotemil.htmlparser.LastminuteEs;
+import com.jakubadamek.robotemil.services.PriceService;
+import com.jakubadamek.robotemil.services.SettingsService;
 
 /**
  */
@@ -29,17 +30,21 @@ public class App
 	private static final String DEFAULT_CACHE_LENGTH = "0";
 	private static final String CACHE_LENGTH = "cacheLength";
 	/** restart the same work unit when no response for as long */
-	static final int RESTART_AFTER_SECONDS = 60;
+	static final int RESTART_AFTER_SECONDS = 30;
 	/** concurrent thread count */
-	static int threadCount;
-	/** default for the GUI version */
-	private static final int GUI_THREAD_COUNT = 4;
+	private int threadCount;
 	//private static final boolean TEST = false;
 	private ResourceBundle bundle = ResourceBundle.getBundle("robotemil");
 	private final String CUSTOMER = System.getProperty("customer", Customer.JALTA.toString());
 	enum Customer { JALTA, PERLA }
 	private AppFrame appFrame;
 	private boolean useCache;
+	public WorkUnitsManager workUnitsManager = new WorkUnitsManager(this);
+    @Autowired SettingsModel settingsModel;
+	@Autowired
+	public PriceService priceService;
+	@Autowired
+	public static SettingsService settingsService;
 
 	/**
 	 * List of all our hotels
@@ -59,8 +64,9 @@ public class App
 	 * Main
 	 * @param args
 	 * @throws IOException
+	 * @throws InterruptedException 
 	 */
-    public static void main( String[] args ) throws IOException
+    public static void main( String[] args ) throws IOException, InterruptedException
     {
     	if(args.length == 0) {
 	    	runWithGui();
@@ -77,20 +83,24 @@ public class App
     	JavaServiceWrapper.setApp(this);
     }
 
+    private static App getApp() {
+        ClassPathXmlApplicationContext spring = new ClassPathXmlApplicationContext(new String[]{"spring-config.xml"});
+        return spring.getBean(App.class);
+    }
+    
 	private static void runWithGui() {
-		App app = new App();
+		App app = getApp();
 		app.appFrame = new AppFrame(app);
-		threadCount = GUI_THREAD_COUNT;
 		app.startWork();
 	}
 
-	private static void runWithoutGui(String ... args) {
+	private static void runWithoutGui(String ... args) throws InterruptedException {
 		/* Args: - count of days since today, when to start
 		 *       - count of days including the start date
 		 */
 		//if(new Scheduler().isScheduled("automatic " + args[0] + " " + args[1])) {
-	    	App app = new App();
-	    	threadCount = 1;
+	    	App app = getApp();
+	    	app.threadCount = 1;
 			app.startDate = new Date(new Date().getTime() + Long.valueOf(args[0]) * 24*60*60*1000);
 			app.dayCount = Integer.valueOf(args[1]);
 			app.useCache = true;
@@ -126,37 +136,6 @@ public class App
 		}
 	}
 
-    private List<WebStruct> initWebStructs() {
-    	List<WebStruct> webStructs = new ArrayList<WebStruct>();
-    	WebStruct
-// /*
-    	webStruct = new WebStruct();
-    	webStruct.label = "booking.com";
-    	webStruct.fileName = "booking_com_1.1.txt";
-    	webStruct.excelName = "Booking";
-    	webStruct.parserClass = BookingCom.class;
-    	webStruct.iconName = "bookingcom.gif";
-    	webStructs.add(webStruct);
-
-    	webStruct = new WebStruct();
-    	webStruct.label = "lastminute.es";
-    	webStruct.fileName = "lastminute_1.1.txt";
-    	webStruct.excelName = "Lastminute";
-    	webStruct.parserClass = LastminuteEs.class;
-    	webStruct.iconName = "lastminutees.gif";
-    	webStructs.add(webStruct);
-// */
-    	webStruct = new WebStruct();
-    	webStruct.label = "hrs.com";
-    	webStruct.fileName = "hrs_com_1.1.txt";
-    	webStruct.excelName = "Hrs";
-    	webStruct.parserClass = HrsCom.class;
-    	webStruct.iconName = "hrscom.gif";
-    	webStructs.add(webStruct);
-
-   		return webStructs;
-    }
-
     Customer getCustomer() {
     	return Customer.valueOf(CUSTOMER);
     }
@@ -178,12 +157,6 @@ public class App
         return retval;
     }
 
-    /** thread work queue */
-    List<WorkUnit> workQueue = Collections.synchronizedList(new ArrayList<WorkUnit>());
-
-    /** progress - count of pages processed */
-    int progress = 0;
-
     /** sleep
      * @param milliSeconds */
     static void sleep(int milliSeconds) {
@@ -195,7 +168,7 @@ public class App
     }
 
     private void startWork() {
-    	try {
+        try {
 			loadHotels();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -206,19 +179,13 @@ public class App
 		}
     }
 
-    void workBody() {
-        OurHotel ourHotel = getOurHotel();
-        for(Date date : getDates()) {
-        	for(WebStruct webStruct : ourHotel.webStructs) {
-        		WorkUnit workUnit = new WorkUnit();
-        		workUnit.web = webStruct;
-        		workUnit.date = date;
-        		this.workQueue.add(workUnit);
-        	}
-        }
+    void workBody() throws InterruptedException {
+    	workUnitsManager.prepare();
         if(appFrame != null) {
         	appFrame.runPrepare();
+        	appFrame.runProgress();
         }
+        workUnitsManager.downloadAll(threadCount);
 		/*if(TEST) {
 			try {
 				deserialize();
@@ -226,18 +193,6 @@ public class App
 				throw new RuntimeException(e);
 			}
 		} else {*/
-			List<DownloadThread> downloadThreads = new ArrayList<DownloadThread>();
-	        for(int i=0; i < threadCount; i ++) {
-	        	DownloadThread thread = new DownloadThread(this);
-	        	thread.start();
-	        	downloadThreads.add(thread);
-	        }
-	        if(appFrame != null) {
-	        	appFrame.runProgress();
-	        }
-			while(this.workQueue.size() > 0) {
-				App.sleep(1000);
-			}
 		//}
     }
 
@@ -251,9 +206,9 @@ public class App
 				new File(hotelsDir()).mkdirs();
 			}
 			for(OurHotel ourHotel : this.ourHotels) {
-				for(WebStruct webStruct : ourHotel.webStructs) {
+				for(WebStruct webStruct : ourHotel.getWebStructs()) {
 					BufferedWriter writer = new BufferedWriter(new FileWriter(new File(hotelsDir(), ourHotel.fileName(webStruct))));
-					for(Text hotel : webStruct.hotelTexts) {
+					for(Text hotel : webStruct.getHotelTexts()) {
 						writer.append(hotel.getText());
 						writer.newLine();
 					}
@@ -272,30 +227,25 @@ public class App
 		return new File(System.getProperty("user.home"), getCustomer().toString()).getPath();
 	}
 
-	void loadHotels() throws IOException {
-		String[] ourHotelNames;
-		switch(getCustomer()) {
-		case JALTA: ourHotelNames = new String[] { "Jalta", "Alta" }; break;
-		case PERLA: ourHotelNames = new String[] { "Perla" }; break;
-		default: throw new IllegalArgumentException(getCustomer().toString());
-		}
-		for(String ourHotelName : ourHotelNames) {
-			OurHotel ourHotel = new OurHotel(this);
-			ourHotel.ourHotelName = ourHotelName;
-			ourHotel.webStructs = initWebStructs();
-			this.ourHotels.add(ourHotel);
-	    	for(WebStruct web : ourHotel.webStructs) {
-				web.hotelList.clear();
-				String[] hotels = readFileToStrings(hotelsDir(), ourHotel.fileName(web));
-				if(hotels.length == 0) {
-					hotels = readFileToStrings(hotelsDir(), this.ourHotels.get(0).fileName(web));
-				}
-				for(String hotel : hotels) {
-					web.hotelList.add(DiacriticsRemover.removeDiacritics(hotel).trim());
-				}
-	    	}
-		}
-	}
+    void loadHotels() throws IOException {
+    	int index = 0;
+    	for (String ourHotelName : settingsModel.getOurHotelNames()) {
+    	    OurHotel ourHotel = new OurHotel(index++);
+    	    ourHotel.setOurHotelName(ourHotelName);
+    	    ourHotel.setWebStructs(settingsModel.getWebStructs());
+    	    settingsModel.getOurHotels().add(ourHotel);
+    	    for (WebStruct web : ourHotel.getWebStructs()) {
+    		web.getHotelList().clear();
+    		String[] hotels = readFileToStrings(hotelsDir(), ourHotel.fileName(web));
+    		if (hotels.length == 0) {
+    		    hotels = readFileToStrings(hotelsDir(), settingsModel.getOurHotels().get(0).fileName(web));
+    		}
+    		for (String hotel : hotels) {
+    		    web.getHotelList().add(DiacriticsRemover.removeDiacritics(hotel).trim());
+    		}
+    	    }
+    	}
+        }
 
 	private String[] readFileToStrings(String dir, String file) throws IOException {
 		Reader reader;
@@ -324,6 +274,7 @@ public class App
 	}
 
 	private DateFormat timeFormat = DateFormat.getTimeInstance();
+	private ExecutorService threadPool;
 
 	public void showLog(String row) {
 		String logRow = timeFormat.format(new Date()) + " " + row;
@@ -348,7 +299,7 @@ public class App
 	}
 
 	public void setCacheLength(int cacheLength) {
-		Database.storeSetting(CACHE_LENGTH, "" + cacheLength);
+		settingsService.storeSetting(CACHE_LENGTH, "" + cacheLength);
 		if(cacheLength == 0) {
 			JavaServiceWrapper.stop();
 		} else {
@@ -357,7 +308,7 @@ public class App
 	}
 
 	public static int getCacheLength() {
-		return Integer.valueOf(Database.readSetting(CACHE_LENGTH, DEFAULT_CACHE_LENGTH));
+		return Integer.valueOf(settingsService.readSetting(CACHE_LENGTH, DEFAULT_CACHE_LENGTH));
 	}
 
 	/**
@@ -382,5 +333,26 @@ public class App
 			retval.mkdirs();
 		}
 		return retval;
+	}
+
+	/**
+	 * @return the threadPool
+	 */
+	public ExecutorService getThreadPool() {
+		return threadPool;
+	}
+
+	/**
+	 * @return the threadCount
+	 */
+	public int getThreadCount() {
+		return threadCount;
+	}
+
+	/**
+	 * @param threadCount the threadCount to set
+	 */
+	public void setThreadCount(int threadCount) {
+		this.threadCount = threadCount;
 	}
 }

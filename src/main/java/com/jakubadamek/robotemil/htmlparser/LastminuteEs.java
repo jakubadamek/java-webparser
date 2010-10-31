@@ -36,7 +36,7 @@ public class LastminuteEs extends HtmlParser {
 		"&lmnRoom3ChildAge4=-1&lmnRoom1ChildAge4=-1&preserveName-skin=eses.lastminute.com";
 
 	@Override
-	public void run() throws ParserException, IOException {
+	public boolean run() throws ParserException, IOException {
 		String url = LASTMINUTE_COM;
 	    Calendar calendar = Calendar.getInstance();
 	    calendar.setTime(this.date);
@@ -60,7 +60,7 @@ public class LastminuteEs extends HtmlParser {
 		int ipage = 0;
 		int pageHotels = 1;
 		while(pageHotels > 0) {
-		    if(isStop()) return;
+		    if(isStop()) return false;
 			String hotel = "";
 			String price = "";
 			String pagedUrl = url;
@@ -69,9 +69,9 @@ public class LastminuteEs extends HtmlParser {
 			ipage ++;
 			pageHotels = 0;
 			Parser parser = new Parser(pagedUrl);
-		    if(isStop()) return;
+		    if(isStop()) return false;
 			for(Node node : parser.extractAllNodesThatMatch(takeAllFilter).toNodeArray()) {
-			    if(isStop()) return;
+			    if(isStop()) return false;
 				if(hotelNameFilter.accept(node)) {
 					hotel = node.getChildren().toNodeArray()[0].getText().replace("- Praga", "").trim();
 				}
@@ -91,5 +91,6 @@ public class LastminuteEs extends HtmlParser {
 			}
 			System.out.println("*** " + pageHotels + " hotels");
 		}
+		return true;
 	}	
 }

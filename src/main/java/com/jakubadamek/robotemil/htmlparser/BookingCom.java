@@ -26,7 +26,7 @@ public class BookingCom extends HtmlParser {
 		"&si=ai%2Cco%2Cci%2Cre&ss=Prague&radius=15&do_availability_check=on";
 
 	@Override
-	public void run() throws ParserException, IOException {
+	public boolean run() throws ParserException, IOException {
 		String url = BOOKING_COM;
 	    Calendar calendar = Calendar.getInstance();
 	    calendar.setTime(this.date);
@@ -54,16 +54,16 @@ public class BookingCom extends HtmlParser {
 		int pageHotels = 1;
 		int offset = 0;
 		while(pageHotels > 0) {
-		    if(isStop()) return;
+		    if(isStop()) return false;
 			String hotel = "";
 			String price = "";
 			String pagedUrl = url + "&offset=" + offset;
 			ipage ++;
 			pageHotels = 0;
 			Parser parser = new Parser(pagedUrl);
-		    if(isStop()) return;
+		    if(isStop()) return false;
 			for(Node node : parser.extractAllNodesThatMatch(takeAllFilter).toNodeArray()) {
-			    if(isStop()) return;
+			    if(isStop()) return false;
 				if(hotelNameFilter.accept(node)) {
 					hotel = node.getChildren().toNodeArray()[0].getText().trim();
 				}
@@ -84,5 +84,6 @@ public class BookingCom extends HtmlParser {
 			offset += pageHotels;
 			System.out.println("*** " + pageHotels + " hotels");
 		}
+		return true;
 	}
 }

@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.jakubadamek.robotemil.entities.PriceAndOrder;
+
 
 /**
  * Prices for hotel rooms
@@ -12,7 +14,7 @@ import java.util.Map;
 public class Prices implements Serializable {
 	private static final long serialVersionUID = 4924511073557468113L;
 	/** Data */
-	public Map<String, Map<Date, PriceAndOrder>> data = new HashMap<String, Map<Date, PriceAndOrder>>();
+	private Map<String, Map<Date, PriceAndOrder>> data = new HashMap<String, Map<Date, PriceAndOrder>>();
 
 	/**
 	 * Adds a price
@@ -22,7 +24,7 @@ public class Prices implements Serializable {
 	 * @param price
 	 * @param order
 	 */
-	public void addPrice(String hotel, Date date, String price, int order) {
+	public synchronized void addPrice(String hotel, Date date, String price, int order) {
 		addPrice(hotel, date, Double.valueOf(price), order);
 	}
 
@@ -41,7 +43,7 @@ public class Prices implements Serializable {
 	 *
 	 * @param prices
 	 */
-	public void addAll(Prices prices) {
+	public synchronized void addAll(Prices prices) {
 		for(String hotel : prices.data.keySet()) {
 			Map<Date, PriceAndOrder> map = prices.data.get(hotel);
 			for(Date date : map.keySet()) {
@@ -51,11 +53,19 @@ public class Prices implements Serializable {
 		}
 	}
 
-	public long size() {
+	public synchronized long size() {
 		long retval = 0;
 		for(String hotel : data.keySet()) {
 			retval += data.get(hotel).size();
 		}
 		return retval;
+	}
+	
+	/**
+	 * Concurrency: Always lock the object before using getData.
+	 * @return the inner data structure
+	 */
+	public Map<String, Map<Date, PriceAndOrder>> getData() {
+		return this.data;
 	}
 }

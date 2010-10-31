@@ -221,7 +221,11 @@ public class AppFrame
 				new Thread() {
 					@Override
 					public void run() {
-						onBtnRun();
+						try {
+							onBtnRun();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 					}
 				}.start();
 			}
@@ -280,7 +284,7 @@ public class AppFrame
         	ScrolledCompositeWrapper scrolled;
         	if(app.ourHotels.size() > 1) {
 	        	TabItem tabItem = new TabItem(this.tabFolder, SWT.NONE);
-	        	tabItem.setText(ourHotel.ourHotelName);
+	        	tabItem.setText(ourHotel.getOurHotelName());
 	        	scrolled = new ScrolledCompositeWrapper(this.tabFolder);
 		        tabItem.setControl(scrolled.getParent());
         	} else {
@@ -288,7 +292,7 @@ public class AppFrame
         	}
     		Composite cmpWebs = scrolled.getComposite();
 	        GridLayout glWebs = new GridLayout();
-	        glWebs.numColumns = ourHotel.webStructs.size() * 2;
+	        glWebs.numColumns = ourHotel.getWebStructs().size() * 2;
 	        //glWebs.marginWidth = glWebs.marginHeight = 0;
 	        cmpWebs.setLayout(glWebs);
 	        GridData gdWebs = new GridData(SWT.LEFT, SWT.TOP, false, false);
@@ -296,10 +300,10 @@ public class AppFrame
 	        scrolled.getParent().setLayoutData(gdWebs);
 
 	        // row 2
-	        for(WebStruct webStruct : ourHotel.webStructs) {
-	        	Image icon = new Image(this.shell.getDisplay(), getClass().getClassLoader().getResourceAsStream(webStruct.iconName));
+	        for(WebStruct webStruct : ourHotel.getWebStructs()) {
+	        	Image icon = new Image(this.shell.getDisplay(), getClass().getClassLoader().getResourceAsStream(webStruct.getIconName()));
 	        	new Button(cmpWebs, SWT.FLAT).setImage(icon);
-	            new Label(cmpWebs, SWT.NONE).setText(webStruct.label);
+	            new Label(cmpWebs, SWT.NONE).setText(webStruct.getLabel());
 	        }
 
 	        KeyListener hotelsListener =  new KeyAdapter() {
@@ -311,9 +315,9 @@ public class AppFrame
 
 	        // row 3
 	        int nhotels = 0;
-	        for(WebStruct webStruct : ourHotel.webStructs) {
-	        	if(webStruct.hotelList.size() > nhotels) {
-	        		nhotels = webStruct.hotelList.size();
+	        for(WebStruct webStruct : ourHotel.getWebStructs()) {
+	        	if(webStruct.getHotelList().size() > nhotels) {
+	        		nhotels = webStruct.getHotelList().size();
 	        	}
 	        }
 	        if(nhotels < MIN_HOTEL_ROWS) {
@@ -321,16 +325,16 @@ public class AppFrame
 	        }
 
 	        for(int i=0; i < nhotels + ADDITIONAL_ROWS; i ++) {
-	        	for(WebStruct webStruct : ourHotel.webStructs) {
+	        	for(WebStruct webStruct : ourHotel.getWebStructs()) {
 		        	Text text = new Text(cmpWebs, SWT.NONE);
 		        	GridData gridData = new GridData(SWT.FILL, SWT.TOP, true, false);
 		        	gridData.horizontalSpan = 2;
 		        	text.setLayoutData(gridData);
 		        	text.addKeyListener(hotelsListener);
-		        	if(i < webStruct.hotelList.size()) {
-		        		text.setText(webStruct.hotelList.get(i));
+		        	if(i < webStruct.getHotelList().size()) {
+		        		text.setText(webStruct.getHotelList().get(i));
 		        	}
-		        	webStruct.hotelTexts.add(text);
+		        	webStruct.getHotelTexts().add(text);
 	        	}
 	        }
 	        scrolled.setSize();
@@ -343,7 +347,7 @@ public class AppFrame
 		this.shell.getDisplay().syncExec(new Runnable() {
 			@SuppressWarnings("synthetic-access")
 			public void run() {
-				AppFrame.this.progressBar.setSelection(progressBar.getMaximum() - app.workQueue.size());
+				AppFrame.this.progressBar.setSelection(progressBar.getMaximum() - app.workUnitsManager.unfinishedCount());
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(new Date(new Date().getTime() - AppFrame.this.start.getTime()));
 				final Formatter formatter = new Formatter(new StringBuilder(), Locale.getDefault());
@@ -359,11 +363,11 @@ public class AppFrame
 		public void run() {
 			authorized = true;
 	    	for(OurHotel ourHotel : app.ourHotels) {
-	    		for(WebStruct webStruct : ourHotel.webStructs) {
-	    			if(webStruct.hotelTexts.size() > 0) {
-	    				String hotel = DiacriticsRemover.removeDiacritics(webStruct.hotelTexts.get(0).getText()).toUpperCase();
-	    				if(! hotel.contains(ourHotel.ourHotelName.toUpperCase())) {
-	    					String msg = MessageFormat.format(app.getBundleString("Neopravneny pristup"), webStruct.label, ourHotel.ourHotelName);
+	    		for(WebStruct webStruct : ourHotel.getWebStructs()) {
+	    			if(webStruct.getHotelTexts().size() > 0) {
+	    				String hotel = DiacriticsRemover.removeDiacritics(webStruct.getHotelTexts().get(0).getText()).toUpperCase();
+	    				if(! hotel.contains(ourHotel.getOurHotelName().toUpperCase())) {
+	    					String msg = MessageFormat.format(app.getBundleString("Neopravneny pristup"), webStruct.getLabel(), ourHotel.getOurHotelName());
 	    					displayException(msg, new IllegalStateException());
 	    					authorized = false;
 	    					return;
@@ -392,7 +396,7 @@ public class AppFrame
         App.stop = false;
 		this.shell.getDisplay().syncExec(new Runnable() {
 			public void run() {
-				AppFrame.this.progressBar.setMaximum(AppFrame.this.app.workQueue.size() + 1);
+				AppFrame.this.progressBar.setMaximum(AppFrame.this.app.workUnitsManager.unfinishedCount() + 1);
 				AppFrame.this.progressBar.setSelection(1);
 			}
 		});
@@ -412,7 +416,7 @@ public class AppFrame
 		this.shell.getDisplay().asyncExec(runnableProgress);
 	}
 
-    private void onBtnRun() {
+    private void onBtnRun() throws InterruptedException {
     	try {
 	        if(App.stop) {
 	        	return;
