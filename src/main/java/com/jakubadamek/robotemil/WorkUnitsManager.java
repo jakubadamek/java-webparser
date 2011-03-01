@@ -83,8 +83,8 @@ public class WorkUnitsManager {
 
 		OurHotel ourHotel = app.getOurHotel();
         for(Date date : app.getDates()) {
-        	for(WebStruct webStruct : ourHotel.getWebStructs()) {
-        		WorkUnit workUnit = new WorkUnit(date, webStruct);
+        	for(WebStruct webHotels : ourHotel.getWebStructs()) {
+        		WorkUnit workUnit = new WorkUnit(date, webHotels);
         		add(workUnit);
         		submit(workUnit);
         	}

@@ -49,7 +49,23 @@ public class BookingCom extends HtmlParser {
 							new AndFilter(
 									new TagNameFilter("td"),
 									new HasAttributeFilter("class", "roomPrice"))));
-		NodeFilter takeAllFilter = new OrFilter(hotelNameFilter, priceFilter);
+/*		NodeFilter roomTypeFilter = 
+			new AndFilter(
+					new TagNameFilter("a"),
+					new HasParentFilter( // div
+							new HasParentFilter( // td
+									new HasParentFilter( // tr class="roomrow"
+											new AndFilter(
+													new TagNameFilter("tr"),
+													new HasAttributeFilter("class", "roomrow"))))));
+*/		
+		NodeFilter roomTypeFilter = 
+			new AndFilter(
+					new TagNameFilter("a"),
+					new HasAttributeFilter("class", "room_link "));
+
+		
+		NodeFilter takeAllFilter = new OrFilter(new OrFilter(hotelNameFilter, priceFilter), roomTypeFilter);
 		int ipage = 0;
 		int pageHotels = 1;
 		int offset = 0;
@@ -66,6 +82,9 @@ public class BookingCom extends HtmlParser {
 			    if(isStop()) return false;
 				if(hotelNameFilter.accept(node)) {
 					hotel = node.getChildren().toNodeArray()[0].getText().trim();
+				}
+				if(roomTypeFilter.accept(node)) {
+					//System.out.println(node.getChildren().toNodeArray()[0].getText().trim());
 				}
 				if(priceFilter.accept(node)) {
 					for(Node child : node.getChildren().toNodeArray()) {

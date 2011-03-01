@@ -9,7 +9,7 @@ public class SettingsModel implements Serializable {
 
     private List<OurHotel> ourHotels = new ArrayList<OurHotel>();
     private List<String> ourHotelNames;
-    private List<WebStruct> webStructs;
+    private List<WebParams> webStructs;
     private String customer;
     private String appTitle;
     private String excelFile;
@@ -45,14 +45,14 @@ public class SettingsModel implements Serializable {
     /**
      * @param webStructs the webStructs to set
      */
-    public void setWebStructs(List<WebStruct> webStructs) {
+    public void setWebStructs(List<WebParams> webStructs) {
 	this.webStructs = webStructs;
     }
 
     /**
      * @return the webStructs
      */
-    public List<WebStruct> getWebStructs() {
+    public List<WebParams> getWebParams() {
 	return webStructs;
     }
 

@@ -120,7 +120,7 @@ public class HrsCom extends HtmlParser
 	    	anchorTexts += a.getTextContent() + " ";
 	    }
 	    if(! prahaFound) {
-	    	throw new RuntimeException("Praha not found in " + anchorTexts);
+	    	//throw new RuntimeException("Praha not found in " + anchorTexts);
 	    }
 
 	    System.out.println("Downloading hotellist. Frames on this page: " + page.getFrames());

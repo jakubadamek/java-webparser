@@ -15,17 +15,18 @@ public class DownloadTask implements Runnable {
 		this.app = app;
 	}
 
+	@Override
 	public void run() {
-		System.out.println("Starting thread for " + this.workUnit.web.getParserClass().getSimpleName() + " " +
+		System.out.println("Starting thread for " + this.workUnit.web.getParams().getParserClass().getSimpleName() + " " +
 				DateFormat.getDateInstance().format(this.workUnit.date));
 		if(workUnit.finished) {
 			return;
 		}
 		int readFromCache = 0;
 		DateFormat dateFormat = DateFormat.getDateInstance();
-		String workUnitDesc = this.workUnit.web.getLabel() + " " + dateFormat.format(this.workUnit.date);
+		String workUnitDesc = this.workUnit.web.getParams().getLabel() + " " + dateFormat.format(this.workUnit.date);
 		if(this.app.isUseCache()) {
-			readFromCache = app.priceService.readPrices(this.workUnit.web.getExcelName(), this.workUnit.web.getPrices(), this.workUnit.date);
+			readFromCache = app.priceService.readPrices(this.workUnit.web.getParams().getExcelName(), this.workUnit.web.getPrices(), this.workUnit.date);
 			if(readFromCache > 0) {
 				this.app.showLog("Cache " + workUnitDesc + ": " + readFromCache + " " + this.app.getBundleString("data nalezena v cache"));
 				workUnit.finished = true;
@@ -36,12 +37,12 @@ public class DownloadTask implements Runnable {
 		try {
 			Date start = new Date();
 			this.app.showLog("Start " + workUnitDesc);
-			HtmlParser htmlParser = this.workUnit.web.getParserClass().newInstance();
+			HtmlParser htmlParser = this.workUnit.web.getParams().getParserClass().newInstance();
 			htmlParser.init(this.workUnit, this.app);
 			if(htmlParser.run()) {
 				if(htmlParser.getPrices().size() > 0) {
 					this.workUnit.web.getPrices().addAll(htmlParser.getPrices());
-					app.priceService.persistPrices(this.workUnit.web.getExcelName(), htmlParser.getPrices(), this.workUnit.date);
+					app.priceService.persistPrices(this.workUnit.web.getParams().getExcelName(), htmlParser.getPrices(), this.workUnit.date);
 					this.app.showLog("Hotovo " + workUnitDesc + ": " + htmlParser.getPrices().size()
 							+ " hotelu za " + (new Date().getTime() - start.getTime()) / 1000 + " s");
 					workUnit.finished = true;
