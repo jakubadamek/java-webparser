@@ -3,6 +3,7 @@ package com.jakubadamek.robotemil.htmlparser;
 import java.io.IOException;
 import java.util.Calendar;
 
+import org.apache.log4j.Logger;
 import org.htmlparser.Node;
 import org.htmlparser.NodeFilter;
 import org.htmlparser.Parser;
@@ -19,6 +20,7 @@ import org.htmlparser.util.ParserException;
  * @author Jakub
  */
 public class BookingCom extends HtmlParser {
+    private final Logger logger = Logger.getLogger(getClass());
 	private static final String HTML_EURO = "&#x20AC;";
 	private static final String BOOKING_COM =
 		"http://www.booking.com/searchresults.html?city=-553173&ssne=Prague" +
@@ -29,7 +31,7 @@ public class BookingCom extends HtmlParser {
 	public boolean run() throws ParserException, IOException {
 		String url = BOOKING_COM;
 	    Calendar calendar = Calendar.getInstance();
-	    calendar.setTime(this.date);
+	    calendar.setTime(this.dateFrom);
 	    //checkin_monthday=22;checkin_year_month=2008-8;" +
 		//"checkout_monthday=23;checkout_year_month=2008-8;" +
 		url += ";checkin_monthday=" + calendar.get(Calendar.DAY_OF_MONTH);
@@ -37,7 +39,7 @@ public class BookingCom extends HtmlParser {
 		calendar.add(Calendar.DAY_OF_MONTH, 1);
 		url += ";checkout_monthday=" + calendar.get(Calendar.DAY_OF_MONTH);
 		url += ";checkout_year_month=" + calendar.get(Calendar.YEAR) + "-" + (calendar.get(Calendar.MONTH) + 1);
-		System.out.println(url);
+		logger.info(url);
 		NodeFilter hotelNameFilter =
 			new AndFilter(
 					new TagNameFilter("a"),
@@ -84,7 +86,7 @@ public class BookingCom extends HtmlParser {
 					hotel = node.getChildren().toNodeArray()[0].getText().trim();
 				}
 				if(roomTypeFilter.accept(node)) {
-					//System.out.println(node.getChildren().toNodeArray()[0].getText().trim());
+					//logger.info(node.getChildren().toNodeArray()[0].getText().trim());
 				}
 				if(priceFilter.accept(node)) {
 					for(Node child : node.getChildren().toNodeArray()) {
@@ -94,14 +96,14 @@ public class BookingCom extends HtmlParser {
 					}
 					price = price.replace(HTML_EURO, "").replace("&nbsp;", "").trim();
 					if(price.length() > 0 && hotel != "") {
-						addPrice(hotel, this.date, price);
+						addPrice(hotel, this.dateFrom, price);
 						pageHotels ++;
 						hotel = "";
 					}
 				}
 			}
 			offset += pageHotels;
-			System.out.println("*** " + pageHotels + " hotels");
+			logger.info("*** " + pageHotels + " hotels");
 		}
 		return true;
 	}

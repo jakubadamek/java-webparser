@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 
-import org.eclipse.swt.widgets.Text;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -28,8 +28,9 @@ import com.jakubadamek.robotemil.services.SettingsService;
  */
 public class App implements InitializingBean 
 {
+    private static final Logger logger = Logger.getLogger(App.class);
     /** restart the same work unit when no response for as long */
-    static final int RESTART_AFTER_SECONDS = 30;
+    static final int RESTART_AFTER_SECONDS = 900;
     /** concurrent thread count */
     private int threadCount;
     //private static final boolean TEST = false;
@@ -98,11 +99,11 @@ public class App implements InitializingBean
             app.startDate = new Date(new Date().getTime() + Long.valueOf(args[0]) * 24*60*60*1000);
             app.dayCount = Integer.valueOf(args[1]);
             app.useCache = true;
-            System.out.println("startDate " + args[0] + " dayCount " + app.dayCount);
+            logger.info("startDate " + args[0] + " dayCount " + app.dayCount);
             app.startWork();
             app.workBody();
         /*} else {
-            System.out.println(new Date() + " task is not scheduled now");
+            logger.info(new Date() + " task is not scheduled now");
         }*/
     }
 
@@ -122,7 +123,7 @@ public class App implements InitializingBean
                     waitMinutes = 10;
                 }
                 lastRun = new Date();
-                System.out.println("waitMinutes: " + waitMinutes);
+                logger.info("waitMinutes: " + waitMinutes);
                 Thread.sleep(waitMinutes * 60 * 1000);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -157,7 +158,7 @@ public class App implements InitializingBean
         try {
             Thread.sleep(milliSeconds);
         } catch(InterruptedException e) {
-            System.out.println(e.toString());
+            logger.info(e.toString());
         }
     }
 
@@ -282,7 +283,7 @@ public class App implements InitializingBean
             try {
                 reader = new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream(filename));
             } catch(NullPointerException e) {
-                System.out.println(filename + " not found");
+                logger.info(filename + " not found");
                 return new String[] {};
             }
         }
@@ -304,7 +305,7 @@ public class App implements InitializingBean
 
     public void showLog(String row) {
         String logRow = timeFormat.format(new Date()) + " " + row;
-        System.out.println(logRow);
+        logger.info(logRow);
         if(this.appFrame != null) {
             this.appFrame.showLog(logRow);
         }

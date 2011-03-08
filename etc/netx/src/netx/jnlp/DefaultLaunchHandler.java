@@ -103,7 +103,7 @@ public class DefaultLaunchHandler implements LaunchHandler {
             result.append(")");
         }
 
-        System.out.println(result);
+        logger.info(result);
     }
 
 }

@@ -339,11 +339,11 @@ public class Version {
                 System.out.print( jvms[j].toString() + " " );
                 if (!jvms[j].matches(versions[v]))
                     System.out.print( "!" );
-                System.out.println( "matches " + versions[v].toString() );
+                logger.info( "matches " + versions[v].toString() );
             }
         }
 
-        System.out.println("Test completed");
+        logger.info("Test completed");
     }
     */
 

@@ -3,10 +3,14 @@ package com.jakubadamek.robotemil;
 import java.text.DateFormat;
 import java.util.Date;
 
+import org.apache.log4j.Logger;
+
 import com.jakubadamek.robotemil.htmlparser.HtmlParser;
 
 public class DownloadTask implements Runnable {
 	
+    private final Logger logger = Logger.getLogger(getClass());
+    
 	private WorkUnit workUnit;
 	private final App app;
 
@@ -17,7 +21,7 @@ public class DownloadTask implements Runnable {
 
 	@Override
 	public void run() {
-		System.out.println("Starting thread for " + this.workUnit.web.getParams().getParserClass().getSimpleName() + " " +
+		logger.info("Starting thread for " + this.workUnit.web.getParams().getParserClass().getSimpleName() + " " +
 				DateFormat.getDateInstance().format(this.workUnit.date));
 		if(workUnit.finished) {
 			return;
@@ -30,6 +34,7 @@ public class DownloadTask implements Runnable {
 			if(readFromCache > 0) {
 				this.app.showLog("Cache " + workUnitDesc + ": " + readFromCache + " " + this.app.getBundleString("data nalezena v cache"));
 				workUnit.finished = true;
+				logger.info("Latch count down - read from CACHE " + readFromCache + " records");
 				this.app.workUnitsManager.getLatch().countDown();
 				return;
 			}
@@ -46,6 +51,7 @@ public class DownloadTask implements Runnable {
 					this.app.showLog("Hotovo " + workUnitDesc + ": " + htmlParser.getPrices().size()
 							+ " hotelu za " + (new Date().getTime() - start.getTime()) / 1000 + " s");
 					workUnit.finished = true;
+	                logger.info("Latch count down - read from WEB " + htmlParser.getPrices().size() + " records");
 					this.app.workUnitsManager.getLatch().countDown();
 				} else {
 					this.app.showLog("Chyba, nic nenacteno " + workUnitDesc);
@@ -53,7 +59,7 @@ public class DownloadTask implements Runnable {
 			} else {
 				this.app.showLog("Stop " + workUnitDesc);				
 			}
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			this.app.showLog("Chyba " + workUnitDesc);
 			this.app.workUnitsManager.submit(this.workUnit);

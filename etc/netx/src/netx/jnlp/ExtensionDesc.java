@@ -123,7 +123,7 @@ public class ExtensionDesc {
             file = new JNLPFile(location);
 
             if (JNLPRuntime.isDebug())
-                System.out.println("Resolve: "+file.getInformation().getTitle());
+                logger.info("Resolve: "+file.getInformation().getTitle());
 
             // check for it being an extension descriptor
             if (!file.isComponent() && !file.isInstaller())

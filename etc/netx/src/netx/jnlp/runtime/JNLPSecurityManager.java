@@ -255,7 +255,7 @@ class JNLPSecurityManager extends SecurityManager {
         }
         catch (SecurityException ex) {
             if (JNLPRuntime.isDebug())
-                System.out.println("denying permission: "+perm);
+                logger.info("denying permission: "+perm);
 
             throw ex;
         }

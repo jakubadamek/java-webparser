@@ -2,6 +2,8 @@ package com.jakubadamek.robotemil.htmlparser;
 
 import java.io.IOException;
 import java.util.Calendar;
+
+import org.apache.log4j.Logger;
 import org.htmlparser.Node;
 import org.htmlparser.NodeFilter;
 import org.htmlparser.Parser;
@@ -18,6 +20,7 @@ import org.htmlparser.util.ParserException;
  * @author Jakub
  */
 public class LastminuteEs extends HtmlParser {
+    private final Logger logger = Logger.getLogger(getClass());
 	private static final String LASTMINUTE_COM =
 		"http://www.es.lastminute.com/site/viajes/hoteles/hotels-results.html" +
 		"?skin=eses.lastminute.com&lmnRooms=1" +
@@ -39,7 +42,7 @@ public class LastminuteEs extends HtmlParser {
 	public boolean run() throws ParserException, IOException {
 		String url = LASTMINUTE_COM;
 	    Calendar calendar = Calendar.getInstance();
-	    calendar.setTime(this.date);
+	    calendar.setTime(this.dateFrom);
 	    //&lmnCheckOutMonth=8&lmnCheckInDay=15&lmnCheckOutDay=16&lmnCheckInMonth=8
 	    //&startIndex=26
 	    url += "&lmnCheckInDay=" + calendar.get(Calendar.DAY_OF_MONTH);
@@ -47,7 +50,7 @@ public class LastminuteEs extends HtmlParser {
 	    calendar.add(Calendar.DAY_OF_MONTH, 1);
 	    url += "&lmnCheckOutDay=" + calendar.get(Calendar.DAY_OF_MONTH);
 	    url += "&lmnCheckOutMonth=" + (calendar.get(Calendar.MONTH) + 1);
-		System.out.println(url);
+		logger.debug(url);
 		NodeFilter hotelNameFilter = 
 			new AndFilter(
 					new TagNameFilter("a"),
@@ -83,13 +86,13 @@ public class LastminuteEs extends HtmlParser {
 					}
 					price = price.replace("&euro;", "").replace("&nbsp;", "").trim();
 					if(price.length() > 0 && hotel != "") {
-						addPrice(hotel, this.date, price);
+						addPrice(hotel, this.dateFrom, price);
 						pageHotels ++;
 						hotel = "";
 					}
 				}
 			}
-			System.out.println("*** " + pageHotels + " hotels");
+			logger.info("*** " + pageHotels + " hotels");
 		}
 		return true;
 	}	

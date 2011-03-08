@@ -176,7 +176,7 @@ public class ApplicationInstance {
             int nthreads = group.enumerate(threads);
             for (int i=0; i < nthreads; i++) {
                 if (JNLPRuntime.isDebug())
-                    System.out.println("Interrupt thread: "+threads[i]);
+                    logger.info("Interrupt thread: "+threads[i]);
 
                 threads[i].interrupt();
             }
@@ -186,7 +186,7 @@ public class ApplicationInstance {
             nthreads = group.enumerate(threads);
             for (int i=0; i < nthreads; i++) {
                 if (JNLPRuntime.isDebug())
-                    System.out.println("Stop thread: "+threads[i]);
+                    logger.info("Stop thread: "+threads[i]);
 
                 threads[i].stop();
             }

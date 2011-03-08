@@ -92,7 +92,7 @@ public class JNLPClassLoader extends URLClassLoader {
         super(new URL[0], JNLPClassLoader.class.getClassLoader());
 
         if (JNLPRuntime.isDebug())
-            System.out.println("New classloader: "+file.getFileLocation());
+            logger.info("New classloader: "+file.getFileLocation());
 
         this.file = file;
         this.updatePolicy = policy;
@@ -346,7 +346,7 @@ public class JNLPClassLoader extends URLClassLoader {
      */
     protected void activateNative(JARDesc jar) {
         if (JNLPRuntime.isDebug())
-            System.out.println("Activate native: "+jar.getLocation());
+            logger.info("Activate native: "+jar.getLocation());
 
         File localFile = tracker.getCacheFile(jar.getLocation());
         if (localFile == null)

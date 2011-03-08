@@ -191,7 +191,7 @@ public class Resource {
                     System.out.print(" +("+getStatusString(status & ~orig)+")");
                 if ((~status & orig) != 0) 
                     System.out.print(" -("+getStatusString(~status & orig)+")");
-                System.out.println(" @ "+location.getPath());
+                logger.info(" @ "+location.getPath());
             }
     }
 

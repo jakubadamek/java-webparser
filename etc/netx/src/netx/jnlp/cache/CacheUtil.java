@@ -148,7 +148,7 @@ public class CacheUtil {
             boolean result = entry.isCurrent(connection);
 
             if (JNLPRuntime.isDebug())
-                System.out.println("isCurrent: "+source+" = "+result);
+                logger.info("isCurrent: "+source+" = "+result);
 
             return result;
         }
@@ -177,7 +177,7 @@ public class CacheUtil {
         boolean result = entry.isCached();
 
         if (JNLPRuntime.isDebug())
-            System.out.println("isCached: "+source+" = "+result);
+            logger.info("isCached: "+source+" = "+result);
 
         return result;
     }

@@ -63,8 +63,8 @@ class XPersistenceService implements PersistenceService {
             requestPath = "";
 
         if (JNLPRuntime.isDebug()) {
-            System.out.println("codebase path: "+source.getFile());
-            System.out.println("request path: "+requestPath);
+            logger.info("codebase path: "+source.getFile());
+            logger.info("request path: "+requestPath);
         }
 
         if (!source.getFile().startsWith(requestPath))

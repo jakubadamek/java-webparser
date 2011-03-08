@@ -219,7 +219,7 @@ public class ResourceTracker {
 
             if (entry.isCached() && !updatePolicy.shouldUpdate(entry)) {
                 if (JNLPRuntime.isDebug())
-                    System.out.println("not updating: "+resource.location);
+                    logger.info("not updating: "+resource.location);
 
                 synchronized (resource) {
                     resource.localFile = CacheUtil.getCacheFile(resource.location, resource.downloadVersion);

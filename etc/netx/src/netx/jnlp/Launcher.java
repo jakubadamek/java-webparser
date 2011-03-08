@@ -219,7 +219,7 @@ public class Launcher {
         try {
             URL cs = Launcher.class.getProtectionDomain().getCodeSource().getLocation();
             if (JNLPRuntime.isDebug())
-                System.out.println("netx.jar path: "+cs.getPath());
+                logger.info("netx.jar path: "+cs.getPath());
 
             File netxFile = new File(cs.getPath());
             if (!netxFile.exists())

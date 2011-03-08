@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.RowMapper;
@@ -23,6 +24,7 @@ import com.jakubadamek.robotemil.entities.PriceAndOrder;
 @Repository
 @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 public class JdbcPriceService implements PriceService {
+    private final Logger logger = Logger.getLogger(getClass());
 
 	private static final String PRICES_COLUMNS = "Web, Hotel, Today, DaysBefore, Date, Price, HotelOrder";
 
@@ -73,9 +75,11 @@ public class JdbcPriceService implements PriceService {
 		List<Object[]> rows = new ArrayList<Object[]>();
 		for (String hotel : prices.getData().keySet()) {
 			PriceAndOrder priceAndOrder = prices.getData().get(hotel).get(date);
-			rows.add(new Object[] { web, hotel, new Date(),
-					daysBefore(date, new Date()), date, priceAndOrder.price,
-					priceAndOrder.order });
+			if(priceAndOrder != null) {
+    			rows.add(new Object[] { web, hotel, new Date(),
+    					daysBefore(date, new Date()), date, priceAndOrder.price,
+    					priceAndOrder.order });
+			}
 		}
 		jdbcTemplate.batchUpdate("INSERT INTO Prices(" + PRICES_COLUMNS
 				+ ") VALUES(?, ?, ?, ?, ?, ?, ?)", rows);
@@ -85,7 +89,7 @@ public class JdbcPriceService implements PriceService {
 		int deleted = jdbcTemplate.update(
 				"DELETE FROM Prices WHERE Date=? AND Web=? AND DaysBefore=?",
 				date, web, daysBefore(date, new Date()));
-		System.out.println("Deleted " + deleted + " rows");
+		logger.info("Deleted " + deleted + " rows");
 	}
 
 	private int daysBefore(Date date1, Date date2) {

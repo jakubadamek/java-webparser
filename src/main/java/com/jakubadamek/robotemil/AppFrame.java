@@ -1,14 +1,12 @@
 package com.jakubadamek.robotemil;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Formatter;
 import java.util.Locale;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -39,6 +37,7 @@ import org.eclipse.swt.widgets.Text;
 
 public class AppFrame
 {
+    private final Logger logger = Logger.getLogger(getClass());
 	private static final int MIN_HOTEL_ROWS = 15;
 	private static final int ADDITIONAL_ROWS = 10;
 	/** shell */
@@ -297,7 +296,7 @@ public class AppFrame
         }
 	}
 	
-	private void copyHotelNames() {
+	void copyHotelNames() {
         for (OurHotel ourHotel : app.getSettingsModel().getOurHotels()) {
             for(WebStruct webStruct : ourHotel.getWebStructs()) {
                 webStruct.getHotelList().clear();
@@ -355,7 +354,7 @@ public class AppFrame
     }
 
 	void displayException(final String msg, final Exception e) {
-		System.out.println(e);
+		logger.info(e);
 		displayMessage(msg + "\n" + e.toString(), app.getBundleString("Interni chyba"));
 	}
 

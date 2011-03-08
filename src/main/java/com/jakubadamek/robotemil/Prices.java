@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import jxl.common.Logger;
+
 import com.jakubadamek.robotemil.entities.PriceAndOrder;
 
 
@@ -12,6 +14,7 @@ import com.jakubadamek.robotemil.entities.PriceAndOrder;
  * Prices for hotel rooms
  */
 public class Prices implements Serializable {
+    private static final Logger logger = Logger.getLogger(Prices.class);
 	private static final long serialVersionUID = 4924511073557468113L;
 	/** Data */
 	private Map<String, Map<Date, PriceAndOrder>> data = new HashMap<String, Map<Date, PriceAndOrder>>();
@@ -25,17 +28,19 @@ public class Prices implements Serializable {
 	 * @param order
 	 */
 	public synchronized void addPrice(String hotel, Date date, String price, int order) {
-		addPrice(hotel, date, Double.valueOf(price), order);
+		addPrice(hotel, date, price == null ? null : Double.valueOf(price), order);
 	}
 
 	public synchronized void addPrice(String hotel, Date date, Double price, int order) {
 		if(! this.data.containsKey(hotel)) {
 			this.data.put(hotel, new HashMap<Date, PriceAndOrder>());
 		}
-		PriceAndOrder priceAndOrder = new PriceAndOrder();
-		priceAndOrder.price = price;
-		priceAndOrder.order = order;
-		this.data.get(hotel).put(date, priceAndOrder);
+		if(price != null) {
+    		PriceAndOrder priceAndOrder = new PriceAndOrder();
+    		priceAndOrder.price = price;
+    		priceAndOrder.order = order;
+    		this.data.get(hotel).put(date, priceAndOrder);
+		}
 	}
 
 	/**
@@ -67,5 +72,25 @@ public class Prices implements Serializable {
 	 */
 	public Map<String, Map<Date, PriceAndOrder>> getData() {
 		return this.data;
+	}
+	
+	public PriceAndOrder findHotel(String hotelNamePart, Date date) {
+        String hotelName = hotelNamePart; 
+	    if(! this.data.containsKey(hotelNamePart)) {
+    	    for(String hotel : this.data.keySet()) {
+    	        if(hotel.contains(hotelNamePart)) {
+    	            if(hotelNamePart.equals(hotelName)) {
+    	                hotelName = hotel;
+    	            } else {
+                        logger.info("Duplicit hotelNamePart: " + hotelNamePart + " = " + hotelName + " x " + hotel);
+    	                hotelName = null;
+    	            }
+    	        }
+    	    }
+	    }
+	    if(this.data.containsKey(hotelName)) {
+	        return data.get(hotelName).get(date);
+	    }
+	    return null;
 	}
 }

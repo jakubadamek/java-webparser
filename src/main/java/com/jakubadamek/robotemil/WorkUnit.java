@@ -31,4 +31,10 @@ public class WorkUnit {
 	public boolean miniEquals(WorkUnit other) {
 		return this.date.equals(other.date) && this.web == other.web;
 	}
+
+    @Override
+    public String toString() {
+        return "WorkUnit [date=" + date + ", web=" + web + ", lastResponseTime=" + lastResponseTime + ", finished=" + finished
+                + ", trials=" + trials + "]";
+    }	
 }

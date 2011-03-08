@@ -32,6 +32,8 @@
 				                <ref bean="bookingCom"/>
 				                <ref bean="lastminuteEs"/>
 				                <ref bean="hrsCom"/>
+				                <ref bean="expediaIt"/>
+<!--                                <ref bean="orbitzCom"/>-->
 				            </list>
 				        </property>
 				    </bean>                    

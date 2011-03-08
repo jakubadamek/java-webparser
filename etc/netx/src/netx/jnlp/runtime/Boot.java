@@ -112,17 +112,17 @@ public final class Boot implements PrivilegedAction {
         args = argsIn;
 
         if (null != getOption("-license")) {
-            System.out.println(miniLicense);
+            logger.info(miniLicense);
             System.exit(0);
         }
 
         if (null != getOption("-help")) {
-            System.out.println(helpMessage);
+            logger.info(helpMessage);
             System.exit(0);
         }
 
         if (null != getOption("-about"))
-            System.out.println(aboutMessage);
+            logger.info(aboutMessage);
 
         if (null != getOption("-verbose"))
             JNLPRuntime.setDebug(true);
@@ -194,7 +194,7 @@ public final class Boot implements PrivilegedAction {
             fatalError(R("BNeedsFile")+helpMessage);
 
         if (JNLPRuntime.isDebug())
-            System.out.println(R("BFileLoc")+": "+location);
+            logger.info(R("BFileLoc")+": "+location);
 
         URL url = null;
         if (new File(location).exists())
@@ -218,11 +218,11 @@ public final class Boot implements PrivilegedAction {
         if (JNLPRuntime.isDebug()) {
             if (getOption("-arg") != null)
                 if (file.isInstaller() || file.isApplet())
-                    System.out.println(R("BArgsNA"));
+                    logger.info(R("BArgsNA"));
 
             if (getOption("-param") != null)
                 if (file.isApplication())
-                    System.out.println(R("BParamNA"));
+                    logger.info(R("BParamNA"));
         }
 
         return file;

@@ -1,19 +1,23 @@
 package com.jakubadamek.robotemil;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.log4j.Logger;
+
 public class WorkUnitsManager {
 	/** max trials for one WorkUnit */
 	private static final int MAX_TRIALS = 5;
+    private final Logger logger = Logger.getLogger(getClass());
 	
 	private final App app;
 	
-	private final List<WorkUnit> workUnits = new ArrayList<WorkUnit>();
+	private final List<WorkUnit> workUnits = new CopyOnWriteArrayList<WorkUnit>();
+    // @GuardedBy this
 	private Thread checker;
 	private CountDownLatch workUnitsLatch;
 
@@ -24,17 +28,18 @@ public class WorkUnitsManager {
 		this.app = app;
 	}
 
-	public synchronized void add(WorkUnit workUnit) {
+	public void add(WorkUnit workUnit) {
 		workUnits.add(workUnit);
 	}
 
-	public synchronized int unfinishedCount() {
+	public int unfinishedCount() {
 		return (int) workUnitsLatch.getCount();
 	}
 
 	public synchronized void checkPeriodically() {
 		checker = new Thread("WorkUnitsChecker") {
-			@Override
+			@SuppressWarnings("synthetic-access")
+            @Override
 			public void run() {
 				try {
 					while(! isInterrupted()) {
@@ -42,7 +47,7 @@ public class WorkUnitsManager {
 						Thread.sleep(1000);
 					}
 				} catch(InterruptedException e) {
-					// interrupted - probably the application is shutting down
+					logger.info("Checker was interrupted - probably the app is shutting down.");
 				}
 			}
 		};
@@ -53,7 +58,7 @@ public class WorkUnitsManager {
 		return (new Date().getTime() - date.getTime()) / 1000;
 	}
 
-	public synchronized void check() {
+	public void check() {
 		for(WorkUnit workUnit : workUnits) {
 			if(! workUnit.finished) {
 				Date response = workUnit.lastResponseTime;
@@ -64,7 +69,7 @@ public class WorkUnitsManager {
 		}
 	}
 
-	public synchronized void interrupt() {
+	public synchronized void interruptChecker() {
 		if(checker != null) {
 			checker.interrupt();
 		}		
@@ -91,17 +96,20 @@ public class WorkUnitsManager {
         }
         checkPeriodically();
         getLatch().await();
-        System.out.println("latch entered");
+        logger.info("latch entered");
         threadPool.shutdown();
-		interrupt();		
+		interruptChecker();		
 	}
 
 	public void submit(WorkUnit workUnit) {
 		if(workUnit.trials.addAndGet(1) < MAX_TRIALS) {
-			DownloadTask task = new DownloadTask(workUnit, app); 
+			DownloadTask task = new DownloadTask(workUnit, app);
+			workUnit.lastResponseTime = new Date();
 			threadPool.submit(task);
+			logger.info("Submitting task " + workUnit);
 		} else {
 			workUnit.finished = true;
+            logger.info("Latch count down - max trials reached " + MAX_TRIALS);			
 			getLatch().countDown();
 		}
 	}

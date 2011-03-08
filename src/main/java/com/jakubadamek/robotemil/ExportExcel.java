@@ -7,6 +7,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
+
 import jxl.Workbook;
 import jxl.biff.EmptyCell;
 import jxl.format.Alignment;
@@ -25,6 +27,7 @@ import jxl.write.biff.RowsExceededException;
 import com.jakubadamek.robotemil.entities.PriceAndOrder;
 
 public class ExportExcel {
+    private final Logger logger = Logger.getLogger(getClass());
     /** days per row in the Excel result */
     private static final int DAYS_PER_ROW = 3;
     private static final int EMPTY_ROWS_EXCEL = 3;
@@ -70,10 +73,10 @@ public class ExportExcel {
         if (ihotel == this.lastHotel) {
             cellFormat.setBorder(Border.BOTTOM, BorderLineStyle.MEDIUM);
         }
-        if (col % (this.ourHotel.getWebStructs().size() * 2) == 1) {
+        if (col % (webCount() * 2) == 1) {
             cellFormat.setBorder(Border.LEFT, BorderLineStyle.MEDIUM);
         }
-        if (col % (this.ourHotel.getWebStructs().size() * 2) == 0) {
+        if (col % (webCount() * 2) == 0) {
             cellFormat.setBorder(Border.RIGHT, BorderLineStyle.MEDIUM);
         }
         if (row == 0) {
@@ -109,7 +112,7 @@ public class ExportExcel {
         String filename = app.getSettingsModel().getExcelFile();
         SimpleDateFormat format = new SimpleDateFormat("_yyyyMMdd_HHmmss");
         filename += format.format(new Date()) + ".xls";
-        System.out.println(filename);
+        logger.info(filename);
         WritableWorkbook workbook = Workbook.createWorkbook(new File(filename));
         boolean retval = writeXlsPrices(workbook);
         // serialize();
@@ -122,7 +125,7 @@ public class ExportExcel {
     }
 
     @SuppressWarnings("boxing")
-    private boolean writeXlsPrices(WritableWorkbook workbook) throws RowsExceededException, WriteException, IOException {
+    private boolean writeXlsPrices(WritableWorkbook workbook) throws RowsExceededException, WriteException {
         WritableSheet sheet = workbook.createSheet("ceny za pokoj", 1);
         sheet.setColumnView(0, 40);
         Calendar cal = Calendar.getInstance();
@@ -177,32 +180,17 @@ public class ExportExcel {
                     String hotel = webStruct.hasHotel(ihotel) ? webStruct.getHotelTexts().get(ihotel).getText() : "";
                     boolean noResult = true;
                     if (hotel.trim().length() > 0) {
-                        // String match = "";
-                        for (String hotelKey : webStruct.getPrices().getData().keySet()) {
-                            // if(hotelKey.contains(hotel)) {
-                            if (hotelKey.equals(hotel)) {
-                                /*
-                                 * if(match != "") {
-                                 * displayMessage(MessageFormat
-                                 * .format(getBundleString
-                                 * ("Nejednoznacny nazev"), new Object[] {
-                                 * hotel, webStruct.label, match + ", " +
-                                 * hotelKey }), "Chyba"); return false; }
-                                 */
-                                // match = hotelKey;
-                                PriceAndOrder priceAndOrder = webStruct.getPrices().getData().get(hotelKey).get(date);
-                                if (priceAndOrder != null) {
-                                    sheet.addCell(new jxl.write.Number(icol, this.irow + ihotel, priceAndOrder.order,
-                                            getCellFormat(date, ihotel, icol, this.irow + ihotel, null)));
-                                    sheet.addCell(new jxl.write.Number(icol + 1, this.irow + ihotel, priceAndOrder.price,
-                                            getCellFormat(date, ihotel, icol + 1, this.irow + ihotel,
-                                                    firstHotelPrice > priceAndOrder.price ? this.redPriceFont : null)));
-                                    if (ihotel == 0) {
-                                        firstHotelPrice = priceAndOrder.price;
-                                    }
-                                    noResult = false;
-                                }
+                        PriceAndOrder priceAndOrder = webStruct.getPrices().findHotel(hotel, date);
+                        if (priceAndOrder != null) {
+                            sheet.addCell(new jxl.write.Number(icol, this.irow + ihotel, priceAndOrder.order,
+                                    getCellFormat(date, ihotel, icol, this.irow + ihotel, null)));
+                            sheet.addCell(new jxl.write.Number(icol + 1, this.irow + ihotel, priceAndOrder.price,
+                                    getCellFormat(date, ihotel, icol + 1, this.irow + ihotel,
+                                            firstHotelPrice > priceAndOrder.price ? this.redPriceFont : null)));
+                            if (ihotel == 0) {
+                                firstHotelPrice = priceAndOrder.price;
                             }
+                            noResult = false;
                         }
                     }
                     if (noResult) {
@@ -249,7 +237,7 @@ public class ExportExcel {
         // split rows
         int nrows = (this.app.getDates().size() + 2) / DAYS_PER_ROW;
         for (int idateRow = 0; idateRow < nrows; idateRow++) {
-            int toRow = idateRow * (this.lastHotel + 3 + EMPTY_ROWS_EXCEL);
+            int toRow = idateRow * (this.lastHotel + webCount() + EMPTY_ROWS_EXCEL);
             copyCells(sheet, 0, 0, 0, this.lastHotel + 1 + EMPTY_ROWS_EXCEL, 0, toRow);
             int colStart = idateRow * moveWidth + 1;
             // for last row: decrease moveWidth
@@ -268,10 +256,10 @@ public class ExportExcel {
             }
             // merge date cells
             for (int idate = 0; idate < DAYS_PER_ROW; idate++) {
-                // System.out.println(idate * DAYS_PER_ROW + 1+", "+ toRow+", "+
+                // logger.info(idate * DAYS_PER_ROW + 1+", "+ toRow+", "+
                 // (idate + 1) * DAYS_PER_ROW+", "+
                 // toRow);
-                sheet.mergeCells(idate * DAYS_PER_ROW * 2 + 1, toRow, (idate + 1) * DAYS_PER_ROW * 2, toRow);
+                sheet.mergeCells(idate * webCount() * 2 + 1, toRow, (idate + 1) * webCount() * 2, toRow);
             }
         }
         moveWidth = ourHotel.getWebStructs().size() * 2 * Math.min(this.app.getDates().size(), DAYS_PER_ROW);
@@ -279,6 +267,10 @@ public class ExportExcel {
         for (int row = 0; row < 2; row++) {
             sheet.addCell(new jxl.write.Label(moveWidth + 1, row, "", cellFormat));
         }
+    }
+
+    private int webCount() {
+        return this.ourHotel.getWebStructs().size();
     }
 
     private void copyCells(WritableSheet sheet, int fromCol1, int fromRow1, int fromCol2, int fromRow2, int toCol, int toRow)

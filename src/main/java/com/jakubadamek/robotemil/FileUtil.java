@@ -10,7 +10,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 
+import org.apache.log4j.Logger;
+
 public class FileUtil {
+    private static final Logger logger = Logger.getLogger(FileUtil.class);
 	/**
 	 * Executes a command and shows its output
 	 * @param commandLine
@@ -18,13 +21,13 @@ public class FileUtil {
 	 * @throws IOException
 	 */
 	public static void exec(String commandLine, File workingDir) throws IOException {
-		System.out.println(commandLine);
+		logger.info(commandLine);
         Process process = Runtime.getRuntime().exec(commandLine, null, workingDir);
         BufferedReader inputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
         String line;
         while ((line = inputReader.readLine()) != null) {
-            System.out.println(line);
+            logger.info(line);
         }
         while ((line = errorReader.readLine()) != null) {
             System.err.println(line);
@@ -46,7 +49,7 @@ public class FileUtil {
      * @return true if target path is equal with source
      */
     public static boolean copyOut(String resourceName, File outputPath, ClassLoader classLoader) {
-        System.out.println("Checking contents " + resourceName + " against " + outputPath);
+        logger.info("Checking contents " + resourceName + " against " + outputPath);
 
         byte [] source = null;
         byte [] dest = null;
@@ -64,12 +67,12 @@ public class FileUtil {
                     dest = loadFromStream(new FileInputStream(outputPath));
                 }
             } catch (IOException e) {
-                System.out.println(e);
+                logger.info(e);
             }
 
             if (dest == null || !Arrays.equals(source, dest)) {
                 saveToFile(outputPath, source);
-                System.out.println(resourceName + " copied out to " + outputPath);
+                logger.info(resourceName + " copied out to " + outputPath);
             }
         } catch (IOException e) {
             e.printStackTrace();
