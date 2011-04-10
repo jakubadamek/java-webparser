@@ -19,8 +19,9 @@ public class FileUtil {
 	 * @param commandLine
 	 * @param workingDir
 	 * @throws IOException
+	 * @throws InterruptedException 
 	 */
-	public static void exec(String commandLine, File workingDir) throws IOException {
+	public static void exec(String commandLine, File workingDir) throws IOException, InterruptedException {
 		logger.info(commandLine);
         Process process = Runtime.getRuntime().exec(commandLine, null, workingDir);
         BufferedReader inputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -32,13 +33,8 @@ public class FileUtil {
         while ((line = errorReader.readLine()) != null) {
             System.err.println(line);
         }
-        try {
-            if (process.waitFor() != 0) {
-                System.err.println("exit value = " + process.exitValue());
-            }
-        }
-        catch (InterruptedException e) {
-            System.err.println(e);
+        if (process.waitFor() != 0) {
+            System.err.println("exit value = " + process.exitValue());
         }
     }
 

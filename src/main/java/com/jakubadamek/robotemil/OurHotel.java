@@ -51,6 +51,16 @@ public class OurHotel implements Serializable {
     public List<WebStruct> getWebStructs() {
         return webStructs;
     }
+    
+    public List<WebStruct> getEnabledWebStructs() {
+        List<WebStruct> retval = new ArrayList<WebStruct>(webStructs.size());
+        for(WebStruct webStruct : webStructs) {
+            if(webStruct.getParams().getEnabled()) {
+                retval.add(webStruct);
+            }
+        }
+        return retval;
+    }
 
     /**
      * @param ourHotelName

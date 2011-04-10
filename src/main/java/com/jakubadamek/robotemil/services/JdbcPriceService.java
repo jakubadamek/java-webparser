@@ -2,31 +2,25 @@ package com.jakubadamek.robotemil.services;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
-import org.springframework.jdbc.BadSqlGrammarException;
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jakubadamek.robotemil.Prices;
 import com.jakubadamek.robotemil.entities.PriceAndOrder;
 
 @Repository
-@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 public class JdbcPriceService implements PriceService {
     private final Logger logger = Logger.getLogger(getClass());
 
-	private static final String PRICES_COLUMNS = "Web, Hotel, Today, DaysBefore, Date, Price, HotelOrder";
+	private static final String PRICES_COLUMNS = "Web, Hotel, QueryDate, DaysBefore, Date, Price, HotelOrder";
 
 	private SimpleJdbcTemplate jdbcTemplate;
 
@@ -35,10 +29,11 @@ public class JdbcPriceService implements PriceService {
 		this.jdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
+	/* Read-only because of the method name starting with "read" */
+	@Transactional
 	@Override
 	public int readPrices(final String web, final Prices prices, final Date date) {
-		createTablePrices();
-		RowMapper<Object> rowMapper = new RowMapper<Object>() {
+		ParameterizedRowMapper<Object> rowMapper = new ParameterizedRowMapper<Object>() {
 			@Override
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 				String hotel = rs.getString("Hotel");
@@ -50,39 +45,40 @@ public class JdbcPriceService implements PriceService {
 		};
 		int rows = jdbcTemplate.query(
 				"SELECT * FROM Prices WHERE Date=? AND Web=? AND DaysBefore=?",
-				rowMapper, date, web, daysBefore(date, new Date())).size();
+				rowMapper, new java.sql.Date(date.getTime()), web, daysBefore(date, new Date())).size();
 		return rows;
 	}
 
-	private void createTablePrices() {
-		try {
-			jdbcTemplate
-					.update("CREATE TABLE Prices(Web VARCHAR(255), Hotel VARCHAR(255), Today DATE, DaysBefore INTEGER, "
-							+ "Date DATE, Price DECIMAL(10), HotelOrder INTEGER)");
-		} catch (BadSqlGrammarException e) {
-			if (e.getCause() == null
-					|| !e.getCause().getMessage()
-							.contains("Table already exists")) {
-				throw e;
-			}
-		}
+	@Transactional
+	@Override
+	public void createTables() {
+		jdbcTemplate
+				.update("CREATE TABLE IF NOT EXISTS Prices(" +
+						"	Web VARCHAR(255), " +
+						"	Hotel VARCHAR(255), " +
+						"	QueryDate DATE, " +
+						"	DaysBefore INTEGER, " +
+						"	Date DATE, " +
+						"	Price DECIMAL(10), " +
+						"	HotelOrder INTEGER)");
 	}
 
+	@Transactional
 	@Override
 	public void persistPrices(String web, Prices prices, Date date) {
-		createTablePrices();
 		deleteRefreshedData(web, date);
-		List<Object[]> rows = new ArrayList<Object[]>();
 		for (String hotel : prices.getData().keySet()) {
 			PriceAndOrder priceAndOrder = prices.getData().get(hotel).get(date);
 			if(priceAndOrder != null) {
-    			rows.add(new Object[] { web, hotel, new Date(),
-    					daysBefore(date, new Date()), date, priceAndOrder.price,
-    					priceAndOrder.order });
+    			jdbcTemplate.update("INSERT INTO Prices(" + PRICES_COLUMNS
+    					+ ") VALUES(?, ?, ?, ?, ?, ?, ?)", 
+    					web, hotel, new Date(),
+    					daysBefore(date, new Date()), 
+    					new java.sql.Date(date.getTime()), 
+    					priceAndOrder.price,
+    					priceAndOrder.order);
 			}
 		}
-		jdbcTemplate.batchUpdate("INSERT INTO Prices(" + PRICES_COLUMNS
-				+ ") VALUES(?, ?, ?, ?, ?, ?, ?)", rows);
 	}
 
 	private void deleteRefreshedData(String web, Date date) {

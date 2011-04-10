@@ -103,16 +103,28 @@ public class ExportExcel {
         }
         return cellFormat;
     }
+    
+    /**
+     * @return %APPDATA%/robotemil/robotemil_yyyyMMdd_HHmmss.xls
+     */
+    private String excelFileName() {
+        String filename = app.getSettingsModel().getExcelFile();
+        File dir = new File(System.getenv("APPDATA"), filename);
+        if(! dir.exists()) {
+        	dir.mkdirs();
+        }
+        filename = new File(dir, filename).getPath();
+        SimpleDateFormat format = new SimpleDateFormat("_yyyyMMdd_HHmmss");
+        filename += format.format(new Date()) + ".xls";
+        logger.info(filename);
+        return filename;
+    }
 
     boolean createXls() throws IOException, RowsExceededException, WriteException {
         if (!this.redPriceFont.getColour().equals(Colour.RED)) {
             this.redPriceFont.setColour(Colour.RED);
         }
-
-        String filename = app.getSettingsModel().getExcelFile();
-        SimpleDateFormat format = new SimpleDateFormat("_yyyyMMdd_HHmmss");
-        filename += format.format(new Date()) + ".xls";
-        logger.info(filename);
+        String filename = excelFileName();
         WritableWorkbook workbook = Workbook.createWorkbook(new File(filename));
         boolean retval = writeXlsPrices(workbook);
         // serialize();
@@ -134,7 +146,7 @@ public class ExportExcel {
         int icol = 1;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd. M. EEEE");
         // column widths
-        for (icol = 1; icol < 1 + this.app.getDates().size() * ourHotel.getWebStructs().size() * 2; icol += 2) {
+        for (icol = 1; icol < 1 + this.app.getDates().size() * ourHotel.getEnabledWebStructs().size() * 2; icol += 2) {
             sheet.setColumnView(icol, 6);
             sheet.setColumnView(icol + 1, 5);
         }
@@ -144,12 +156,12 @@ public class ExportExcel {
             cal.setTime(date);
             sheet.addCell(new jxl.write.Label(icol, this.irow, simpleDateFormat.format(cal.getTime()), getCellFormat(date, -1,
                     icol, this.irow, this.bigFont)));
-            icol += ourHotel.getWebStructs().size() * 2;
+            icol += ourHotel.getEnabledWebStructs().size() * 2;
         }
         this.irow += 2;
         // find last hotel
-        for (int ihotel = 0; ihotel < ourHotel.getWebStructs().get(0).getHotelTexts().size(); ihotel++) {
-            for (WebStruct webStruct : ourHotel.getWebStructs()) {
+        for (int ihotel = 0; ihotel < ourHotel.getEnabledWebStructs().get(0).getHotelTexts().size(); ihotel++) {
+            for (WebStruct webStruct : ourHotel.getEnabledWebStructs()) {
                 if (webStruct.hasHotel(ihotel)) {
                     this.lastHotel = ihotel;
                 }
@@ -158,7 +170,7 @@ public class ExportExcel {
         // hotel names
         for (int ihotel = 0; ihotel <= this.lastHotel; ihotel++) {
             String hotelName = "";
-            for (WebStruct webStruct : ourHotel.getWebStructs()) {
+            for (WebStruct webStruct : ourHotel.getEnabledWebStructs()) {
                 if (webStruct.hasHotel(ihotel)) {
                     hotelName = webStruct.getHotelTexts().get(ihotel).getText();
                     break;
@@ -170,7 +182,7 @@ public class ExportExcel {
         icol = 1;
         // order and price
         for (Date date : this.app.getDates()) {
-            for (WebStruct webStruct : ourHotel.getWebStructs()) {
+            for (WebStruct webStruct : ourHotel.getEnabledWebStructs()) {
                 sheet.addCell(new jxl.write.Label(icol, this.irow - 1, webStruct.getParams().getExcelName(), getCellFormat(date,
                         -1, icol, this.irow - 1, null)));
                 // sheet.mergeCells(icol, this.irow - 1, icol + 1, this.irow -
@@ -215,11 +227,11 @@ public class ExportExcel {
      * @throws WriteException
      */
     private void splitDates(WritableSheet sheet) throws RowsExceededException, WriteException {
-        int moveWidth = ourHotel.getWebStructs().size() * 2 * DAYS_PER_ROW;
+        int moveWidth = ourHotel.getEnabledWebStructs().size() * 2 * DAYS_PER_ROW;
         WritableCellFormat cellFormat = new WritableCellFormat();
         cellFormat.setBorder(Border.TOP, BorderLineStyle.MEDIUM);
         // top border
-        for (int icol = 1; icol < this.app.getDates().size() * 2 * ourHotel.getWebStructs().size() + 1; icol++) {
+        for (int icol = 1; icol < this.app.getDates().size() * 2 * ourHotel.getEnabledWebStructs().size() + 1; icol++) {
             WritableCell cell = sheet.getWritableCell(icol, 0);
             if (cell instanceof EmptyCell) {
                 sheet.addCell(new jxl.write.Label(icol, 0, "", cellFormat));
@@ -243,7 +255,7 @@ public class ExportExcel {
             // for last row: decrease moveWidth
             int overhead = (idateRow + 1) * DAYS_PER_ROW - this.app.getDates().size();
             if (overhead > 0) {
-                moveWidth -= overhead * ourHotel.getWebStructs().size() * 2;
+                moveWidth -= overhead * ourHotel.getEnabledWebStructs().size() * 2;
             }
             if (idateRow > 0) {
                 copyCells(sheet, colStart, 0, colStart + moveWidth - 1, this.lastHotel + EMPTY_ROWS_EXCEL - 1, 1, toRow);
@@ -262,7 +274,7 @@ public class ExportExcel {
                 sheet.mergeCells(idate * webCount() * 2 + 1, toRow, (idate + 1) * webCount() * 2, toRow);
             }
         }
-        moveWidth = ourHotel.getWebStructs().size() * 2 * Math.min(this.app.getDates().size(), DAYS_PER_ROW);
+        moveWidth = ourHotel.getEnabledWebStructs().size() * 2 * Math.min(this.app.getDates().size(), DAYS_PER_ROW);
         // last border on first row
         for (int row = 0; row < 2; row++) {
             sheet.addCell(new jxl.write.Label(moveWidth + 1, row, "", cellFormat));
@@ -270,7 +282,7 @@ public class ExportExcel {
     }
 
     private int webCount() {
-        return this.ourHotel.getWebStructs().size();
+        return this.ourHotel.getEnabledWebStructs().size();
     }
 
     private void copyCells(WritableSheet sheet, int fromCol1, int fromRow1, int fromCol2, int fromRow2, int toCol, int toRow)
@@ -294,7 +306,7 @@ public class ExportExcel {
     private void writeXlsHotelNames(WritableWorkbook workbook) throws RowsExceededException, WriteException {
         WritableSheet sheet = workbook.createSheet("nazvy hotelu", 2);
         int icol = 0;
-        for (WebStruct webStruct : this.ourHotel.getWebStructs()) {
+        for (WebStruct webStruct : this.ourHotel.getEnabledWebStructs()) {
             sheet.setColumnView(icol, 40);
             sheet.addCell(new jxl.write.Label(icol, 0, webStruct.getParams().getLabel()));
             this.irow = 1;
@@ -309,7 +321,7 @@ public class ExportExcel {
     private void writeXlsSettings(WritableWorkbook workbook) throws RowsExceededException, WriteException {
         WritableSheet sheet = workbook.createSheet("nastaveni", 3);
         int icol = 0;
-        for (WebStruct webStruct : this.ourHotel.getWebStructs()) {
+        for (WebStruct webStruct : this.ourHotel.getEnabledWebStructs()) {
             sheet.setColumnView(icol, 40);
             sheet.addCell(new jxl.write.Label(icol, 0, webStruct.getParams().getLabel()));
             this.irow = 1;

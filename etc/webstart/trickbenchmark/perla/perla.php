@@ -8,7 +8,7 @@
     <vendor>Jakub Adámek</vendor>
     <!--homepage href="docs/help.html"/-->
     <description>Benchmark cen hotelových pokojů</description>
-    <icon href="robot.jpg"/>
+    <icon href="splash.png" kind="splash"/>
     <offline-allowed/>
   </information>
   <security>

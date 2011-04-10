@@ -1,9 +1,12 @@
 package com.jakubadamek.robotemil;
 
+import java.awt.SplashScreen;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Formatter;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
@@ -59,12 +62,21 @@ public class AppFrame
 	private Date start;
 	private boolean shellDisposed;
 	boolean showDuration;
+	private List<Button> enabledWebs = new ArrayList<Button>();
 
     public AppFrame(App app) {
 		this.app = app;
 	}
 
+    private void closeSplashscreen() {
+        SplashScreen splash = SplashScreen.getSplashScreen();
+        if(splash != null) {
+            splash.close();
+        }
+    }
+    
 	void runGui() {
+	    closeSplashscreen();
         Display display = new Display ();
         this.shell = new Shell (display);
         this.shell.setText(app.getSettingsModel().getAppTitle());
@@ -148,7 +160,23 @@ public class AppFrame
         this.useCache.setFont(biggerFont);
         this.useCache.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
         this.useCache.setSelection(true);
-
+        
+        // new row: enabled webs
+        Composite rowEnabledWebs = new Composite(cmp, SWT.NONE);
+        GridLayout rowEnabledWebsLayout = new GridLayout();
+        rowEnabledWebsLayout.numColumns = app.getOurHotel().getWebStructs().size() + 1;
+        rowEnabledWebs.setLayout(rowEnabledWebsLayout);
+        Label enabledWebsLabel = new Label(rowEnabledWebs, SWT.NONE);
+        enabledWebsLabel.setText(app.getBundleString("Nacitat z techto webu"));
+        enabledWebsLabel.setFont(biggerFont);
+        for(WebStruct webStruct : app.getOurHotel().getWebStructs()) {
+            Button check = new Button(rowEnabledWebs, SWT.CHECK);
+            check.setFont(biggerFont);
+            check.setSelection(webStruct.getParams().getEnabled());
+            check.setText(webStruct.getParams().getLabel());
+            enabledWebs.add(check);
+        }
+        
         // new row
         Composite row5 = new Composite(cmp, SWT.NONE);
         GridLayout row5Layout = new GridLayout();
@@ -207,11 +235,18 @@ public class AppFrame
         });
 
         this.shell.addDisposeListener(new DisposeListener() {
+			@SuppressWarnings("synthetic-access")
 			@Override
 			public void widgetDisposed(DisposeEvent e) {
-	             System.exit(0);
-	             biggerFont.dispose();
-	             searchFont.dispose();
+				shellDisposed = true;
+			    bindHotelNames();
+			    bindEnabledWebs();
+			    app.saveHotels();
+			    app.storeEnabledWebs();
+			    App.stop = true;
+                biggerFont.dispose();
+	            searchFont.dispose();
+                app.workUnitsManager.shutdown();
 			}
         });
 	}
@@ -263,7 +298,7 @@ public class AppFrame
 	        KeyListener hotelsListener =  new KeyAdapter() {
 				@Override
 				public void keyReleased(KeyEvent arg0) {
-				    copyHotelNames();
+				    bindHotelNames();
 					app.saveHotels();
 				}
 	        };
@@ -296,7 +331,7 @@ public class AppFrame
         }
 	}
 	
-	void copyHotelNames() {
+	void bindHotelNames() {
         for (OurHotel ourHotel : app.getSettingsModel().getOurHotels()) {
             for(WebStruct webStruct : ourHotel.getWebStructs()) {
                 webStruct.getHotelList().clear();
@@ -305,6 +340,15 @@ public class AppFrame
                 }
             }
         }	    
+	}
+	
+	void bindEnabledWebs() {
+	    for(int iWeb = 0; iWeb < app.getOurHotel().getWebStructs().size(); iWeb ++) {
+	        for (OurHotel ourHotel : app.getSettingsModel().getOurHotels()) {
+	            boolean enabled = enabledWebs.get(iWeb).getSelection();
+	            ourHotel.getWebStructs().get(iWeb).getParams().setEnabled(enabled);
+	        }	        
+        }
 	}
 
     /** show the progress
@@ -388,6 +432,17 @@ public class AppFrame
 
     private void onBtnRun() throws InterruptedException {
     	try {
+            this.shell.getDisplay().syncExec(new Runnable() {
+                @Override
+                public void run() {                
+            	    bindEnabledWebs();
+            	    bindHotelNames();
+                }
+            });
+            if(app.getOurHotel().getEnabledWebStructs().size() == 0) {
+                displayMessage(app.getBundleString("Aspon1web"), app.getBundleString("Aspon1web.title"));
+                return;
+            }
 	        if(App.stop) {
 	        	return;
 	        }
@@ -407,7 +462,7 @@ public class AppFrame
 			this.shell.getDisplay().syncExec(new Runnable() {
 				@Override
 				public void run() {
-			        while(true) {
+			        for(int trial = 0; trial < 3; trial ++) {
 			    		try {
 			    			ExportExcel exportExcel = new ExportExcel(app.getOurHotel(), app);
 			    			exportExcel.createXls();
@@ -430,7 +485,9 @@ public class AppFrame
 					@Override
 					@SuppressWarnings("synthetic-access")
 					public void run() {
-						AppFrame.this.btnRun.setEnabled(true);
+						if(! AppFrame.this.btnRun.isDisposed()) {
+							AppFrame.this.btnRun.setEnabled(true);
+						}
 					}
 				});
 			}

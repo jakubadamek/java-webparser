@@ -8,7 +8,7 @@
     <vendor>Jakub Adámek</vendor>
     <!--homepage href="docs/help.html"/-->
     <description>Robot, který načte ceny hotelových pokojů v daném období</description>
-    <icon href="robot.jpg"/>
+    <icon href="splash.png" kind="splash"/>
     <offline-allowed/>
   </information>
   <security>

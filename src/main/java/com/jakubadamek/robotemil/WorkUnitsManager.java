@@ -20,6 +20,7 @@ public class WorkUnitsManager {
     // @GuardedBy this
 	private Thread checker;
 	private CountDownLatch workUnitsLatch;
+	private volatile Thread latchThread;
 
 	private ExecutorService threadPool;
 
@@ -80,7 +81,7 @@ public class WorkUnitsManager {
 	}
 	
 	public void prepare() {
-		workUnitsLatch = new CountDownLatch(app.getDates().size() * app.getOurHotel().getWebStructs().size());		
+		workUnitsLatch = new CountDownLatch(app.getDates().size() * app.getOurHotel().getEnabledWebStructs().size());		
 	}
 	
 	public void downloadAll(int threadCount) throws InterruptedException {
@@ -88,13 +89,14 @@ public class WorkUnitsManager {
 
 		OurHotel ourHotel = app.getOurHotel();
         for(Date date : app.getDates()) {
-        	for(WebStruct webHotels : ourHotel.getWebStructs()) {
+        	for(WebStruct webHotels : ourHotel.getEnabledWebStructs()) {
         		WorkUnit workUnit = new WorkUnit(date, webHotels);
         		add(workUnit);
         		submit(workUnit);
         	}
         }
         checkPeriodically();
+        latchThread = Thread.currentThread();
         getLatch().await();
         logger.info("latch entered");
         threadPool.shutdown();
@@ -112,6 +114,16 @@ public class WorkUnitsManager {
             logger.info("Latch count down - max trials reached " + MAX_TRIALS);			
 			getLatch().countDown();
 		}
+	}
+	
+	public void shutdown() {
+	    if(threadPool != null) {
+	        threadPool.shutdownNow();
+	    }
+	    if(latchThread != null) {
+	    	latchThread.interrupt();
+	    }
+	    interruptChecker();
 	}
 }
 

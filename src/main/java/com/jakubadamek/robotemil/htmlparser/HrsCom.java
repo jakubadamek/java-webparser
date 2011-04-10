@@ -65,12 +65,7 @@ public class HrsCom extends HtmlParser
     	    //savePage(page);
     	    //if(true) return;
     	    /*savePage(page);
-    	    try {
-    			Thread.sleep(100000);
-    		} catch (InterruptedException e) {
-    			// TODO Auto-generated catch block
-    			e.printStackTrace();
-    		}*/
+  			Thread.sleep(100000);*/
     
     	    boolean prahaFound = false;
     	    String prahaXPath = "//a";
@@ -107,7 +102,7 @@ public class HrsCom extends HtmlParser
     	    sumbitXPath = "//form[@name='currencyForm']";
     	    HtmlForm currencyForm = (HtmlForm) page.getByXPath(sumbitXPath).get(0);
     	    logger.info("Submitting " + currencyForm);
-    	    //page = (HtmlPage) currencyForm.submit(null);
+    	    page = (HtmlPage) currencyForm.submit(null);
     
     		logger.info("Downloading hotellist 2. Frames on this page: " + page.getFrames());
     	    // 16.8.2010

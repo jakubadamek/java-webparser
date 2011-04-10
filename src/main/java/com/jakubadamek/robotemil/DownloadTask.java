@@ -29,17 +29,17 @@ public class DownloadTask implements Runnable {
 		int readFromCache = 0;
 		DateFormat dateFormat = DateFormat.getDateInstance();
 		String workUnitDesc = this.workUnit.web.getParams().getLabel() + " " + dateFormat.format(this.workUnit.date);
-		if(this.app.isUseCache()) {
-			readFromCache = app.priceService.readPrices(this.workUnit.web.getParams().getExcelName(), this.workUnit.web.getPrices(), this.workUnit.date);
-			if(readFromCache > 0) {
-				this.app.showLog("Cache " + workUnitDesc + ": " + readFromCache + " " + this.app.getBundleString("data nalezena v cache"));
-				workUnit.finished = true;
-				logger.info("Latch count down - read from CACHE " + readFromCache + " records");
-				this.app.workUnitsManager.getLatch().countDown();
-				return;
-			}
-		}
 		try {
+			if(this.app.isUseCache()) {
+				readFromCache = app.priceService.readPrices(this.workUnit.web.getParams().getExcelName(), this.workUnit.web.getPrices(), this.workUnit.date);
+				if(readFromCache > 0) {
+					this.app.showLog("Cache " + workUnitDesc + ": " + readFromCache + " " + this.app.getBundleString("data nalezena v cache"));
+					workUnit.finished = true;
+					logger.info("Latch count down - read from CACHE " + readFromCache + " records");
+					this.app.workUnitsManager.getLatch().countDown();
+					return;
+				}
+			}
 			Date start = new Date();
 			this.app.showLog("Start " + workUnitDesc);
 			HtmlParser htmlParser = this.workUnit.web.getParams().getParserClass().newInstance();
@@ -52,7 +52,7 @@ public class DownloadTask implements Runnable {
 							+ " hotelu za " + (new Date().getTime() - start.getTime()) / 1000 + " s");
 					workUnit.finished = true;
 	                logger.info("Latch count down - read from WEB " + htmlParser.getPrices().size() + " records");
-					this.app.workUnitsManager.getLatch().countDown();
+					this.app.workUnitsManager.getLatch().countDown();					
 				} else {
 					this.app.showLog("Chyba, nic nenacteno " + workUnitDesc);
 				}

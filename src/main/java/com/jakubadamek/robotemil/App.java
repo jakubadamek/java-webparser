@@ -49,7 +49,7 @@ public class App implements InitializingBean
      */
     int ourHotelIndex = 0;
     /** stop execution */
-    public static boolean stop;
+    public static volatile boolean stop;
 
     Date startDate;
     int dayCount;
@@ -78,9 +78,10 @@ public class App implements InitializingBean
     }
 
     private static App getApp() {
-        ClassPathXmlApplicationContext spring = new ClassPathXmlApplicationContext(new String[]{"spring-config.xml"});
+        ClassPathXmlApplicationContext spring = new ClassPathXmlApplicationContext(
+        		new String[]{"spring/spring-config.xml"});
         //settingsService = spring.getBean(SettingsService.class);
-        return spring.getBean(App.class);
+        return (App) spring.getBean("app");
     }
     
     private static void runWithGui() {
@@ -152,16 +153,6 @@ public class App implements InitializingBean
         return retval;
     }
 
-    /** sleep
-     * @param milliSeconds */
-    static void sleep(int milliSeconds) {
-        try {
-            Thread.sleep(milliSeconds);
-        } catch(InterruptedException e) {
-            logger.info(e.toString());
-        }
-    }
-
     private void startWork() {
         try {
             loadHotels();
@@ -199,6 +190,10 @@ public class App implements InitializingBean
     	return customers.getSettingsModel();
     }
 
+    void storeEnabledWebs() {
+        settingsService.storeEnabledWebs(getOurHotel());    	
+    }
+    
     void saveHotels() {
         try {
             if(! new File(hotelsDir()).exists()) {
@@ -228,8 +223,10 @@ public class App implements InitializingBean
 
     @Override
     public void afterPropertiesSet() throws Exception {
+    	settingsService.createTables();
+    	priceService.createTables();
         int index = 0;
-        if(getSettingsModel().getOurHotels().size() > 0) {
+        if(getSettingsModel() == null || getSettingsModel().getOurHotels().size() > 0) {
             return;
         }
         for (String ourHotelName : getSettingsModel().getOurHotelNames()) {
@@ -241,6 +238,7 @@ public class App implements InitializingBean
                 ourHotel.getWebStructs().add(webStruct);
             }
             getSettingsModel().getOurHotels().add(ourHotel);
+            settingsService.readEnabledWebs(ourHotel);
         }        
     }
     

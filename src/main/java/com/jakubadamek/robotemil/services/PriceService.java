@@ -8,4 +8,6 @@ public interface PriceService {
     void persistPrices(String web, Prices prices, Date date);
 
     int readPrices(final String web, final Prices prices, final Date date);
+    
+    void createTables();
 }
