@@ -1,5 +1,7 @@
 package com.jakubadamek.robotemil.services;
 
+import java.util.List;
+
 import com.jakubadamek.robotemil.OurHotel;
 
 public interface SettingsService {
@@ -10,6 +12,10 @@ public interface SettingsService {
     void readEnabledWebs(OurHotel ourHotel);
     
     void storeEnabledWebs(OurHotel ourHotel);
+    
+    List<Integer> readLengthsOfStay();
+    
+    void storeLengthsOfStay(List<Integer> lengthsOfStay);
     
     void createTables();
 }

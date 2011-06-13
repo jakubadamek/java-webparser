@@ -1,8 +1,8 @@
 package com.jakubadamek.robotemil.htmlparser;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
@@ -17,6 +17,7 @@ import com.jakubadamek.robotemil.App;
 import com.jakubadamek.robotemil.DiacriticsRemover;
 import com.jakubadamek.robotemil.Prices;
 import com.jakubadamek.robotemil.WorkUnit;
+import com.jakubadamek.robotemil.WorkUnitKey;
 
 
 /**
@@ -29,6 +30,7 @@ public abstract class HtmlParser {
 	/** date for which prices are searched */
 	protected Date dateFrom;
 	protected DateTime dateTo;
+	protected WorkUnitKey key;
 	/** prices - the result of parsing */
 	private Prices prices;
 	private int order;
@@ -42,8 +44,9 @@ public abstract class HtmlParser {
 	 * @param aApp
 	 */
 	public void init(WorkUnit aWorkUnit, App aApp) {
-		this.dateFrom = aWorkUnit.date;
-		this.dateTo = new DateTime(aWorkUnit.date).plusDays(1);
+		this.dateFrom = aWorkUnit.key.getDate();
+		this.dateTo = new DateTime(aWorkUnit.key.getDate()).plusDays(aWorkUnit.key.getLengthOfStay());
+		this.key = aWorkUnit.key;
 		this.workUnit = aWorkUnit;
 		this.prices = new Prices();
 		this.app = aApp;
@@ -58,25 +61,50 @@ public abstract class HtmlParser {
 	 */
 	public abstract boolean run() throws Exception;
 
-	private DateFormat dateFormat = DateFormat.getDateInstance();
-
 	/**
 	 * Adds price to the inner structure
 	 *
 	 * @param aHotel
 	 * @param aDate
 	 * @param price
+	 * @param divideByLOS 
 	 */
-	protected void addPrice(String aHotel, Date aDate, String price) {
+	protected void addPrice(String aHotel, WorkUnitKey aKey, String price, boolean divideByLOS) {
+		addPrice(aHotel, aKey, price, divideByLOS, Currency.EUR);
+	}
+
+	private double usdEurExchangeRate;
+	
+	protected void addPrice(String aHotel, WorkUnitKey aKey, String price, boolean divideByLOS, Currency currency) {
 		this.order ++;
 		String hotel = DiacriticsRemover.removeDiacritics(aHotel.replace("&amp;", "&"));
-		final String logRow = getClass().getSimpleName() + " " + this.order + " " + hotel + " " + price + " "
-			+ this.dateFormat.format(aDate);
+		final String logRow = getClass().getSimpleName() + " " + this.order + " " + hotel + " " 
+			+ price + " " + key;
 		logger.info(logRow);
 		if(this.app != null) {
 			//this.app.showLog(logRow);
 		}
-		this.prices.addPrice(hotel, aDate, price, this.order);
+		Double priceDouble = null;
+		if(price != null) {
+			if(divideByLOS) {
+				priceDouble = Double.valueOf(price) / aKey.getLengthOfStay();
+			} else {
+				priceDouble = Double.valueOf(price);
+			}
+		}
+		if(priceDouble != null && currency != Currency.EUR) {
+			switch(currency) {
+			case USD:
+				if(usdEurExchangeRate == 0) {
+					usdEurExchangeRate = new ExchangeRate().currentUsdEur();
+				}
+				priceDouble /= usdEurExchangeRate;
+				break;
+			default:
+				throw new IllegalArgumentException(currency.name());
+			}
+		}
+		this.prices.addPrice(hotel, aKey, priceDouble, this.order);
 	}
 
 	/**
@@ -134,6 +162,21 @@ public abstract class HtmlParser {
                 htmlFile.delete();
             }
             page.save(htmlFile);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }	
+    
+    protected void savePage(String pageSource) {
+        try {
+            File htmlFile = new File("backup.html");
+            logger.info("Saving html page to " + htmlFile.getCanonicalPath());
+            if(htmlFile.exists()) {
+                htmlFile.delete();
+            }
+        	FileWriter fileWriter = new FileWriter(htmlFile);
+        	fileWriter.write(pageSource);
+        	fileWriter.close();
         } catch(Exception e) {
             e.printStackTrace();
         }

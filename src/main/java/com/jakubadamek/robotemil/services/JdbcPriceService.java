@@ -14,13 +14,14 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jakubadamek.robotemil.Prices;
+import com.jakubadamek.robotemil.WorkUnitKey;
 import com.jakubadamek.robotemil.entities.PriceAndOrder;
 
 @Repository
 public class JdbcPriceService implements PriceService {
     private final Logger logger = Logger.getLogger(getClass());
 
-	private static final String PRICES_COLUMNS = "Web, Hotel, QueryDate, DaysBefore, Date, Price, HotelOrder";
+	private static final String PRICES_COLUMNS = "Web, Hotel, QueryDate, DaysBefore, Date, Price, HotelOrder, LengthOfStay";
 
 	private SimpleJdbcTemplate jdbcTemplate;
 
@@ -32,20 +33,20 @@ public class JdbcPriceService implements PriceService {
 	/* Read-only because of the method name starting with "read" */
 	@Transactional
 	@Override
-	public int readPrices(final String web, final Prices prices, final Date date) {
+	public int readPrices(final String web, final Prices prices, final WorkUnitKey key) {
 		ParameterizedRowMapper<Object> rowMapper = new ParameterizedRowMapper<Object>() {
 			@Override
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 				String hotel = rs.getString("Hotel");
 				Double price = rs.getDouble("Price");
 				int order = rs.getInt("HotelOrder");
-				prices.addPrice(hotel, date, price, order);
+				prices.addPrice(hotel, key, price, order);
 				return null;
 			}
 		};
 		int rows = jdbcTemplate.query(
-				"SELECT * FROM Prices WHERE Date=? AND Web=? AND DaysBefore=?",
-				rowMapper, new java.sql.Date(date.getTime()), web, daysBefore(date, new Date())).size();
+				"SELECT * FROM Prices WHERE Date=? AND Web=? AND DaysBefore=? AND LengthOfStay=?",
+				rowMapper, new java.sql.Date(key.getDate().getTime()), web, daysBefore(key.getDate(), new Date()), key.getLengthOfStay()).size();
 		return rows;
 	}
 
@@ -60,31 +61,33 @@ public class JdbcPriceService implements PriceService {
 						"	DaysBefore INTEGER, " +
 						"	Date DATE, " +
 						"	Price DECIMAL(10), " +
-						"	HotelOrder INTEGER)");
+						"	HotelOrder INTEGER, " +
+						"   LengthOfStay INTEGER)");
 	}
 
 	@Transactional
 	@Override
-	public void persistPrices(String web, Prices prices, Date date) {
-		deleteRefreshedData(web, date);
+	public void persistPrices(String web, Prices prices, WorkUnitKey key) {
+		deleteRefreshedData(web, key);
 		for (String hotel : prices.getData().keySet()) {
-			PriceAndOrder priceAndOrder = prices.getData().get(hotel).get(date);
+			PriceAndOrder priceAndOrder = prices.getData().get(hotel).get(key);
 			if(priceAndOrder != null) {
     			jdbcTemplate.update("INSERT INTO Prices(" + PRICES_COLUMNS
-    					+ ") VALUES(?, ?, ?, ?, ?, ?, ?)", 
+    					+ ") VALUES(?, ?, ?, ?, ?, ?, ?, ?)", 
     					web, hotel, new Date(),
-    					daysBefore(date, new Date()), 
-    					new java.sql.Date(date.getTime()), 
+    					daysBefore(key.getDate(), new Date()), 
+    					new java.sql.Date(key.getDate().getTime()), 
     					priceAndOrder.price,
-    					priceAndOrder.order);
+    					priceAndOrder.order,
+    					key.getLengthOfStay());
 			}
 		}
 	}
 
-	private void deleteRefreshedData(String web, Date date) {
+	private void deleteRefreshedData(String web, WorkUnitKey key) {
 		int deleted = jdbcTemplate.update(
-				"DELETE FROM Prices WHERE Date=? AND Web=? AND DaysBefore=?",
-				date, web, daysBefore(date, new Date()));
+				"DELETE FROM Prices WHERE Date=? AND Web=? AND DaysBefore=? AND LengthOfStay=?",
+				key.getDate(), web, daysBefore(key.getDate(), new Date()), key.getLengthOfStay());
 		logger.info("Deleted " + deleted + " rows");
 	}
 

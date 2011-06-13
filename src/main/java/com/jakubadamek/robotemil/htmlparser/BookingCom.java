@@ -36,7 +36,7 @@ public class BookingCom extends HtmlParser {
 		//"checkout_monthday=23;checkout_year_month=2008-8;" +
 		url += ";checkin_monthday=" + calendar.get(Calendar.DAY_OF_MONTH);
 		url += ";checkin_year_month=" + calendar.get(Calendar.YEAR) + "-" + (calendar.get(Calendar.MONTH) + 1);
-		calendar.add(Calendar.DAY_OF_MONTH, 1);
+		calendar.setTime(this.dateTo.toDate());
 		url += ";checkout_monthday=" + calendar.get(Calendar.DAY_OF_MONTH);
 		url += ";checkout_year_month=" + calendar.get(Calendar.YEAR) + "-" + (calendar.get(Calendar.MONTH) + 1);
 		logger.info(url);
@@ -96,7 +96,7 @@ public class BookingCom extends HtmlParser {
 					}
 					price = price.replace(HTML_EURO, "").replace("&nbsp;", "").trim();
 					if(price.length() > 0 && hotel != "") {
-						addPrice(hotel, this.dateFrom, price);
+						addPrice(hotel, key, price, true);
 						pageHotels ++;
 						hotel = "";
 					}

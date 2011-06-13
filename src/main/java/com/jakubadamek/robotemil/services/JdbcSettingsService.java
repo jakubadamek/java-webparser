@@ -1,5 +1,8 @@
 package com.jakubadamek.robotemil.services;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.sql.DataSource;
 
 import jxl.common.Logger;
@@ -16,7 +19,8 @@ import com.jakubadamek.robotemil.WebStruct;
 @Repository
 public class JdbcSettingsService implements SettingsService {
 
-    private static final Logger logger = Logger.getLogger(JdbcSettingsService.class);
+    private static final String LENGTHS_OF_STAY = "lengthsOfStay";
+	private static final Logger logger = Logger.getLogger(JdbcSettingsService.class);
 	private static final String WEB_ENABLED = ".enabled";
     private SimpleJdbcTemplate jdbcTemplate;
 
@@ -66,7 +70,7 @@ public class JdbcSettingsService implements SettingsService {
         }
     }
 
-	@Transactional
+//	@Transactional
     @Override
     public void storeEnabledWebs(OurHotel ourHotel) {
         for(WebStruct webStruct : ourHotel.getWebStructs()) {
@@ -76,4 +80,26 @@ public class JdbcSettingsService implements SettingsService {
         }        
         logger.info("storeEnabledWebs finished");
     }
+
+	/* Read-only because of the method name starting with "read" */
+	@Transactional
+	@Override
+	public List<Integer> readLengthsOfStay() {
+		List<Integer> retval = new ArrayList<Integer>();
+		for(String los : readSetting(LENGTHS_OF_STAY, "1").split(" ")) {
+			retval.add(Integer.valueOf(los));
+		}
+		return retval;
+	}
+
+	@Transactional
+	@Override
+	public void storeLengthsOfStay(List<Integer> lengthsOfStay) {
+		StringBuffer code = new StringBuffer();
+		for(Integer los : lengthsOfStay) {
+			code.append(los).append(" ");
+		}
+		logger.info("storeLengthsOfStay " + code);
+		storeSetting(LENGTHS_OF_STAY, code.toString());
+	}
 }

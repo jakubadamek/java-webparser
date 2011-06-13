@@ -47,7 +47,7 @@ public class LastminuteEs extends HtmlParser {
 	    //&startIndex=26
 	    url += "&lmnCheckInDay=" + calendar.get(Calendar.DAY_OF_MONTH);
 	    url += "&lmnCheckInMonth=" + (calendar.get(Calendar.MONTH) + 1);
-	    calendar.add(Calendar.DAY_OF_MONTH, 1);
+	    calendar.setTime(this.dateTo.toDate());
 	    url += "&lmnCheckOutDay=" + calendar.get(Calendar.DAY_OF_MONTH);
 	    url += "&lmnCheckOutMonth=" + (calendar.get(Calendar.MONTH) + 1);
 		logger.debug(url);
@@ -86,7 +86,7 @@ public class LastminuteEs extends HtmlParser {
 					}
 					price = price.replace("&euro;", "").replace("&nbsp;", "").trim();
 					if(price.length() > 0 && hotel != "") {
-						addPrice(hotel, this.dateFrom, price);
+						addPrice(hotel, this.key, price, false);
 						pageHotels ++;
 						hotel = "";
 					}

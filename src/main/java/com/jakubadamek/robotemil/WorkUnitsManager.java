@@ -81,20 +81,22 @@ public class WorkUnitsManager {
 	}
 	
 	public void prepare() {
-		workUnitsLatch = new CountDownLatch(app.getDates().size() * app.getOurHotel().getEnabledWebStructs().size());		
+		workUnitsLatch = new CountDownLatch(app.getDates().size() * app.getOurHotel().getEnabledWebStructs().size() * app.getLengthsOfStay().size());		
 	}
 	
 	public void downloadAll(int threadCount) throws InterruptedException {
         threadPool = Executors.newFixedThreadPool(threadCount);
 
 		OurHotel ourHotel = app.getOurHotel();
-        for(Date date : app.getDates()) {
-        	for(WebStruct webHotels : ourHotel.getEnabledWebStructs()) {
-        		WorkUnit workUnit = new WorkUnit(date, webHotels);
-        		add(workUnit);
-        		submit(workUnit);
-        	}
-        }
+		for(Integer lengthOfStay : app.getLengthsOfStay()) {
+	        for(Date date : app.getDates()) {
+	        	for(WebStruct webHotels : ourHotel.getEnabledWebStructs()) {
+	        		WorkUnit workUnit = new WorkUnit(new WorkUnitKey(date, lengthOfStay), webHotels);
+	        		add(workUnit);
+	        		submit(workUnit);
+	        	}
+	        }
+		}
         checkPeriodically();
         latchThread = Thread.currentThread();
         getLatch().await();

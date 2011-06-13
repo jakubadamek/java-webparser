@@ -1,6 +1,5 @@
 package com.jakubadamek.robotemil;
 
-import java.text.DateFormat;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
@@ -21,17 +20,15 @@ public class DownloadTask implements Runnable {
 
 	@Override
 	public void run() {
-		logger.info("Starting thread for " + this.workUnit.web.getParams().getParserClass().getSimpleName() + " " +
-				DateFormat.getDateInstance().format(this.workUnit.date));
+		String workUnitDesc = this.workUnit.web.getParams().getLabel() + " " + this.workUnit.key;
+		logger.info("Starting thread for " + workUnitDesc);
 		if(workUnit.finished) {
 			return;
 		}
 		int readFromCache = 0;
-		DateFormat dateFormat = DateFormat.getDateInstance();
-		String workUnitDesc = this.workUnit.web.getParams().getLabel() + " " + dateFormat.format(this.workUnit.date);
 		try {
 			if(this.app.isUseCache()) {
-				readFromCache = app.priceService.readPrices(this.workUnit.web.getParams().getExcelName(), this.workUnit.web.getPrices(), this.workUnit.date);
+				readFromCache = app.priceService.readPrices(this.workUnit.web.getParams().getExcelName(), this.workUnit.web.getPrices(), this.workUnit.key);
 				if(readFromCache > 0) {
 					this.app.showLog("Cache " + workUnitDesc + ": " + readFromCache + " " + this.app.getBundleString("data nalezena v cache"));
 					workUnit.finished = true;
@@ -47,7 +44,7 @@ public class DownloadTask implements Runnable {
 			if(htmlParser.run()) {
 				if(htmlParser.getPrices().size() > 0) {
 					this.workUnit.web.getPrices().addAll(htmlParser.getPrices());
-					app.priceService.persistPrices(this.workUnit.web.getParams().getExcelName(), htmlParser.getPrices(), this.workUnit.date);
+					app.priceService.persistPrices(this.workUnit.web.getParams().getExcelName(), htmlParser.getPrices(), this.workUnit.key);
 					this.app.showLog("Hotovo " + workUnitDesc + ": " + htmlParser.getPrices().size()
 							+ " hotelu za " + (new Date().getTime() - start.getTime()) / 1000 + " s");
 					workUnit.finished = true;

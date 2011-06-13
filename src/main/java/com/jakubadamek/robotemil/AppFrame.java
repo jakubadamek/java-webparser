@@ -43,6 +43,7 @@ public class AppFrame
     private final Logger logger = Logger.getLogger(getClass());
 	private static final int MIN_HOTEL_ROWS = 15;
 	private static final int ADDITIONAL_ROWS = 10;
+	private static final int MAX_LENGTH_OF_STAY = 3;
 	/** shell */
 	public Shell shell;
 	/** progress bar */
@@ -63,6 +64,7 @@ public class AppFrame
 	private boolean shellDisposed;
 	boolean showDuration;
 	private List<Button> enabledWebs = new ArrayList<Button>();
+	private List<Button> lengthsOfStay = new ArrayList<Button>();
 
     public AppFrame(App app) {
 		this.app = app;
@@ -177,6 +179,22 @@ public class AppFrame
             enabledWebs.add(check);
         }
         
+        // new row: length of stay
+        Composite rowLengthOfStay = new Composite(cmp, SWT.NONE);
+        GridLayout rowLengthOfStayLayout = new GridLayout();
+        rowLengthOfStayLayout.numColumns = app.getOurHotel().getWebStructs().size() + 1;
+        rowLengthOfStay.setLayout(rowLengthOfStayLayout);
+        Label rowLengthOfStayLabel = new Label(rowLengthOfStay, SWT.NONE);
+        rowLengthOfStayLabel.setText(app.getBundleString("Delka pobytu"));
+        rowLengthOfStayLabel.setFont(biggerFont);
+        for(int lengthOfStay = 1; lengthOfStay <= MAX_LENGTH_OF_STAY; lengthOfStay ++) {
+            Button check = new Button(rowLengthOfStay, SWT.CHECK);
+            check.setFont(biggerFont);
+            check.setSelection(app.getLengthsOfStay().contains(new Integer(lengthOfStay)));
+            check.setText("" + lengthOfStay);
+            lengthsOfStay.add(check);
+        }
+        
         // new row
         Composite row5 = new Composite(cmp, SWT.NONE);
         GridLayout row5Layout = new GridLayout();
@@ -241,8 +259,10 @@ public class AppFrame
 				shellDisposed = true;
 			    bindHotelNames();
 			    bindEnabledWebs();
+			    bindLengthsOfStay();
 			    app.saveHotels();
 			    app.storeEnabledWebs();
+			    app.storeLengthsOfStay();
 			    App.stop = true;
                 biggerFont.dispose();
 	            searchFont.dispose();
@@ -350,6 +370,19 @@ public class AppFrame
 	        }	        
         }
 	}
+	
+	void bindLengthsOfStay() {
+		List<Integer> lengthsOfStayNumbers = new ArrayList<Integer>();
+		int lengthOfStayNumber = 1;
+		for(Button los : this.lengthsOfStay) {
+			if(los.getSelection()) {
+				lengthsOfStayNumbers.add(lengthOfStayNumber);
+			}
+			lengthOfStayNumber ++;
+		}
+		app.setLengthsOfStay(lengthsOfStayNumbers);
+		logger.info("setLengthOfStay " + lengthsOfStayNumbers);
+	}
 
     /** show the progress
      * @param finishedCount */
@@ -437,6 +470,7 @@ public class AppFrame
                 public void run() {                
             	    bindEnabledWebs();
             	    bindHotelNames();
+            	    bindLengthsOfStay();
                 }
             });
             if(app.getOurHotel().getEnabledWebStructs().size() == 0) {

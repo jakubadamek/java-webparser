@@ -43,6 +43,7 @@ public class App implements InitializingBean
     Customers customers;    
     public PriceService priceService;
     public SettingsService settingsService;
+    private List<Integer> lengthsOfStay = new ArrayList<Integer>();
 
     /**
      * Index of currently chosen tab in our hotels
@@ -172,6 +173,7 @@ public class App implements InitializingBean
             appFrame.runProgress();
         }
         workUnitsManager.downloadAll(threadCount);
+        fixHotelNames();
         /*if(TEST) {
             try {
                 deserialize();
@@ -191,7 +193,11 @@ public class App implements InitializingBean
     }
 
     void storeEnabledWebs() {
-        settingsService.storeEnabledWebs(getOurHotel());    	
+        settingsService.storeEnabledWebs(getOurHotel());        
+    }
+    
+    void storeLengthsOfStay() {
+    	settingsService.storeLengthsOfStay(lengthsOfStay);
     }
     
     void saveHotels() {
@@ -240,6 +246,7 @@ public class App implements InitializingBean
             getSettingsModel().getOurHotels().add(ourHotel);
             settingsService.readEnabledWebs(ourHotel);
         }        
+        lengthsOfStay = settingsService.readLengthsOfStay();
     }
     
     void loadHotels() throws IOException {
@@ -255,6 +262,31 @@ public class App implements InitializingBean
 	            }
             }
         }
+    }
+    
+    void fixHotelNames() {
+        for(OurHotel ourHotel : getSettingsModel().getOurHotels()) {
+            for (WebStruct web : ourHotel.getWebStructs()) {
+            	List<String> oldHotels = new ArrayList<String>();
+            	oldHotels.addAll(web.getHotelList());
+	            //web.getHotelList().clear();
+	            for (String hotel : oldHotels) {
+	            	if(hotel != "" && web.getPrices().findHotelName(hotel) != null) {
+		            	String bestMatch = "no match";
+		            	int minWordDistance = 999;
+		            	for(String hotelName : web.getPrices().getData().keySet()) {
+		            		int wordDistance = Levensthein.wordDistance(hotelName, hotel); 
+		            		if(wordDistance < minWordDistance) {
+		            			minWordDistance = wordDistance;
+		            			bestMatch = hotelName;
+		            		}
+		            	}
+		            	logger.info(web.getParams().getLabel() + " " + hotel + " best matches " + bestMatch + " distance " + minWordDistance);
+	            	}
+	                //web.getHotelList().add(DiacriticsRemover.removeDiacritics(bestMatch).trim());
+	            }
+            }
+        }    	
     }
 
     @Required
@@ -358,4 +390,12 @@ public class App implements InitializingBean
     public void setThreadCount(int threadCount) {
         this.threadCount = threadCount;
     }
+
+	public void setLengthsOfStay(List<Integer> lengthsOfStay) {
+		this.lengthsOfStay = lengthsOfStay;
+	}
+
+	public List<Integer> getLengthsOfStay() {
+		return lengthsOfStay;
+	}
 }

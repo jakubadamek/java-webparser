@@ -8,7 +8,29 @@
 	<version>2.0</version>
 	<url>http://maven.apache.org</url>
 	<dependencies>
+<!-- 		<dependency>
+		    <groupId>org.seleniumhq.selenium</groupId>
+		    <artifactId>selenium</artifactId>
+		    <version>2.0b3</version>
+		</dependency>
 		<dependency>
+		    <groupId>org.seleniumhq.webdriver</groupId>
+		    <artifactId>webdriver-htmlunit</artifactId>
+		    <version>0.9.7376</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.seleniumhq.webdriver</groupId>
+		    <artifactId>webdriver-firefox</artifactId>
+		    <version>0.9.7376</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.seleniumhq.webdriver</groupId>
+		    <artifactId>webdriver-support</artifactId>
+		    <version>0.9.7376</version>
+		</dependency>
+		
+ -->		
+ 		<dependency>
 		    <groupId>joda-time</groupId>
 		    <artifactId>joda-time</artifactId>
 		    <version>1.6.2</version>
@@ -153,6 +175,14 @@
 			<id>central</id>
 			<name>Maven Repository Switchboard</name>
 			<url>http://repo1.maven.org/maven2</url>
+		</repository>
+		<repository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>mvnrepository</id>
+			<name>Mvn Repository</name>
+			<url>http://mvnrepository.com/artifact</url>
 		</repository>
 	</repositories>
 	<build>

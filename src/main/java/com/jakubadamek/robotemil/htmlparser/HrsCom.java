@@ -27,7 +27,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
  * http://www.hrs.com/search.do;jsessionid=4E8CA1799BDCCC476E46A08BC6463687?clientId=Y3NfX0hSUw--&cid=12-1&location=Praha (Hlavní město Praha)&perimeter=20&startDateDay=20&startDateMonth=11&startDateYear=2008&endDateDay=21&endDateMonth=11&endDateYear=2008
  *
  * @author Jakub Adamek
- */
+ */	
 public class HrsCom extends HtmlParser
 {
     private final Logger logger = Logger.getLogger(getClass());
@@ -55,7 +55,7 @@ public class HrsCom extends HtmlParser
     	    DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.ENGLISH);
     	    fillTextField(page, "stayPeriod.start.date", dateFormat.format(calendar.getTime()));
     	    logger.info(dateFormat.format(calendar.getTime()));
-    	    calendar.add(Calendar.DATE, 1);
+    	    calendar.setTime(this.dateTo.toDate());
     	    fillTextField(page, "stayPeriod.end.date", dateFormat.format(calendar.getTime()));
     	    String sumbitXPath = "//input[@name='submitBasicSearch']";
     	    HtmlSubmitInput inputSubmit = (HtmlSubmitInput) page.getByXPath(sumbitXPath).get(0);
@@ -133,7 +133,7 @@ public class HrsCom extends HtmlParser
     				    	//HtmlTable htmlTable = (HtmlTable) a.getParentNode().getParentNode().getParentNode().getParentNode().getParentNode();
     				    	//logger.info(htmlTable.getAttribute("id") + " " + a.getCanonicalXPath());
     			    	    //logger.info(a.getTextContent() + "; " + price);
-    			    	    addPrice(a.getTextContent(), this.dateFrom, price);
+    			    	    addPrice(a.getTextContent(), key, price, false);
     			    	}
     		    	}
     	    	}
