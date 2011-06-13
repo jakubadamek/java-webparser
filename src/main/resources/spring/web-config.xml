@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <bean id="bookingCom" class="com.jakubadamek.robotemil.WebParams">
+        <property name="label" value="booking.com"/>
+        <property name="fileName" value="booking_com_1.2.txt"/>
+        <property name="excelName" value="Booking"/>
+        <property name="parserClass" value="com.jakubadamek.robotemil.htmlparser.BookingCom"/>
+        <property name="iconName" value="bookingcom.gif"/>
+    </bean>
+
+    <bean id="lastminuteEs" class="com.jakubadamek.robotemil.WebParams">
+        <property name="label" value="lastminute.es"/>
+        <property name="fileName" value="lastminute_1.2.txt"/>
+        <property name="excelName" value="Lastminute"/>
+        <property name="parserClass" value="com.jakubadamek.robotemil.htmlparser.LastminuteEs"/>
+        <property name="iconName" value="lastminutees.gif"/>
+    </bean>
+
+    <bean id="hrsCom" class="com.jakubadamek.robotemil.WebParams">
+        <property name="label" value="hrs.com"/>
+        <property name="fileName" value="hrs_com_1.2.txt"/>
+        <property name="excelName" value="Hrs"/>
+        <property name="parserClass" value="com.jakubadamek.robotemil.htmlparser.HrsCom"/>
+        <property name="iconName" value="hrscom.gif"/>
+    </bean>
+        
+    <bean id="expediaIt" class="com.jakubadamek.robotemil.WebParams">
+        <property name="label" value="expedia.it"/>
+        <property name="fileName" value="expedia_com_1.2.txt"/>
+        <property name="excelName" value="Expedia"/>
+        <property name="parserClass" value="com.jakubadamek.robotemil.htmlparser.ExpediaIt"/>
+        <property name="iconName" value="expediacom.gif"/>
+    </bean>
+        
+    <bean id="orbitzCom" class="com.jakubadamek.robotemil.WebParams">
+        <property name="label" value="orbitz.com"/>
+        <property name="fileName" value="orbitz_com_1.2.txt"/>
+        <property name="excelName" value="Orbitz"/>
+        <property name="parserClass" value="com.jakubadamek.robotemil.htmlparser.OrbitzCom"/>
+        <property name="iconName" value="orbitzcom.gif"/>
+    </bean>
+        
+</beans>        

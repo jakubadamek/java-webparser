@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+	       http://www.springframework.org/schema/aop 
+	       http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx 
+           http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
+
+	<!-- Instructs Spring to use system properties in placeholders (needed for 
+		${user.home}): -->
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+	</bean>
+
+	<!-- Deploys a in-memory "booking" datasource populated -->
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="org.h2.Driver" />
+		<property name="url"
+			value="jdbc:h2:~/trickBenchmark/trickBenchmark;AUTOCOMMIT=ON" />
+		<property name="username" value="sa" />
+		<property name="password" value="" />
+	</bean>
+	<bean id="priceService" class="com.jakubadamek.robotemil.services.JdbcPriceService">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="settingsService" class="com.jakubadamek.robotemil.services.JdbcSettingsService">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- ========================= TRANSACTIONS ========================= -->
+	<!-- Instructs Spring to perfrom declarative transaction management on annotated 
+		classes -->
+	<!-- <tx:annotation-driven /> -->
+	
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- the transactional advice (i.e. what 'happens'; see the <aop:advisor/> 
+		bean below) -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<!-- all methods starting with 'read' are read-only -->			
+ 			<tx:method name="read*" read-only="true" />
+			<!-- other methods use the default transaction settings (see below) -->
+			<tx:method name="*" />
+		</tx:attributes>
+	</tx:advice>
+
+	<aop:config>
+		<aop:pointcut id="txPointcut"
+			expression="com.jakubadamek.robotemil.services.AopPointcut.txPointcut()" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut" />
+	</aop:config>
+
+
+</beans>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <bean id="app" class="com.jakubadamek.robotemil.App">
+        <property name="threadCount" value="2"/>
+        <property name="customers" ref="customers"/>
+        <property name="priceService" ref="priceService"/>
+        <property name="settingsService" ref="settingsService"/>
+    </bean>  
+
+    <bean id="customers" class="com.jakubadamek.robotemil.Customers">
+        <property name="app" ref="app"/>
+        <property name="customers">
+            <map>
+                <entry key="JALTA">
+				    <bean class="com.jakubadamek.robotemil.SettingsModel">
+				        <property name="customer" value="Jalta"/>
+				        <property name="appTitle" value="Trick Benchmark"/>
+				        <property name="excelFile" value="trick"/>
+				        <property name="ourHotelNames">
+				            <list>
+				                <value>Jalta</value>
+				                <value>Alta</value>
+				            </list>
+				        </property>
+				        <property name="webStructs">
+				            <list>
+				                <ref bean="bookingCom"/>
+				                <ref bean="lastminuteEs"/>
+				                <ref bean="hrsCom"/>
+<!--				                <ref bean="expediaIt"/>-->
+                                <ref bean="orbitzCom"/>
+				            </list>
+				        </property>
+				    </bean>                    
+                </entry>
+                <entry key="PERLA">
+                    <bean class="com.jakubadamek.robotemil.SettingsModel">
+                        <property name="customer" value="Perla"/>
+                        <property name="appTitle" value="Trick Benchmark"/>
+                        <property name="excelFile" value="trick_benchmark"/>
+                        <property name="ourHotelNames">
+                            <list>
+                                <value>Perla</value>
+                            </list>
+                        </property>
+                        <property name="webStructs">
+                            <list>
+                                <ref bean="bookingCom"/>
+                                <ref bean="lastminuteEs"/>
+                                <ref bean="hrsCom"/>
+<!--                                <ref bean="expediaIt"/>-->
+                            </list>
+                        </property>
+                    </bean>                    
+                </entry>
+                <entry key="TESTHOTEL">
+				    <bean class="com.jakubadamek.robotemil.SettingsModel">
+				        <property name="customer" value="Test Hotel"/>
+				        <property name="appTitle" value="Robot Emil Test"/>
+				        <property name="excelFile" value="robotemiltest"/>
+				        <property name="ourHotelNames">
+				            <list>
+				                <value>Test</value>
+				            </list>
+				        </property>
+				        <property name="webStructs">
+				            <list>
+				                <ref bean="bookingCom"/>
+				                <ref bean="lastminuteEs"/>
+				                <ref bean="hrsCom"/>
+				                <ref bean="expediaIt"/>
+                                <ref bean="orbitzCom"/>
+				            </list>
+				        </property>
+				    </bean>                    
+                </entry>
+            </map>
+        </property>
+    </bean>    
+    
+</beans>
