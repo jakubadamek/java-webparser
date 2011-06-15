@@ -291,9 +291,19 @@ public class ExportExcel {
 	private String hotelName(int ihotel) {
 		for (WebStruct webStruct : ourHotel.getEnabledWebStructs()) {
 		    if (webStruct.hasHotel(ihotel)) {
-		        return webStruct.getHotelTexts().get(ihotel).getText();
+		    	String hotelNamePart = webStruct.getHotelTexts().get(ihotel).getText(); 
+		    	String name = webStruct.getPrices().findHotelName(hotelNamePart);
+		    	if(name != null) {
+		    		return name;
+		    	}
 		    }
 		}
+		// If the name was not found in prices ...
+		for (WebStruct webStruct : ourHotel.getEnabledWebStructs()) {
+		    if (webStruct.hasHotel(ihotel)) {
+		    	return webStruct.getHotelTexts().get(ihotel).getText();
+		    }
+		}		
 		return "";
 	}
 

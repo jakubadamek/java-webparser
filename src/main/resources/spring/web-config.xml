@@ -7,7 +7,7 @@
 
     <bean id="bookingCom" class="com.jakubadamek.robotemil.WebParams">
         <property name="label" value="booking.com"/>
-        <property name="fileName" value="booking_com_1.2.txt"/>
+        <property name="fileName" value="booking_com_1.3.txt"/>
         <property name="excelName" value="Booking"/>
         <property name="parserClass" value="com.jakubadamek.robotemil.htmlparser.BookingCom"/>
         <property name="iconName" value="bookingcom.gif"/>
@@ -15,7 +15,7 @@
 
     <bean id="lastminuteEs" class="com.jakubadamek.robotemil.WebParams">
         <property name="label" value="lastminute.es"/>
-        <property name="fileName" value="lastminute_1.2.txt"/>
+        <property name="fileName" value="lastminute_1.3.txt"/>
         <property name="excelName" value="Lastminute"/>
         <property name="parserClass" value="com.jakubadamek.robotemil.htmlparser.LastminuteEs"/>
         <property name="iconName" value="lastminutees.gif"/>
@@ -23,7 +23,7 @@
 
     <bean id="hrsCom" class="com.jakubadamek.robotemil.WebParams">
         <property name="label" value="hrs.com"/>
-        <property name="fileName" value="hrs_com_1.2.txt"/>
+        <property name="fileName" value="hrs_com_1.3.txt"/>
         <property name="excelName" value="Hrs"/>
         <property name="parserClass" value="com.jakubadamek.robotemil.htmlparser.HrsCom"/>
         <property name="iconName" value="hrscom.gif"/>
@@ -31,7 +31,7 @@
         
     <bean id="expediaIt" class="com.jakubadamek.robotemil.WebParams">
         <property name="label" value="expedia.it"/>
-        <property name="fileName" value="expedia_com_1.2.txt"/>
+        <property name="fileName" value="expedia_com_1.3.txt"/>
         <property name="excelName" value="Expedia"/>
         <property name="parserClass" value="com.jakubadamek.robotemil.htmlparser.ExpediaIt"/>
         <property name="iconName" value="expediacom.gif"/>
@@ -39,7 +39,7 @@
         
     <bean id="orbitzCom" class="com.jakubadamek.robotemil.WebParams">
         <property name="label" value="orbitz.com"/>
-        <property name="fileName" value="orbitz_com_1.2.txt"/>
+        <property name="fileName" value="orbitz_com_1.3.txt"/>
         <property name="excelName" value="Orbitz"/>
         <property name="parserClass" value="com.jakubadamek.robotemil.htmlparser.OrbitzCom"/>
         <property name="iconName" value="orbitzcom.gif"/>
