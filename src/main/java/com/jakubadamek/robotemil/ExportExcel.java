@@ -112,7 +112,7 @@ public class ExportExcel {
      */
     private String excelFileName() {
         String filename = app.getSettingsModel().getExcelFile();
-        File dir = new File("d:\\temp"); //System.getenv("APPDATA"), filename);
+        File dir = new File(System.getProperty("user.home"), filename);
         if(! dir.exists()) {
         	dir.mkdirs();
         }

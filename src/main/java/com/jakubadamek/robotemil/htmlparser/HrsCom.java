@@ -42,7 +42,7 @@ public class HrsCom extends HtmlParser
     	    if(isStop()) return false;
     	    //selectOption(page, "//select[@name='localeString']", "cs");
     
-    	    fillTextField(page, "location", "Prague (Praha)");
+    	    fillTextField(page, "location", "Praha (Praha)");
     	    fillTextField(page, "singleRooms", "1");
     	    fillTextField(page, "doubleRooms", "0");
     	    fillTextField(page, "adults", "1");
@@ -74,7 +74,7 @@ public class HrsCom extends HtmlParser
     		    if(isStop()) return	false;
     	    	HtmlAnchor a = (HtmlAnchor) o;
     	    	//logger.info(a.getTextContent());
-    	    	if(a.getTextContent().startsWith("Prague (Praha)")) {
+    	    	if(a.getTextContent().startsWith("Praha (Hl")) {
     	    	    logger.info("Clicking on " + a);
         	    	page = (HtmlPage) a.click();
     	    		prahaFound = true;
