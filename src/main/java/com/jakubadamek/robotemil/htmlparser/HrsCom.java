@@ -74,7 +74,7 @@ public class HrsCom extends HtmlParser
     		    if(isStop()) return	false;
     	    	HtmlAnchor a = (HtmlAnchor) o;
     	    	//logger.info(a.getTextContent());
-    	    	if(a.getTextContent().startsWith("Praha (Hl")) {
+    	    	if(a.getTextContent().startsWith("Praha (Hl") || a.getTextContent().startsWith("Praha (Prag")) {
     	    	    logger.info("Clicking on " + a);
         	    	page = (HtmlPage) a.click();
     	    		prahaFound = true;
@@ -94,15 +94,15 @@ public class HrsCom extends HtmlParser
     	    	logger.info(((HtmlDivision) o).getTextContent());
     	    }*/
     	    //savePage(page);
-    	    selectOption(page, "//select[@name='currency']", "EUR");
+    	    //selectOption(page, "//select[@name='currency']", "EUR");
     	    //sumbitXPath = "//form[@name='currencyForm']/noscript/input";
     	    //HtmlImageInput inputImage = (HtmlImageInput) page.getByXPath(sumbitXPath).get(0);
     	    //logger.info("Clicking on " + inputImage);
     	    //page = (HtmlPage) inputImage.click();
-    	    sumbitXPath = "//form[@name='currencyForm']";
-    	    HtmlForm currencyForm = (HtmlForm) page.getByXPath(sumbitXPath).get(0);
-    	    logger.info("Submitting " + currencyForm);
-    	    page = (HtmlPage) currencyForm.submit(null);
+    	    //sumbitXPath = "//form[@name='currencyForm']";
+    	    //HtmlForm currencyForm = (HtmlForm) page.getByXPath(sumbitXPath).get(0);
+    	    //logger.info("Submitting " + currencyForm);
+    	    //page = (HtmlPage) currencyForm.submit(null);
     
     		logger.info("Downloading hotellist 2. Frames on this page: " + page.getFrames());
     	    // 16.8.2010
@@ -133,7 +133,7 @@ public class HrsCom extends HtmlParser
     				    	//HtmlTable htmlTable = (HtmlTable) a.getParentNode().getParentNode().getParentNode().getParentNode().getParentNode();
     				    	//logger.info(htmlTable.getAttribute("id") + " " + a.getCanonicalXPath());
     			    	    //logger.info(a.getTextContent() + "; " + price);
-    			    	    addPrice(a.getTextContent(), key, price, false);
+    			    	    addPrice(a.getTextContent(), key, price, false, Currency.USD);
     			    	}
     		    	}
     	    	}

@@ -37,7 +37,6 @@ public class OrbitzCom extends HtmlParser {
 	
 	@Override
 	public boolean run() throws ParserException, IOException {
-		double usdEurRate = new ExchangeRate().currentUsdEur();
 		String url = ORBITZ_COM;
 		SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 	    Calendar calendar = Calendar.getInstance();
