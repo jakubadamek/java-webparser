@@ -14,7 +14,6 @@ import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 
@@ -69,7 +68,8 @@ public class HrsCom extends HtmlParser
     
     	    boolean prahaFound = false;
     	    String prahaXPath = "//a";
-    	    String anchorTexts = "";
+    	    @SuppressWarnings("unused")
+			String anchorTexts = "";
     	    for(Object o : page.getByXPath(prahaXPath)) {
     		    if(isStop()) return	false;
     	    	HtmlAnchor a = (HtmlAnchor) o;

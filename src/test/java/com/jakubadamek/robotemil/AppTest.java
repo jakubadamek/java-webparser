@@ -5,7 +5,6 @@ import java.io.IOException;
 import junit.framework.Assert;
 
 import org.junit.BeforeClass;
-import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class AppTest {

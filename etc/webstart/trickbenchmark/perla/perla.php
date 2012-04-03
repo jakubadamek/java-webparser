@@ -19,7 +19,7 @@
     <property name="customer" value="PERLA"/>
     <jar href="trickbenchmark.jar"/>
     <jar href="lib/aopalliance-1.0.jar"/>
-    <jar href="lib/aspectjweaver-1.5.4.jar"/>
+    <jar href="lib/aspectjweaver-1.6.12.jar"/>
     <jar href="lib/commons-codec-1.4.jar"/>
     <jar href="lib/commons-collections-3.2.1.jar"/>
     <jar href="lib/commons-httpclient-3.1.jar"/>

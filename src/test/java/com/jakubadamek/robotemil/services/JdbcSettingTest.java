@@ -16,7 +16,8 @@ public abstract class JdbcSettingTest extends SpringTransactionalTest {
 		this.ourHotel = ourHotel;
 	}
 	
-    private void testStoreEnabledWebs() {
+    @SuppressWarnings("unused")
+	private void testStoreEnabledWebs() {
         settingsService.storeEnabledWebs(ourHotel);
         ourHotel.getWebStructs().get(0).getParams().setEnabled(false);
         settingsService.storeEnabledWebs(ourHotel);

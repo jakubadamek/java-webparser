@@ -45,7 +45,8 @@ public class ExpediaIt extends HtmlParser
         "&hotelSearchWizard_inpHotelName=&hotelSearchWizard_inpHotelClass=0" +
         "&searchWizard_wizardType=hotelOnly";
 
-    private static final String AJAX_URL =
+    @SuppressWarnings("unused")
+	private static final String AJAX_URL =
         "action=hotelResultsDisplay%40search" +
         "&hotelResultsDisplay_inpAjax=1" +
         "&hotelResultsDisplay_inpRfrrId=" +

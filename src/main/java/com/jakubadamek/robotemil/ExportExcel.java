@@ -9,7 +9,6 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 
-import jxl.CellFormat;
 import jxl.Workbook;
 import jxl.biff.EmptyCell;
 import jxl.format.Alignment;

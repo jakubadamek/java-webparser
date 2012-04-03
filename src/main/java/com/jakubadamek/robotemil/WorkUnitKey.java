@@ -1,12 +1,14 @@
 package com.jakubadamek.robotemil;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-public class WorkUnitKey {
+public class WorkUnitKey implements Serializable {
+	private static final long serialVersionUID = 1L;
 	/** date */
 	private final Date date;
 	/** length of stay */

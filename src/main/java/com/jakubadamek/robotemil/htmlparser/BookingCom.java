@@ -21,12 +21,19 @@ import org.htmlparser.util.ParserException;
  */
 public class BookingCom extends HtmlParser {
     private final Logger logger = Logger.getLogger(getClass());
+	private static final int MAX_TRIALS = 10;
 	private static final String HTML_EURO = "&#x20AC;";
 	private static final String BOOKING_COM =
-		"http://www.booking.com/searchresults.html?city=-553173&ssne=Prague" +
-		"&order=&addressAddress=&addressCity=&addressZIP=&addressCountry=cz" +
-		"&si=ai%2Cco%2Cci%2Cre&ss=Prague&radius=15&do_availability_check=on";
-
+		"http://www.booking.com/searchresults.en-us.html?" +
+		"class_interval=1;" +
+		"group_adults=1;group_children=0;" +
+		"inac=0;" +
+		"redirected_from_city=0;" +
+		"redirected_from_landmark=0;" +
+		"review_score_group=empty;score_min=0;" +
+		"si=ai%2Cco%2Cci%2Cre%2Cdi;src=index;ss_all=0;;" +
+		"city=-553173;origin=disamb;srhash=2002341665;srpos=1;rows=50";
+	
 	@Override
 	public boolean run() throws ParserException, IOException {
 		String url = BOOKING_COM;
@@ -68,14 +75,16 @@ public class BookingCom extends HtmlParser {
 
 		
 		NodeFilter takeAllFilter = new OrFilter(new OrFilter(hotelNameFilter, priceFilter), roomTypeFilter);
+		@SuppressWarnings("unused")
 		int ipage = 0;
 		int pageHotels = 1;
 		int offset = 0;
-		while(pageHotels > 0) {
+		int trials = 0;
+		while(pageHotels > 0 || trials < MAX_TRIALS) {
 		    if(isStop()) return false;
 			String hotel = "";
 			String price = "";
-			String pagedUrl = url + "&offset=" + offset;
+			String pagedUrl = url + ";offset=" + offset;
 			ipage ++;
 			pageHotels = 0;
 			Parser parser = new Parser(pagedUrl);
@@ -103,7 +112,12 @@ public class BookingCom extends HtmlParser {
 				}
 			}
 			offset += pageHotels;
-			logger.info("*** " + pageHotels + " hotels");
+			logger.info("*** " + pageHotels + " hotels " + key + " " + pagedUrl);
+			if(pageHotels == 0) {
+				trials ++;
+			} else {
+				trials = 0;
+			}
 		}
 		return true;
 	}
