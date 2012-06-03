@@ -133,7 +133,7 @@ public class HrsCom extends HtmlParser
     				    	//HtmlTable htmlTable = (HtmlTable) a.getParentNode().getParentNode().getParentNode().getParentNode().getParentNode();
     				    	//logger.info(htmlTable.getAttribute("id") + " " + a.getCanonicalXPath());
     			    	    //logger.info(a.getTextContent() + "; " + price);
-    			    	    addPrice(a.getTextContent(), key, price, false, Currency.USD);
+    			    	    addPrice(a.getTextContent(), key, price, false, Currency.USD, true);
     			    	}
     		    	}
     	    	}

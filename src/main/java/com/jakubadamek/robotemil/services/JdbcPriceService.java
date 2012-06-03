@@ -40,7 +40,7 @@ public class JdbcPriceService implements PriceService {
 				String hotel = rs.getString("Hotel");
 				Double price = rs.getDouble("Price");
 				int order = rs.getInt("HotelOrder");
-				prices.addPrice(hotel, key, price, order);
+				prices.addPrice(hotel, key, price, order, true);
 				return null;
 			}
 		};

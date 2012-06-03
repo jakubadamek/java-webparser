@@ -13,6 +13,14 @@
         <property name="iconName" value="bookingcom.gif"/>
     </bean>
 
+    <bean id="bookingComBreakfast" class="com.jakubadamek.robotemil.WebParams">
+        <property name="label" value="booking.com se snidani"/>
+        <property name="fileName" value="booking_com_breakfast_1.3.txt"/>
+        <property name="excelName" value="Booking snid."/>
+        <property name="parserClass" value="com.jakubadamek.robotemil.htmlparser.BookingComBreakfast"/>
+        <property name="iconName" value="bookingcom.gif"/>
+    </bean>
+
     <bean id="lastminuteEs" class="com.jakubadamek.robotemil.WebParams">
         <property name="label" value="lastminute.es"/>
         <property name="fileName" value="lastminute_1.3.txt"/>

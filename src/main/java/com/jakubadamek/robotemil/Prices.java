@@ -26,7 +26,7 @@ public class Prices implements Serializable {
 	 * @param price
 	 * @param order
 	 */
-	public synchronized void addPrice(String hotel, WorkUnitKey key, Double price, int order) {
+	public synchronized void addPrice(String hotel, WorkUnitKey key, Double price, int order, boolean breakfastIncluded) {
 		if(! this.data.containsKey(hotel)) {
 			this.data.put(hotel, new HashMap<WorkUnitKey, PriceAndOrder>());
 		}
@@ -34,7 +34,17 @@ public class Prices implements Serializable {
     		PriceAndOrder priceAndOrder = new PriceAndOrder();
     		priceAndOrder.price = price;
     		priceAndOrder.order = order;
-    		this.data.get(hotel).put(key, priceAndOrder);
+    		priceAndOrder.breakfastIncluded = breakfastIncluded;
+    		
+    		PriceAndOrder previousPrice = this.data.get(hotel).get(key);
+    		if(previousPrice != null) {
+    			if(! previousPrice.breakfastIncluded && breakfastIncluded) {
+    				logger.info("Replacing price without breakfast " + previousPrice.price + " by " + price);
+    				this.data.get(hotel).put(key, priceAndOrder);
+    			}
+    		} else {
+    			this.data.get(hotel).put(key, priceAndOrder);
+    		}
 		}
 	}
 
@@ -48,7 +58,7 @@ public class Prices implements Serializable {
 			Map<WorkUnitKey, PriceAndOrder> map = prices.data.get(hotel);
 			for(WorkUnitKey key : map.keySet()) {
 				PriceAndOrder priceAndOrder = map.get(key);
-				addPrice(hotel, key, priceAndOrder.price, priceAndOrder.order);
+				addPrice(hotel, key, priceAndOrder.price, priceAndOrder.order, priceAndOrder.breakfastIncluded);
 			}
 		}
 	}

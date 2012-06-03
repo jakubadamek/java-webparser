@@ -11,4 +11,6 @@ public class PriceAndOrder implements Serializable {
 	public Double price;
 	/** order on the web site */
 	public int order;
+	
+	public boolean breakfastIncluded;
 }

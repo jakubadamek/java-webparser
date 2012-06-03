@@ -71,13 +71,13 @@ public abstract class HtmlParser {
 	 */
 	protected void addPrice(String aHotel, WorkUnitKey aKey, String price,
 			boolean divideByLOS) {
-		addPrice(aHotel, aKey, price, divideByLOS, Currency.EUR);
+		addPrice(aHotel, aKey, price, divideByLOS, Currency.EUR, true);
 	}
 
 	private double usdEurExchangeRate;
 
 	protected void addPrice(String aHotel, WorkUnitKey aKey, String price,
-			boolean divideByLOS, Currency currency) {
+			boolean divideByLOS, Currency currency, boolean breakfastIncluded) {
 		this.order++;
 		String hotel = DiacriticsRemover.removeDiacritics(aHotel.replace(
 				"&amp;", "&"));
@@ -107,7 +107,7 @@ public abstract class HtmlParser {
 				throw new IllegalArgumentException(currency.name());
 			}
 		}
-		this.prices.addPrice(hotel, aKey, priceDouble, this.order);
+		this.prices.addPrice(hotel, aKey, priceDouble, this.order, breakfastIncluded);
 	}
 
 	/**

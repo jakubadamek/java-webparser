@@ -83,7 +83,7 @@ public class OrbitzCom extends HtmlParser {
                 if(hotelNameFilter.accept(node)) {
                     hotel = node.getFirstChild().getText().trim();
                     //logger.info("Hotel " + hotel + " position " + node.getFirstChild().getStartPosition());
-                    addPrice(hotel, this.key, price, false, Currency.USD);
+                    addPrice(hotel, this.key, price, false, Currency.USD, true);
                     pageHotels ++;
                     price = null;
                 }

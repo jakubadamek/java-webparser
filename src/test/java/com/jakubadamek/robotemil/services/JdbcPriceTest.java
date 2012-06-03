@@ -21,8 +21,8 @@ public class JdbcPriceTest extends SpringTransactionalTest {
 		Date date = new DateTime(2010, 4, 4, 12, 0, 0, 0).toDate();
 		WorkUnitKey key = new WorkUnitKey(date, 1);
 		Prices prices = new Prices();
-		prices.addPrice("hotel1", key, Double.valueOf(14), 2);
-		prices.addPrice("hotel2", key, Double.valueOf(13), 3);
+		prices.addPrice("hotel1", key, Double.valueOf(14), 2, true);
+		prices.addPrice("hotel2", key, Double.valueOf(13), 3, true);
 		priceService.persistPrices("web", prices, key);
 		
 		Prices prices2 = new Prices();
