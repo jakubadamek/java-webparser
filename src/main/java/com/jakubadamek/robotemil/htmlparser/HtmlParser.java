@@ -89,6 +89,7 @@ public abstract class HtmlParser {
 		}
 		Double priceDouble = null;
 		if (price != null) {
+			price = price.replaceAll(",", "");
 			if (divideByLOS) {
 				priceDouble = Double.valueOf(price) / aKey.getLengthOfStay();
 			} else {
