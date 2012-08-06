@@ -1,26 +1,28 @@
 package com.jakubadamek.robotemil.htmlparser;
 
-import org.htmlparser.Node;
-import org.htmlparser.NodeFilter;
-import org.htmlparser.Parser;
-import org.htmlparser.filters.HasAttributeFilter;
-import org.htmlparser.util.ParserException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.net.URL;
+import java.util.regex.Pattern;
+
+import org.apache.commons.io.IOUtils;
 
 public class ExchangeRate {
-	private static final String URL = "http://www.x-rates.com/";
-	private static final String HREF = "/d/USD/EUR/graph120.html";
+	private static final String URL_GOOGLE = "http://www.google.com/ig/calculator?hl=en&q=1EUR%3D%3FUSD";
 	
-	public double currentUsdEur() {
-		NodeFilter usdEurFilter = new HasAttributeFilter("href", HREF);
+	public double currentUsdEur() throws IOException {
+		URL url = new URL(URL_GOOGLE);
+		InputStream inputStream = url.openStream();
+		StringWriter stringWriter = new StringWriter();
 		try {
-			Parser parser = new Parser(URL);
-			for(Node node : parser.extractAllNodesThatMatch(usdEurFilter).toNodeArray()) {
-				String rate = node.getChildren().toNodeArray()[0].getText().trim();
-				return Double.valueOf(rate);
-			}
-		} catch (ParserException e) {
-			throw new RuntimeException(e);
+			IOUtils.copy(inputStream, stringWriter);		
+		} finally {
+			inputStream.close();
 		}
-		return 0;
+		String jsonString = stringWriter.toString();
+		jsonString = jsonString.substring(jsonString.indexOf("rhs: ") + 6);
+		jsonString = jsonString.substring(0, jsonString.indexOf(" "));
+		return Double.valueOf(jsonString);
 	}
 }

@@ -100,7 +100,12 @@ public abstract class HtmlParser {
 			switch (currency) {
 			case USD:
 				if (usdEurExchangeRate == 0) {
-					usdEurExchangeRate = new ExchangeRate().currentUsdEur();
+					try {
+						usdEurExchangeRate = new ExchangeRate().currentUsdEur();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 				priceDouble /= usdEurExchangeRate;
 				break;
