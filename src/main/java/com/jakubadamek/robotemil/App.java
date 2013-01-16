@@ -17,6 +17,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -58,10 +59,10 @@ public class App implements InitializingBean
     /**
      * Main
      * @param args
-     * @throws IOException
+     * @throws I7OException
      * @throws InterruptedException 
      */
-    public static void main( String[] args ) throws IOException, InterruptedException
+    public static void main( String[] args ) throws InterruptedException
     {
         if(args.length == 0) {
             runWithGui();
@@ -98,7 +99,7 @@ public class App implements InitializingBean
         //if(new Scheduler().isScheduled("automatic " + args[0] + " " + args[1])) {
             App app = getApp();
             app.threadCount = 1;
-            app.startDate = new Date(new Date().getTime() + Long.valueOf(args[0]) * 24*60*60*1000);
+            app.startDate = new DateTime().plusDays(Integer.valueOf(args[0])).toDate(); 
             app.dayCount = Integer.valueOf(args[1]);
             app.useCache = true;
             logger.info("startDate " + args[0] + " dayCount " + app.dayCount);

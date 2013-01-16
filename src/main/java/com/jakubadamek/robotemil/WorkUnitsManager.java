@@ -62,9 +62,13 @@ public class WorkUnitsManager {
 	public void check() {
 		for(WorkUnit workUnit : workUnits) {
 			if(! workUnit.finished) {
-				Date response = workUnit.lastResponseTime;
-				if(response != null && secondsSince(response) > App.RESTART_AFTER_SECONDS) {
+				if(workUnit.restartNow) {
 					submit(workUnit);
+				} else {
+					Date response = workUnit.lastResponseTime;
+					if(response != null && secondsSince(response) > App.RESTART_AFTER_SECONDS) {
+						submit(workUnit);
+					}
 				}
 			}
 		}

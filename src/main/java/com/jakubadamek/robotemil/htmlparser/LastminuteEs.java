@@ -45,11 +45,9 @@ public class LastminuteEs extends HtmlParser {
 		NodeFilter priceFilter = 
 			new AndFilter(
 					new TagNameFilter("strong"),
-					new HasAttributeFilter("class", "number highlight has-tooltip cursor-pointer"));
-		NodeFilter priceFilter2 = 
-			new AndFilter(
-					new TagNameFilter("div"),
-					new HasAttributeFilter("class", "product-price product-price-h101"));				
+					new OrFilter(
+							new HasAttributeFilter("class", "number highlight has-tooltip cursor-pointer"),
+							new HasAttributeFilter("class", "number has-tooltip cursor-pointer")));
 		NodeFilter takeAllFilter = new OrFilter(hotelNameFilter, priceFilter); 
 		int ipage = 0;
 		int pageHotels = 1;
@@ -71,7 +69,7 @@ public class LastminuteEs extends HtmlParser {
 					logger.debug("Found hotel: " + hotel);
 				}
 				if(priceFilter.accept(node)) {
-					logger.debug("Found price: " + node.getNextSibling());
+					//logger.debug("Found price: " + node.getNextSibling());
 					price = node.getNextSibling().getText().trim();
 					price = price.replace("&#8364;", "").replace("&nbsp;", "").trim();
 					price = price.replace(",", ".");

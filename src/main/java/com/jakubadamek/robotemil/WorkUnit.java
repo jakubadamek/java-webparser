@@ -11,6 +11,8 @@ public class WorkUnit {
 	public final WebStruct web;
 	/** last response time */
 	public volatile Date lastResponseTime;
+	/** restart immediately */
+	public volatile boolean restartNow = false;
 	/** work finished */
 	public volatile boolean finished = false;
 	/** trial count */

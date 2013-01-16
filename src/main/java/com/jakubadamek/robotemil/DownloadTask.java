@@ -22,6 +22,7 @@ public class DownloadTask implements Runnable {
 	public void run() {
 		String workUnitDesc = this.workUnit.web.getParams().getLabel() + " " + this.workUnit.key;
 		logger.info("Starting thread for " + workUnitDesc);
+		workUnit.restartNow = false;
 		if(workUnit.finished) {
 			return;
 		}
@@ -52,6 +53,7 @@ public class DownloadTask implements Runnable {
 					this.app.workUnitsManager.getLatch().countDown();					
 				} else {
 					this.app.showLog("Chyba, nic nenacteno " + workUnitDesc);
+					workUnit.restartNow = true;
 				}
 			} else {
 				this.app.showLog("Stop " + workUnitDesc);				

@@ -24,6 +24,7 @@ public class JdbcPriceTest extends SpringTransactionalTest {
 		prices.addPrice("hotel1", key, Double.valueOf(14), 2, true);
 		prices.addPrice("hotel2", key, Double.valueOf(13), 3, true);
 		priceService.persistPrices("web", prices, key);
+		priceService.persistPrices("web", prices, key);
 		
 		Prices prices2 = new Prices();
 		priceService.readPrices("web", prices2, key);

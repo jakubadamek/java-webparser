@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.util.Assert;
+
 import jxl.common.Logger;
 
 import com.jakubadamek.robotemil.entities.PriceAndOrder;
@@ -80,24 +82,29 @@ public class Prices implements Serializable {
 	}
 	
 	public String findHotelName(String hotelNamePart) {
-        String hotelName = hotelNamePart; 
-	    if(this.data.containsKey(hotelNamePart)) {
-	    	return hotelNamePart;
-	    }
+		Assert.notNull(hotelNamePart);
+		
+		// first look for exact match
 	    for(String hotel : this.data.keySet()) {
-	        if(hotel.contains(hotelNamePart)) {
-	            if(hotelNamePart.equals(hotelName)) {
+	        if(hotel.toLowerCase().equals(hotelNamePart.toLowerCase())) {
+	        	return hotel;
+	        }
+	    }
+	    // next look for partial match
+        String hotelName = null;
+        boolean found = false;
+	    for(String hotel : this.data.keySet()) {
+	        if(hotel.toLowerCase().contains(hotelNamePart.toLowerCase())) {
+	            if(! found) {
 	                hotelName = hotel;
+	                found = true;
 	            } else {
                     logger.info("Duplicit hotelNamePart: " + hotelNamePart + " = " + hotelName + " x " + hotel);
-	                hotelName = null;
+	                return null;
 	            }
 	        }
 	    }
-	    if(this.data.containsKey(hotelName)) {
-	    	return hotelName;
-	    }
-	    return null;
+    	return hotelName;
 	}
 	
 	public PriceAndOrder findHotel(String hotelNamePart, WorkUnitKey key) {
