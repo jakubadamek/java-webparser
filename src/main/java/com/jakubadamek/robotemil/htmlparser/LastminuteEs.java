@@ -66,15 +66,16 @@ public class LastminuteEs extends HtmlParser {
 			    if(isStop()) return false;
 				if(hotelNameFilter.accept(node)) {
 					hotel = node.getChildren().toNodeArray()[0].getText().replace("- Praga", "").trim();
-					logger.debug("Found hotel: " + hotel);
+					//logger.debug("Found hotel: " + hotel);
 				}
 				if(priceFilter.accept(node)) {
 					//logger.debug("Found price: " + node.getNextSibling());
 					price = node.getNextSibling().getText().trim();
 					price = price.replace("&#8364;", "").replace("&nbsp;", "").trim();
+					price = price.replace(".", "");
 					price = price.replace(",", ".");
 					if(price.length() > 0 && hotel != "") {
-						addPrice(hotel, this.key, price, false);
+						addPrice(hotel, this.key, price, true);
 						pageHotels ++;
 						hotel = "";
 					}

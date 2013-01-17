@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.ProgressBar;
@@ -58,6 +59,7 @@ public class AppFrame
 	Spinner spinnerDays;
 	private Text txtDuration;
 	private Button btnRun;
+	private Button btnImport;
 	Button useCache;
 	App app;
 	private Date start;
@@ -194,6 +196,11 @@ public class AppFrame
             check.setText("" + lengthOfStay);
             lengthsOfStay.add(check);
         }
+
+        // new row
+        Composite rowImport = new Composite(cmp, SWT.NONE);
+        rowImport.setLayout(new GridLayout());
+        importHotels(rowImport);
         
         // new row
         Composite row5 = new Composite(cmp, SWT.NONE);
@@ -230,6 +237,32 @@ public class AppFrame
         this.shell.pack();
     }
 
+	private void importHotels(Composite row4) {
+		this.btnImport = new Button(row4, SWT.CENTER);
+        this.btnImport.setText("Importovat hotely z Excelu, list 'nastaveni'");
+        this.btnImport.setFont(searchFont);
+        this.btnImport.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        
+        this.btnImport.addSelectionListener(new SelectionAdapter() {			
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+		        FileDialog fd = new FileDialog(shell, SWT.OPEN);
+		        fd.setText("Open");
+		        //fd.setFilterPath("C:/");
+		        String[] filterExt = { "*.xls", "*.*" };
+		        fd.setFilterExtensions(filterExt);
+		        String filename = fd.open();
+		        if(filename != null) {
+			        try {
+						new ImportExcel(app.getOurHotel(), app).readXlsSettings(filename);
+					} catch (Exception e) {
+						displayException("Chyba pri nacitani z Excelu", e);
+					}
+		        }
+		 	}
+		});
+	}
+	
 	private void initListeners() {
 		this.btnRun.addSelectionListener(new SelectionAdapter() {
 			@SuppressWarnings({ "synthetic-access" })
