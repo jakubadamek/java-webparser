@@ -46,8 +46,8 @@ public class LastminuteEs extends HtmlParser {
 			new AndFilter(
 					new TagNameFilter("strong"),
 					new OrFilter(
-							new HasAttributeFilter("class", "number highlight has-tooltip cursor-pointer"),
-							new HasAttributeFilter("class", "number has-tooltip cursor-pointer")));
+							new HasAttributeFilter("class", "hotel-price number highlight has-tooltip cursor-pointer"),
+							new HasAttributeFilter("class", "hotel-price number has-tooltip cursor-pointer")));
 		NodeFilter takeAllFilter = new OrFilter(hotelNameFilter, priceFilter); 
 		int ipage = 0;
 		int pageHotels = 1;

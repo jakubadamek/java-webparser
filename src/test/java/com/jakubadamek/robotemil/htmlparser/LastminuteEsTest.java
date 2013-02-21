@@ -1,9 +1,9 @@
 package com.jakubadamek.robotemil.htmlparser;
 
 import java.io.IOException;
-import java.util.Date;
 
 import org.htmlparser.util.ParserException;
+import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -17,7 +17,7 @@ public class LastminuteEsTest {
 	public void test() throws ParserException, IOException {
 		LastminuteEs parser = new LastminuteEs();
 		WebStruct web = new WebStruct();
-		WorkUnit workUnit = new WorkUnit(new WorkUnitKey(new Date(), 1), web);
+		WorkUnit workUnit = new WorkUnit(new WorkUnitKey(new DateTime().plusDays(2).toDate(), 1), web);
 		parser.init(workUnit, null);
 		parser.run();
 		Assert.assertTrue(parser.getPrices().size() > 3);
