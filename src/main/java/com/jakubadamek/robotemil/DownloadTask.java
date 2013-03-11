@@ -34,6 +34,15 @@ public class DownloadTask implements Runnable {
 					this.app.showLog("Cache " + workUnitDesc + ": " + readFromCache + " " + this.app.getBundleString("data nalezena v cache"));
 					workUnit.finished = true;
 					logger.info("Latch count down - read from CACHE " + readFromCache + " records");
+				} else {
+					readFromCache = app.httpPriceService.readPrices(this.workUnit.web.getParams().getExcelName(), this.workUnit.web.getPrices(), this.workUnit.key);
+					if(readFromCache > 0) {
+						this.app.showLog("Cache " + workUnitDesc + ": " + readFromCache + " " + this.app.getBundleString("data nalezena na serveru"));
+						workUnit.finished = true;
+						logger.info("Latch count down - read from SERVER " + readFromCache + " records");
+					}
+				}
+				if(readFromCache > 0) {
 					this.app.workUnitsManager.getLatch().countDown();
 					return;
 				}
@@ -43,16 +52,18 @@ public class DownloadTask implements Runnable {
 			HtmlParser htmlParser = this.workUnit.web.getParams().getParserClass().newInstance();
 			htmlParser.init(this.workUnit, this.app);
 			if(htmlParser.run()) {
-				if(htmlParser.getPrices().size() > 0) {
+				if(htmlParser.getPrices().size() > 25) {
 					this.workUnit.web.getPrices().addAll(htmlParser.getPrices());
-					app.priceService.persistPrices(this.workUnit.web.getParams().getExcelName(), htmlParser.getPrices(), this.workUnit.key);
+					String web = this.workUnit.web.getParams().getExcelName();
+					//app.priceService.persistPrices(web, htmlParser.getPrices(), this.workUnit.key);
+					app.httpPriceService.persistPrices(web, htmlParser.getPrices(), this.workUnit.key);
 					this.app.showLog("Hotovo " + workUnitDesc + ": " + htmlParser.getPrices().size()
 							+ " hotelu za " + (new Date().getTime() - start.getTime()) / 1000 + " s");
 					workUnit.finished = true;
 	                logger.info("Latch count down - read from WEB " + htmlParser.getPrices().size() + " records");
 					this.app.workUnitsManager.getLatch().countDown();					
 				} else {
-					this.app.showLog("Chyba, nic nenacteno " + workUnitDesc);
+					this.app.showLog("Chyba, nenacteno pouze " + workUnitDesc + " zaznamu");
 					workUnit.restartNow = true;
 				}
 			} else {
@@ -64,4 +75,5 @@ public class DownloadTask implements Runnable {
 			this.app.workUnitsManager.submit(this.workUnit);
 		}
 	}
+
 }

@@ -113,7 +113,6 @@ public class BookingCom extends HtmlParser {
 			    if(isStop()) return false;
 				if(hotelNameFilter.accept(node)) {
 					hotel = node.getChildren().toNodeArray()[0].getText().trim();
-					logger.info(hotel);
 				}
 				if(roomTypeFilter.accept(node)) {
 					//logger.info(node.getChildren().toNodeArray()[0].getText().trim());

@@ -22,6 +22,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.jakubadamek.robotemil.services.HttpPriceService;
 import com.jakubadamek.robotemil.services.PriceService;
 import com.jakubadamek.robotemil.services.SettingsService;
 
@@ -43,6 +44,7 @@ public class App implements InitializingBean
     public WorkUnitsManager workUnitsManager = new WorkUnitsManager(this);
     Customers customers;    
     public PriceService priceService;
+    public PriceService httpPriceService = new HttpPriceService();
     public SettingsService settingsService;
     private List<Integer> lengthsOfStay = new ArrayList<Integer>();
 
