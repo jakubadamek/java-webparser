@@ -1,8 +1,9 @@
 package com.jakubadamek.robotemil.services;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.math.BigInteger;	
+import java.math.BigInteger;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -11,7 +12,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
+import org.apache.commons.codec.binary.Base64InputStream;
+import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -30,6 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakubadamek.robotemil.Prices;
 import com.jakubadamek.robotemil.WorkUnitKey;
 import com.jakubadamek.robotemil.entities.PriceAndOrder;
+import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 
 public class HttpPriceService implements PriceService {
     private final Logger logger = Logger.getLogger(getClass());
@@ -75,21 +81,54 @@ public class HttpPriceService implements PriceService {
 		return dtos;
 	}
 	
+	private String marshal(Prices prices) throws IOException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		String json = objectMapper.writeValueAsString(pricesToDtos(prices));
+		
+		ByteOutputStream bos = new ByteOutputStream();
+        GZIPOutputStream gzip = 
+        		new GZIPOutputStream(
+    						new Base64OutputStream(
+    								bos));
+        gzip.write(json.getBytes("UTF-8"));
+        gzip.close();
+        
+        return bos.toString(); //new String(bos.getBytes());
+	}
+	
+	private HttpPriceDTO[] unmarshal(InputStream inputStream) throws IOException {
+		GZIPInputStream gzipInputStream = 
+				new GZIPInputStream(
+						new Base64InputStream(
+								inputStream));
+		StringWriter stringWriter = new StringWriter();
+		try {
+			IOUtils.copy(gzipInputStream, stringWriter);		
+		} finally {
+			gzipInputStream.close();
+		}
+		String json = stringWriter.toString();
+		if(json.length() > 10) {
+			ObjectMapper objectMapper = new ObjectMapper();
+			return objectMapper.readValue(json, HttpPriceDTO[].class);
+		}
+		return new HttpPriceDTO[0];
+	}
+	
 	@Override
 	public void persistPrices(String web, Prices prices, WorkUnitKey key) {
 		try {			
-			ObjectMapper objectMapper = new ObjectMapper();
-			String json = objectMapper.writeValueAsString(pricesToDtos(prices));
 		    HttpClient client = new DefaultHttpClient();
 		    HttpPost post = new HttpPost(SERVER);
+		    String pricesString = marshal(prices);
 		    
 		    List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 			nameValuePairs.add(new BasicNameValuePair("los", String.valueOf(key.getLengthOfStay())));
 			nameValuePairs.add(new BasicNameValuePair("web", web));
 			nameValuePairs.add(new BasicNameValuePair("date", formatDate(key.getDate())));
 			nameValuePairs.add(new BasicNameValuePair("today", formatDate(new Date())));
-			nameValuePairs.add(new BasicNameValuePair("prices", json));
-			nameValuePairs.add(new BasicNameValuePair("crc", md5(json)));
+			nameValuePairs.add(new BasicNameValuePair("prices", pricesString));
+			nameValuePairs.add(new BasicNameValuePair("crc", md5(pricesString)));
 			     
 			post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 			 
@@ -112,22 +151,11 @@ public class HttpPriceService implements PriceService {
 					"&today=" + formatDate(new Date());
 			URL url = new URL(urlText);
 			InputStream inputStream = url.openStream();
-			StringWriter stringWriter = new StringWriter();
-			try {
-				IOUtils.copy(inputStream, stringWriter);		
-			} finally {
-				inputStream.close();
+			HttpPriceDTO[] dtos = unmarshal(inputStream);
+			for(HttpPriceDTO dto : dtos) {
+				prices.addPrice(dto.hotel, key, dto.price / 100.0, dto.order, true);
 			}
-			String jsonString = stringWriter.toString();
-			
-			if(jsonString.length() > 10) {
-				ObjectMapper objectMapper = new ObjectMapper();
-				HttpPriceDTO[] dtos = objectMapper.readValue(jsonString, HttpPriceDTO[].class); 
-				for(HttpPriceDTO dto : dtos) {
-					prices.addPrice(dto.hotel, key, dto.price / 100.0, dto.order, true);
-				}
-				return dtos.length;
-			}
+			return dtos.length;
 		} catch(Exception e) {
 			logger.error("", e);
 		}

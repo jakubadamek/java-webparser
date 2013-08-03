@@ -55,7 +55,7 @@ public class DownloadTask implements Runnable {
 				if(htmlParser.getPrices().size() > 25) {
 					this.workUnit.web.getPrices().addAll(htmlParser.getPrices());
 					String web = this.workUnit.web.getParams().getExcelName();
-					//app.priceService.persistPrices(web, htmlParser.getPrices(), this.workUnit.key);
+					app.priceService.persistPrices(web, htmlParser.getPrices(), this.workUnit.key);
 					app.httpPriceService.persistPrices(web, htmlParser.getPrices(), this.workUnit.key);
 					this.app.showLog("Hotovo " + workUnitDesc + ": " + htmlParser.getPrices().size()
 							+ " hotelu za " + (new Date().getTime() - start.getTime()) / 1000 + " s");
@@ -63,7 +63,7 @@ public class DownloadTask implements Runnable {
 	                logger.info("Latch count down - read from WEB " + htmlParser.getPrices().size() + " records");
 					this.app.workUnitsManager.getLatch().countDown();					
 				} else {
-					this.app.showLog("Chyba, nenacteno pouze " + workUnitDesc + " zaznamu");
+					this.app.showLog("Chyba, nacteno pouze " + workUnitDesc + " zaznamu");
 					workUnit.restartNow = true;
 				}
 			} else {

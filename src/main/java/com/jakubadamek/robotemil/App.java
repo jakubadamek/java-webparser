@@ -117,7 +117,7 @@ public class App implements InitializingBean
         int waitMinutes = 5;
         while(true) {
             try {
-                runWithoutGui("0", "0");
+                runWithoutGui("0", "10");
                 Calendar lastRunCalendar = Calendar.getInstance();
                 lastRunCalendar.setTime(lastRun);
                 Calendar nowCalendar = Calendar.getInstance();

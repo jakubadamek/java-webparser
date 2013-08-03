@@ -18,7 +18,7 @@ import org.htmlparser.util.ParserException;
  * Parses booking.com
  *
  * @author Jakub
- */
+ */  
 public class BookingCom extends HtmlParser {
     private final Logger logger = Logger.getLogger(getClass());
 	private static final int MAX_TRIALS = 3;
@@ -58,13 +58,14 @@ public class BookingCom extends HtmlParser {
 			new AndFilter(
 					new TagNameFilter("a"),
 					new HasParentFilter(new TagNameFilter("h3")));
+		// <td class="roomPrice "><div><strong>e 140</...>
 		NodeFilter priceFilter =
 			new AndFilter(
-					new TagNameFilter("div"),
-					new HasParentFilter(
-							new AndFilter(
-									new TagNameFilter("td"),
-									new HasAttributeFilter("class", "roomPrice"))));
+				new TagNameFilter("div"),
+				new HasParentFilter(
+						new AndFilter(
+								new TagNameFilter("td"),
+								new HasAttributeFilter("class", "roomPrice "))));
 /*		NodeFilter roomTypeFilter = 
 			new AndFilter(
 					new TagNameFilter("a"),
@@ -127,27 +128,29 @@ public class BookingCom extends HtmlParser {
 					}
 				}
 				if(priceFilter.accept(node)) {
-					for(Node child : node.getChildren().toNodeArray()) {
-						if(child.getText().contains(HTML_EURO)) {
-							price = child.getText().trim();
-						}
-					}
-					price = price.replace(HTML_EURO, "").replace("&nbsp;", "").trim();
-					if(price.length() > 0 && hotel != "") {
-						if(! careAboutBreakfast) {
-							breakfastIncluded = true;
-						}
-						addPrice(hotel, key, price, true, Currency.EUR, breakfastIncluded);
-						// 20120603 
-						if(firstHotel) {
-							if(firstHotelOnPage != "" && firstHotelOnPage.equals(hotel)) {
-								lastPageRepeats = true;
+					if(node.getChildren() != null) {
+						for(Node child : node.getChildren().toNodeArray()) {
+							if(child.getText().contains(HTML_EURO)) {
+								price = child.getText().trim();
 							}
-							firstHotelOnPage = hotel;
-							firstHotel = false;
 						}
-						pageHotels ++;
-						hotel = "";
+						price = price.replace(HTML_EURO, "").replace("&nbsp;", "").trim();
+						if(price.length() > 0 && hotel != "") {
+							if(! careAboutBreakfast) {
+								breakfastIncluded = true;
+							}
+							addPrice(hotel, key, price, true, Currency.EUR, breakfastIncluded);
+							// 20120603 
+							if(firstHotel) {
+								if(firstHotelOnPage != "" && firstHotelOnPage.equals(hotel)) {
+									lastPageRepeats = true;
+								}
+								firstHotelOnPage = hotel;
+								firstHotel = false;
+							}
+							pageHotels ++;
+							hotel = "";
+						}
 					}
 				}
 			}

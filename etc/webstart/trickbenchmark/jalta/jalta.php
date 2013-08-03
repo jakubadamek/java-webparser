@@ -18,6 +18,7 @@
     <j2se version="1.5+" max-heap-size="512M"/>
     <property name="customer" value="JALTA"/>
     <jar href="trickbenchmark.jar"/>
+    <jar href="lib/trickbenchmark.jar"/>
     <jar href="lib/aopalliance-1.0.jar"/>
     <jar href="lib/aspectjweaver-1.6.12.jar"/>
     <jar href="lib/commons-codec-1.4.jar"/>
@@ -31,6 +32,11 @@
     <jar href="lib/htmlparser-1.6.jar"/>
     <jar href="lib/htmlunit-2.6.jar"/>
     <jar href="lib/htmlunit-core-js-2.6.jar"/>
+    <jar href="lib/httpclient-4.2.3.jar"/>
+    <jar href="lib/httpcore-4.2.2.jar"/>
+    <jar href="lib/jackson-annotations-2.1.0.jar"/>
+    <jar href="lib/jackson-core-2.1.0.jar"/>
+    <jar href="lib/jackson-databind-2.1.0.jar"/>
     <jar href="lib/joda-time-1.6.2.jar"/>
     <jar href="lib/jxl-2.6.10.jar"/>
     <jar href="lib/log4j-1.2.14.jar"/>
@@ -43,6 +49,8 @@
     <jar href="lib/spring-core-2.0.8.jar"/>
     <jar href="lib/spring-dao-2.0.8.jar"/>
     <jar href="lib/spring-jdbc-2.0.8.jar"/>
+    <jar href="lib/swt-3.6.1-win32-win32-x86_64.jar"/>
+    <jar href="lib/trickbenchmark-2.1.jar"/>
     <jar href="lib/win32.x86-3.6.1.v3665c.jar"/>
     <jar href="lib/xalan-2.7.1.jar"/>
     <jar href="lib/xercesImpl-2.9.1.jar"/>
