@@ -1,5 +1,6 @@
 package com.jakubadamek.robotemil.services;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -35,7 +36,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakubadamek.robotemil.Prices;
 import com.jakubadamek.robotemil.WorkUnitKey;
 import com.jakubadamek.robotemil.entities.PriceAndOrder;
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 
 public class HttpPriceService implements PriceService {
     private final Logger logger = Logger.getLogger(getClass());
@@ -85,7 +85,7 @@ public class HttpPriceService implements PriceService {
 		ObjectMapper objectMapper = new ObjectMapper();
 		String json = objectMapper.writeValueAsString(pricesToDtos(prices));
 		
-		ByteOutputStream bos = new ByteOutputStream();
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
         GZIPOutputStream gzip = 
         		new GZIPOutputStream(
     						new Base64OutputStream(

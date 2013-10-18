@@ -17,7 +17,7 @@
   <resources>
     <j2se version="1.5+" max-heap-size="512M"/>
     <property name="customer" value="PERLA"/>
-    <jar href="lib/trickbenchmark.jar"/>
+    <jar href="trickbenchmark.jar"/>
     <jar href="lib/aopalliance-1.0.jar"/>
     <jar href="lib/aspectjweaver-1.6.12.jar"/>
     <jar href="lib/commons-codec-1.4.jar"/>
@@ -48,8 +48,6 @@
     <jar href="lib/spring-core-2.0.8.jar"/>
     <jar href="lib/spring-dao-2.0.8.jar"/>
     <jar href="lib/spring-jdbc-2.0.8.jar"/>
-    <jar href="lib/swt-3.6.1-win32-win32-x86_64.jar"/>
-    <jar href="lib/trickbenchmark-2.1.jar"/>
     <jar href="lib/win32.x86-3.6.1.v3665c.jar"/>
     <jar href="lib/xalan-2.7.1.jar"/>
     <jar href="lib/xercesImpl-2.9.1.jar"/>

@@ -31,9 +31,11 @@ public class ImportExcel {
     	if(sheet == null) {
     		throw new RuntimeException("V souboru chybi list 'nastaveni'");
     	}
-        for (WebStruct webStruct : this.ourHotel.getEnabledWebStructs()) {
+        for (WebStruct webStruct : this.ourHotel.getWebStructs()) {
         	for(int icol = 0; icol < sheet.getColumns(); icol ++) {
-        		if(sheet.getCell(icol, 0).getContents().equals(webStruct.getParams().getLabel())) {
+        		String webName = sheet.getCell(icol, 0).getContents(); 
+    			logger.info("webName " + webName);
+        		if(webName.equals(webStruct.getParams().getLabel())) {
         			logger.info("Found web " + sheet.getCell(icol, 0).getContents());
                 	webStruct.getHotelList().clear();
                 	for(int irow = 1; irow < sheet.getRows(); irow ++) {

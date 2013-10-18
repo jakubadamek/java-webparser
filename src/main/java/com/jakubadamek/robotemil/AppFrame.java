@@ -65,6 +65,7 @@ public class AppFrame
 	private Date start;
 	private boolean shellDisposed;
 	boolean showDuration;
+	private int nhotels;
 	private List<Button> enabledWebs = new ArrayList<Button>();
 	private List<Button> lengthsOfStay = new ArrayList<Button>();
 
@@ -255,6 +256,7 @@ public class AppFrame
 		        if(filename != null) {
 			        try {
 						new ImportExcel(app.getOurHotel(), app).readXlsSettings(filename);
+						updateHotelNames();
 					} catch (Exception e) {
 						displayException("Chyba pri nacitani z Excelu", e);
 					}
@@ -357,7 +359,7 @@ public class AppFrame
 	        };
 
 	        // row 3
-	        int nhotels = 0;
+	        nhotels = 0;
 	        for(WebStruct webStruct : ourHotel.getWebStructs()) {
 	        	if(webStruct.getHotelList().size() > nhotels) {
 	        		nhotels = webStruct.getHotelList().size();
@@ -381,6 +383,15 @@ public class AppFrame
 	        	}
 	        }
 	        scrolled.setSize();
+        }
+	}
+	
+	public void updateHotelNames() {
+        for(WebStruct webStruct : app.getOurHotel().getWebStructs()) {
+        	for(int i=0; i < nhotels; i++) {
+        		String text = (i < webStruct.getHotelList().size()) ? webStruct.getHotelList().get(i) : ""; 
+        		webStruct.getHotelTexts().get(i).setText(text);
+        	}
         }
 	}
 	

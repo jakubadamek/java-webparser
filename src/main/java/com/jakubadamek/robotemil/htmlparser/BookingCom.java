@@ -65,7 +65,9 @@ public class BookingCom extends HtmlParser {
 				new HasParentFilter(
 						new AndFilter(
 								new TagNameFilter("td"),
-								new HasAttributeFilter("class", "roomPrice "))));
+								new OrFilter(
+										new HasAttributeFilter("class", "roomPrice "),
+										new HasAttributeFilter("class", "roomPrice")))));
 /*		NodeFilter roomTypeFilter = 
 			new AndFilter(
 					new TagNameFilter("a"),

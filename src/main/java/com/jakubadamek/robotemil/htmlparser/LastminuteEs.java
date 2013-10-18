@@ -11,6 +11,7 @@ import org.htmlparser.filters.HasAttributeFilter;
 import org.htmlparser.filters.HasParentFilter;
 import org.htmlparser.filters.OrFilter;
 import org.htmlparser.filters.TagNameFilter;
+import org.htmlparser.nodes.TagNode;
 import org.htmlparser.util.ParserException;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -40,21 +41,21 @@ public class LastminuteEs extends HtmlParser {
 		logger.debug(url);
 		NodeFilter hotelNameFilter = 
 			new AndFilter(
-					new TagNameFilter("a"),
-					new HasParentFilter(new TagNameFilter("h3")));
-		NodeFilter priceFilter = 
-			new AndFilter(
-					new TagNameFilter("strong"),
-					new OrFilter(
-							new HasAttributeFilter("class", "hotel-price number highlight has-tooltip cursor-pointer"),
-							new HasAttributeFilter("class", "hotel-price number has-tooltip cursor-pointer")));
-		NodeFilter takeAllFilter = new OrFilter(hotelNameFilter, priceFilter); 
+					new TagNameFilter("h3"),
+					new HasParentFilter(new HasAttributeFilter("class", "information")));
+		NodeFilter priceMainFilter = 
+			new HasAttributeFilter("class", "price-main");
+		NodeFilter priceDecimalFilter = 
+			new HasAttributeFilter("class", "price-decimal");
+		NodeFilter takeAllFilter = new OrFilter(hotelNameFilter, 
+			new OrFilter(priceMainFilter, priceDecimalFilter)); 
 		int ipage = 0;
 		int pageHotels = 1;
 		while(pageHotels > 0) {
 		    if(isStop()) return false;
 			String hotel = "";
-			String price = "";
+			String priceMain = "";
+			String priceDecimal = "";
 			String pagedUrl = url;
 			if(ipage > 0)
 				pagedUrl += "&startIndex=" + (ipage * 25 + 1);
@@ -68,12 +69,13 @@ public class LastminuteEs extends HtmlParser {
 					hotel = node.getChildren().toNodeArray()[0].getText().replace("- Praga", "").trim();
 					//logger.debug("Found hotel: " + hotel);
 				}
-				if(priceFilter.accept(node)) {
-					//logger.debug("Found price: " + node.getNextSibling());
-					price = node.getNextSibling().getText().trim();
+				if(priceMainFilter.accept(node)) {
+					priceMain = node.getFirstChild().getText().trim();
+					priceDecimal = node.getNextSibling().getFirstChild().getText().trim();
+					String price = priceMain + priceDecimal;
 					price = price.replace("&#8364;", "").replace("&nbsp;", "").trim();
 					price = price.replace(".", "");
-					price = price.replace(",", ".");
+					price = price.replace(",", ".");						
 					if(price.length() > 0 && hotel != "") {
 						addPrice(hotel, this.key, price, true);
 						pageHotels ++;
