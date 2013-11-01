@@ -4,16 +4,10 @@ import java.io.IOException;
 import java.util.Calendar;
 
 import org.apache.log4j.Logger;
-import org.htmlparser.Node;
-import org.htmlparser.NodeFilter;
-import org.htmlparser.Parser;
-import org.htmlparser.filters.AndFilter;
-import org.htmlparser.filters.HasAttributeFilter;
-import org.htmlparser.filters.HasParentFilter;
-import org.htmlparser.filters.OrFilter;
-import org.htmlparser.filters.TagNameFilter;
-import org.htmlparser.nodes.TagNode;
 import org.htmlparser.util.ParserException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 /**
  * Parses booking.com
@@ -22,8 +16,9 @@ import org.htmlparser.util.ParserException;
  */  
 public class BookingCom extends HtmlParser {
     private final Logger logger = Logger.getLogger(getClass());
-	private static final int MAX_TRIALS = 13;
+	private static final int MAX_TRIALS = 3;
 	private static final String HTML_EURO = "&#x20AC;";
+	private static final String CHAR_EURO = "\u20ac";
 	private static final String BOOKING_COM =
 		"http://www.booking.com/searchresults.en-us.html?" +
 		"class_interval=1;" +
@@ -55,92 +50,45 @@ public class BookingCom extends HtmlParser {
 		url += ";checkout_monthday=" + calendar.get(Calendar.DAY_OF_MONTH);
 		url += ";checkout_year_month=" + calendar.get(Calendar.YEAR) + "-" + (calendar.get(Calendar.MONTH) + 1);
 		logger.info(url);
-		NodeFilter hotelNameFilter =
-			new AndFilter(
-					new TagNameFilter("a"),
-					new HasParentFilter(new TagNameFilter("h3")));
-		// <td class="roomPrice "><div><strong>e 140</...>
-		/*NodeFilter priceFilter =
-			new AndFilter(
-				new TagNameFilter("div"),
-				new HasParentFilter(
-						new AndFilter(
-								new TagNameFilter("td"),
-								new OrFilter(
-										new HasAttributeFilter("class", "roomPrice "),
-										new HasAttributeFilter("class", "roomPrice")))));*/
-		NodeFilter priceFilter = 
-			new AndFilter(
-					new TagNameFilter("strong"),
-					new HasParentFilter(
-							new AndFilter(
-									new TagNameFilter("div"),
-									new HasParentFilter(new TagNameFilter("td")))));
-										
-/*		NodeFilter roomTypeFilter = 
-			new AndFilter(
-					new TagNameFilter("a"),
-					new HasParentFilter( // div
-							new HasParentFilter( // td
-									new HasParentFilter( // tr class="roomrow"
-											new AndFilter(
-													new TagNameFilter("tr"),
-													new HasAttributeFilter("class", "roomrow"))))));
-*/		
-		NodeFilter roomTypeFilter = 
-			new AndFilter(
-					new TagNameFilter("a"),
-					new HasAttributeFilter("class", "room_link "));
 		
-		NodeFilter breakfastFilter = new TagNameFilter("sup");
-		
-		NodeFilter roomRowFilter = 
-			new AndFilter(
-					new TagNameFilter("tr"),
-					new HasAttributeFilter("class", "roomrow "));
-		
-		NodeFilter takeAllFilter = new OrFilter(new OrFilter(hotelNameFilter, priceFilter), roomTypeFilter);
-		@SuppressWarnings("unused")
 		int ipage = 0;
 		int pageHotels = 1;
 		int offset = 0;
 		int trials = 0;
 		// 20120603 booking.com nikdy nedobehl, protoze porad dokola nacital posledni stranku
 		String firstHotelOnPage = "";
-		// 20120603 
 		boolean lastPageRepeats = false;
 		while(! lastPageRepeats && (pageHotels > 0 || trials < MAX_TRIALS)) {
 		    if(isStop()) return false;
-			String hotel = "";
-			String price = "";
-			boolean breakfastIncluded = false;			
 			String pagedUrl = url + ";offset=" + offset;
 			ipage ++;
 			pageHotels = 0;
-			Parser parser = new Parser(pagedUrl);
+			Document doc = Jsoup.connect(pagedUrl)
+				.userAgent("Mozilla")
+				.timeout(120000)
+				.get();
 		    if(isStop()) return false;
-			// 20120603 
 		    boolean firstHotel = true;
-			for(Node node : parser.extractAllNodesThatMatch(takeAllFilter).toNodeArray()) {
-			    if(isStop()) return false;
-				if(hotelNameFilter.accept(node)) {
-					hotel = node.getChildren().toNodeArray()[0].getText().trim();
-				}
-				if(roomTypeFilter.accept(node)) {
-					//logger.info(node.getChildren().toNodeArray()[0].getText().trim());
-				}
-				if(roomRowFilter.accept(node)) {
-					breakfastIncluded = false;
-				}
-				if(careAboutBreakfast && breakfastFilter.accept(node)) {
-					String text = node.getChildren().toNodeArray()[0].getText().trim();
-					if(text.contains("Breakfast included")) {
-						breakfastIncluded = true;
+			for(Element div : doc.select("div.sr_item_content")) {
+				String price = null;
+				String hotel = "";
+				boolean breakfastIncluded = false;
+				
+				Element aHotelName = div.select("a.hotel_name_link").first();
+				if(aHotelName != null) {
+					hotel = aHotelName.text().trim();
+					// A B means B is any descendant of A
+					Element elPrice = div.select("td.roomPrice strong.price").first();
+					if(elPrice != null) {
+						price = elPrice.ownText();
 					}
 				}
-				price = priceCondition(node, priceFilter);
-				if(price != null) {
-					price = price.replace(HTML_EURO, "").replace("&nbsp;", "").trim();
+			    if(isStop()) return false;
+				if(price == null) {
+					logger.error("Error parsing hotel " + hotel);
+					//FileUtils.writeStringToFile(new File("error.html"), doc.toString());
+				} else {
+					price = price.replace(HTML_EURO, "").replace(CHAR_EURO, "").replace("&nbsp;", "").trim();
 					if(price.length() > 0 && hotel != "") {
 						if(! careAboutBreakfast) {
 							breakfastIncluded = true;
@@ -168,20 +116,5 @@ public class BookingCom extends HtmlParser {
 			}
 		}
 		return true;
-	}
-	
-	private String priceCondition(Node node, NodeFilter priceFilter) {
-		if(priceFilter.accept(node)) {
-			String attrClass = ((TagNode) node).getAttribute("class");
-			if(attrClass.contains("price ")) {
-				return node.getNextSibling().getText().trim();
-				/*for(Node child : node.getChildren().toNodeArray()) {
-					if(child.getText().contains(HTML_EURO)) {
-						return child.getText().trim();
-					}
-				}*/
-			}
-		}
-		return null;
 	}
 }

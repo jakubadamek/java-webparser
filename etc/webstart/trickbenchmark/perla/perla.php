@@ -52,6 +52,7 @@
     <jar href="lib/xalan-2.7.1.jar"/>
     <jar href="lib/xercesImpl-2.9.1.jar"/>
     <jar href="lib/xml-apis-1.3.04.jar"/>
+    <jar href="lib/jsoup-1.7.2.jar"/>    
   </resources>
   <application-desc main-class="com.jakubadamek.robotemil.App"/>
 </jnlp>

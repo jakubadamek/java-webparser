@@ -70,7 +70,7 @@ public class DownloadTask implements Runnable {
 				this.app.showLog("Stop " + workUnitDesc);				
 			}
 		} catch (Throwable e) {
-			e.printStackTrace();
+			logger.error("Chyba pri zpracovani " + workUnitDesc, e);
 			this.app.showLog("Chyba " + workUnitDesc);
 			this.app.workUnitsManager.submit(this.workUnit);
 		}

@@ -11,7 +11,6 @@ import org.htmlparser.filters.HasAttributeFilter;
 import org.htmlparser.filters.HasParentFilter;
 import org.htmlparser.filters.OrFilter;
 import org.htmlparser.filters.TagNameFilter;
-import org.htmlparser.nodes.TagNode;
 import org.htmlparser.util.ParserException;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;

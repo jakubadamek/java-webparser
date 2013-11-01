@@ -13,3 +13,4 @@ dll
 ./target
 etc/netx/*.jar
 backup.html
+error.html
