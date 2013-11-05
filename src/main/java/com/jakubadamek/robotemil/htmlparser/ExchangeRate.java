@@ -2,26 +2,30 @@ package com.jakubadamek.robotemil.htmlparser;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ExchangeRate {
-	private static final String URL_GOOGLE = "http://www.google.com/ig/calculator?hl=en&q=1EUR%3D%3FUSD";
-	
+    private static final Logger logger = Logger.getLogger(ExchangeRate.class);
+    private static final String URL = "http://openexchangerates.org/api/latest.json?app_id=dfdc5b2857654ec0834124b56c7523b0";
+
 	public double currentUsdEur() throws IOException {
-		URL url = new URL(URL_GOOGLE);
+		URL url = new URL(URL);
 		InputStream inputStream = url.openStream();
-		StringWriter stringWriter = new StringWriter();
+		String jsonString;
 		try {
-			IOUtils.copy(inputStream, stringWriter);		
+			jsonString = IOUtils.toString(inputStream, "UTF-8");
 		} finally {
 			inputStream.close();
 		}
-		String jsonString = stringWriter.toString();
-		jsonString = jsonString.substring(jsonString.indexOf("rhs: ") + 6);
-		jsonString = jsonString.substring(0, jsonString.indexOf(" "));
-		return Double.valueOf(jsonString);
+		logger.debug(jsonString);
+		ObjectMapper objectMapper = new ObjectMapper();
+		JsonNode tree = objectMapper.readTree(jsonString);
+		return 1.0 / tree.get("rates").get("EUR").doubleValue();
 	}
 }

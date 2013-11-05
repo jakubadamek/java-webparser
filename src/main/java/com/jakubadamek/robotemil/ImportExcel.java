@@ -41,7 +41,7 @@ public class ImportExcel {
                 	for(int irow = 1; irow < sheet.getRows(); irow ++) {
                 		String hotel = sheet.getCell(icol, irow).getContents();
                 		webStruct.getHotelList().add(hotel);
-            			logger.info("Found hotel " + hotel);
+            			logger.info("Found hotel " + hotel + " for web " + webName);
                 	}
         		}
         	}

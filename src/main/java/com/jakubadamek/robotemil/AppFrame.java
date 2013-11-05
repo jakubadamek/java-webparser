@@ -388,7 +388,7 @@ public class AppFrame
 	
 	public void updateHotelNames() {
         for(WebStruct webStruct : app.getOurHotel().getWebStructs()) {
-        	for(int i=0; i < nhotels; i++) {
+        	for(int i=0; i < nhotels + ADDITIONAL_ROWS; i++) {
         		String text = (i < webStruct.getHotelList().size()) ? webStruct.getHotelList().get(i) : ""; 
         		webStruct.getHotelTexts().get(i).setText(text);
         	}

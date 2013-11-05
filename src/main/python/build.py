@@ -1,4 +1,4 @@
-import os, glob
+import os, glob, sys
 
 skipTests = len(sys.argv) > 1 and sys.argv[1] == "skipTests"
 
