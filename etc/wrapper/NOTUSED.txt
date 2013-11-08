@@ -1,0 +1,1 @@
+Java Wrapper is not used, instead just run the javaw command line and put it into StartUp program folder.start javaw -Xmx512m -cp trickbenchmark.jar com.jakubadamek.robotemil.App runPeriodically

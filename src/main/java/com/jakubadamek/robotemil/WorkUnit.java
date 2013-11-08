@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /** thread work unit */
 public class WorkUnit {
+	public int maxPages;
 	public WorkUnitKey key;
 	/** web */
 	public final WebStruct web;

@@ -50,7 +50,8 @@ public class LastminuteEs extends HtmlParser {
 			new OrFilter(priceMainFilter, priceDecimalFilter)); 
 		int ipage = 0;
 		int pageHotels = 1;
-		while(pageHotels > 0) {
+		while(pageHotels > 0
+				&& (maxPages == 0 || ipage < maxPages)) {
 		    if(isStop()) return false;
 			String hotel = "";
 			String priceMain = "";

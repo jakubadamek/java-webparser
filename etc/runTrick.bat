@@ -1,0 +1,1 @@
+start javaw -Xmx512m -cp trickbenchmark.jar com.jakubadamek.robotemil.App runPeriodically

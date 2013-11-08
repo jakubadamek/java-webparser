@@ -30,6 +30,7 @@ public abstract class HtmlParser {
 	protected Date dateFrom;
 	protected DateTime dateTo;
 	protected WorkUnitKey key;
+	protected int maxPages;
 	/** prices - the result of parsing */
 	private Prices prices;
 	private int order;
@@ -51,6 +52,7 @@ public abstract class HtmlParser {
 		this.prices = new Prices();
 		this.app = aApp;
 		this.order = 0;
+		this.maxPages = aWorkUnit.maxPages;
 	}
 
 	/**

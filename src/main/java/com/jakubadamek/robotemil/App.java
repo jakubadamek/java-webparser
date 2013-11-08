@@ -104,6 +104,10 @@ public class App implements InitializingBean
             app.startDate = new DateTime().plusDays(Integer.valueOf(args[0])).toDate(); 
             app.dayCount = Integer.valueOf(args[1]);
             app.useCache = true;
+            app.lengthsOfStay = Arrays.asList(new Integer[] { 1, 2, 3 });
+            for(WebStruct webStruct : app.getOurHotel().getWebStructs()) {
+                webStruct.getParams().setEnabled(true);
+            }
             logger.info("startDate " + args[0] + " dayCount " + app.dayCount);
             app.startWork();
             app.workBody();
@@ -114,7 +118,7 @@ public class App implements InitializingBean
 
     private static void runPeriodically() {
         Date lastRun = new Date();
-        int waitMinutes = 5;
+        int waitMinutes = 15;
         while(true) {
             try {
                 runWithoutGui("0", "10");
@@ -123,9 +127,9 @@ public class App implements InitializingBean
                 Calendar nowCalendar = Calendar.getInstance();
                 nowCalendar.setTime(new Date());
                 if(lastRunCalendar.get(Calendar.DATE) == nowCalendar.get(Calendar.DATE)) {
-                    waitMinutes *= 2;
+                    waitMinutes = Math.min(waitMinutes * 2, 120);
                 } else {
-                    waitMinutes = 10;
+                    waitMinutes = 15;
                 }
                 lastRun = new Date();
                 logger.info("waitMinutes: " + waitMinutes);

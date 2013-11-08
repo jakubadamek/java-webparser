@@ -58,7 +58,9 @@ public class BookingCom extends HtmlParser {
 		// 20120603 booking.com nikdy nedobehl, protoze porad dokola nacital posledni stranku
 		String firstHotelOnPage = "";
 		boolean lastPageRepeats = false;
-		while(! lastPageRepeats && (pageHotels > 0 || trials < MAX_TRIALS)) {
+		while(! lastPageRepeats 
+				&& (pageHotels > 0 || trials < MAX_TRIALS)
+				&& (maxPages == 0 || ipage < maxPages)) {
 		    if(isStop()) return false;
 			String pagedUrl = url + ";offset=" + offset;
 			ipage ++;

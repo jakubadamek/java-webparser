@@ -23,6 +23,7 @@ public class ParserTest {
 	private void test(HtmlParser parser) throws Exception {
 		WebStruct web = new WebStruct();
 		WorkUnit workUnit = new WorkUnit(new WorkUnitKey(new DateTime().plusDays(2).toDate(), 1), web);
+		workUnit.maxPages = 1;
 		parser.init(workUnit, null);
 		parser.run();
 		Assert.assertTrue(parser.getPrices().size() > 3);
