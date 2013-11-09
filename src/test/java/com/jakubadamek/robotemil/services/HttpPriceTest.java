@@ -20,8 +20,8 @@ public class HttpPriceTest {
 		WorkUnitKey key = new WorkUnitKey(date, 1);
 		
 		Prices prices = new Prices();
-		prices.addPrice("hotel1", key, Double.valueOf(14), 2, true);
-		prices.addPrice("hotel2", key, Double.valueOf(13), 3, true);
+		prices.addPrice("hotel1", key, 1400, 2, true);
+		prices.addPrice("hotel2", key, 1300, 3, true);
 		priceService.persistPrices("web", prices, key);
 		priceService.persistPrices("web", prices, key);
 		
@@ -30,6 +30,6 @@ public class HttpPriceTest {
 		Assert.assertEquals(2, prices2.size());
 		Assert.assertEquals(2, prices2.findHotel("hotel1", key).order);
 		Assert.assertEquals(3, prices2.findHotel("hotel2", key).order);		
-		Assert.assertEquals(13, prices2.findHotel("hotel2", key).price, 0.001);		
+		Assert.assertEquals(1300, prices2.findHotel("hotel2", key).price);		
 	}
 }

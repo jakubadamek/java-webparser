@@ -196,7 +196,7 @@ public class ExportExcel {
                         if (priceAndOrder != null) {
                             sheet.addCell(new jxl.write.Number(icol, this.irow + ihotel, priceAndOrder.order,
                                     getCellFormat(date, ihotel, icol, this.irow + ihotel, null)));
-                            sheet.addCell(new jxl.write.Number(icol + 1, this.irow + ihotel, priceAndOrder.price,
+                            sheet.addCell(new jxl.write.Number(icol + 1, this.irow + ihotel, priceAndOrder.price / 100.0,
                                     getCellFormat(date, ihotel, icol + 1, this.irow + ihotel,
                                             firstHotelPrice > priceAndOrder.price ? this.redPriceFont : null)));
                             if (ihotel == 0) {
@@ -275,7 +275,7 @@ public class ExportExcel {
 			                for (Date date : this.app.getDates()) {
 			                    PriceAndOrder priceAndOrder = webStruct.getPrices().findHotel(hotel, new WorkUnitKey(date, lengthOfStay));
 			                    if (priceAndOrder != null) {
-			                        sheet.addCell(new jxl.write.Number(icol, this.irow, priceAndOrder.price, filterPriceFormat));
+			                        sheet.addCell(new jxl.write.Number(icol, this.irow, priceAndOrder.price / 100.0, filterPriceFormat));
 			                    }
 			                    icol ++;
 			                }

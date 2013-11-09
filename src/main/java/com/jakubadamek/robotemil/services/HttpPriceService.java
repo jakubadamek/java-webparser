@@ -63,64 +63,12 @@ public class HttpPriceService implements PriceService {
 		return DATE_TIME_FORMAT.print(new DateTime(date).withZone(ZONE)); 
 	}
 	
-	private List<HttpPriceDTO> pricesToDtos(Prices prices) {
-		List<HttpPriceDTO> dtos = new ArrayList<HttpPriceDTO>();
-		for(String hotel : prices.getData().keySet()) {
-			Map<WorkUnitKey, PriceAndOrder> map2 = prices.getData().get(hotel); 
-			for(WorkUnitKey workUnitKey : map2.keySet()) {
-				HttpPriceDTO dto = new HttpPriceDTO();
-				dto.hotel = hotel;
-				PriceAndOrder priceAndOrder = map2.get(workUnitKey); 
-				dto.order = priceAndOrder.order;
-				if(priceAndOrder.price != null) {
-					dto.price = (int) (priceAndOrder.price * 100 + 0.5);
-				}
-				dtos.add(dto);
-			}
-		}	
-		return dtos;
-	}
-	
-	private String marshal(Prices prices) throws IOException {
-		ObjectMapper objectMapper = new ObjectMapper();
-		String json = objectMapper.writeValueAsString(pricesToDtos(prices));
-		
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        GZIPOutputStream gzip = 
-        		new GZIPOutputStream(
-    						new Base64OutputStream(
-    								bos));
-        gzip.write(json.getBytes("UTF-8"));
-        gzip.close();
-        
-        return bos.toString(); //new String(bos.getBytes());
-	}
-	
-	private HttpPriceDTO[] unmarshal(InputStream inputStream) throws IOException {
-		GZIPInputStream gzipInputStream = 
-				new GZIPInputStream(
-						new Base64InputStream(
-								inputStream));
-		StringWriter stringWriter = new StringWriter();
-		try {
-			IOUtils.copy(gzipInputStream, stringWriter);		
-		} finally {
-			gzipInputStream.close();
-		}
-		String json = stringWriter.toString();
-		if(json.length() > 10) {
-			ObjectMapper objectMapper = new ObjectMapper();
-			return objectMapper.readValue(json, HttpPriceDTO[].class);
-		}
-		return new HttpPriceDTO[0];
-	}
-	
 	@Override
 	public void persistPrices(String web, Prices prices, WorkUnitKey key) {
 		try {			
 		    HttpClient client = new DefaultHttpClient();
 		    HttpPost post = new HttpPost(SERVER);
-		    String pricesString = marshal(prices);
+		    String pricesString = PricesMarshaller.marshal(prices, key);
 		    
 		    List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 			nameValuePairs.add(new BasicNameValuePair("los", String.valueOf(key.getLengthOfStay())));
@@ -151,11 +99,7 @@ public class HttpPriceService implements PriceService {
 					"&today=" + formatDate(new Date());
 			URL url = new URL(urlText);
 			InputStream inputStream = url.openStream();
-			HttpPriceDTO[] dtos = unmarshal(inputStream);
-			for(HttpPriceDTO dto : dtos) {
-				prices.addPrice(dto.hotel, key, dto.price / 100.0, dto.order, true);
-			}
-			return dtos.length;
+			return PricesMarshaller.unmarshal(inputStream, prices, key);
 		} catch(Exception e) {
 			logger.error("", e);
 		}
@@ -167,4 +111,7 @@ public class HttpPriceService implements PriceService {
 		// nothing to do
 	}
 
+	@Override
+	public void deleteRefreshedData(String web, WorkUnitKey key) {
+	}
 }

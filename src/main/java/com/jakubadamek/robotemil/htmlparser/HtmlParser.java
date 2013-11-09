@@ -115,7 +115,8 @@ public abstract class HtmlParser {
 				throw new IllegalArgumentException(currency.name());
 			}
 		}
-		this.prices.addPrice(hotel, aKey, priceDouble, this.order, breakfastIncluded);
+		int priceInt = priceDouble == null ? 0 : (int) (priceDouble * 100);
+		this.prices.addPrice(hotel, aKey, priceInt, this.order, breakfastIncluded);
 	}
 
 	/**

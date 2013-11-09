@@ -28,25 +28,23 @@ public class Prices implements Serializable {
 	 * @param price
 	 * @param order
 	 */
-	public synchronized void addPrice(String hotel, WorkUnitKey key, Double price, int order, boolean breakfastIncluded) {
+	public synchronized void addPrice(String hotel, WorkUnitKey key, int price, int order, boolean breakfastIncluded) {
 		if(! this.data.containsKey(hotel)) {
 			this.data.put(hotel, new HashMap<WorkUnitKey, PriceAndOrder>());
 		}
-		if(price != null) {
-    		PriceAndOrder priceAndOrder = new PriceAndOrder();
-    		priceAndOrder.price = price;
-    		priceAndOrder.order = order;
-    		priceAndOrder.breakfastIncluded = breakfastIncluded;
-    		
-    		PriceAndOrder previousPrice = this.data.get(hotel).get(key);
-    		if(previousPrice != null) {
-    			if(! previousPrice.breakfastIncluded && breakfastIncluded) {
-    				logger.info("Replacing price without breakfast " + previousPrice.price + " by " + price);
-    				this.data.get(hotel).put(key, priceAndOrder);
-    			}
-    		} else {
-    			this.data.get(hotel).put(key, priceAndOrder);
-    		}
+		PriceAndOrder priceAndOrder = new PriceAndOrder();
+		priceAndOrder.price = price;
+		priceAndOrder.order = order;
+		priceAndOrder.breakfastIncluded = breakfastIncluded;
+		
+		PriceAndOrder previousPrice = this.data.get(hotel).get(key);
+		if(previousPrice != null) {
+			if(! previousPrice.breakfastIncluded && breakfastIncluded) {
+				logger.info("Replacing price without breakfast " + previousPrice.price + " by " + price);
+				this.data.get(hotel).put(key, priceAndOrder);
+			}
+		} else {
+			this.data.get(hotel).put(key, priceAndOrder);
 		}
 	}
 

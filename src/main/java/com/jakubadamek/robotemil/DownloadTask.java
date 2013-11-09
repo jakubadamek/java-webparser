@@ -28,16 +28,18 @@ public class DownloadTask implements Runnable {
 		}
 		int readFromCache = 0;
 		try {
+			String web = this.workUnit.web.getParams().getExcelName();
 			if(this.app.isUseCache()) {
-				readFromCache = app.priceService.readPrices(this.workUnit.web.getParams().getExcelName(), this.workUnit.web.getPrices(), this.workUnit.key);
-				if(readFromCache > 0) {
+				readFromCache = app.priceService.readPrices(web, workUnit.web.getPrices(), workUnit.key);
+				if(readFromCache > 25) {
 					this.app.showLog("Cache " + workUnitDesc + ": " + readFromCache + " " + this.app.getBundleString("data nalezena v cache"));
 					workUnit.finished = true;
 					logger.info("Latch count down - read from CACHE " + readFromCache + " records");
 				} else {
-					readFromCache = app.httpPriceService.readPrices(this.workUnit.web.getParams().getExcelName(), this.workUnit.web.getPrices(), this.workUnit.key);
-					if(readFromCache > 0) {
+					readFromCache = app.httpPriceService.readPrices(web, workUnit.web.getPrices(), workUnit.key);
+					if(readFromCache > 25) {
 						this.app.showLog("Cache " + workUnitDesc + ": " + readFromCache + " " + this.app.getBundleString("data nalezena na serveru"));
+						app.priceService.persistPrices(web, workUnit.web.getPrices(), workUnit.key);
 						workUnit.finished = true;
 						logger.info("Latch count down - read from SERVER " + readFromCache + " records");
 					}
@@ -54,7 +56,6 @@ public class DownloadTask implements Runnable {
 			if(htmlParser.run()) {
 				if(htmlParser.getPrices().size() > 25) {
 					this.workUnit.web.getPrices().addAll(htmlParser.getPrices());
-					String web = this.workUnit.web.getParams().getExcelName();
 					app.priceService.persistPrices(web, htmlParser.getPrices(), this.workUnit.key);
 					app.httpPriceService.persistPrices(web, htmlParser.getPrices(), this.workUnit.key);
 					this.app.showLog("Hotovo " + workUnitDesc + ": " + htmlParser.getPrices().size()

@@ -9,4 +9,6 @@ public interface PriceService {
     int readPrices(final String web, final Prices prices, WorkUnitKey key);
     
     void createTables();
+
+    void deleteRefreshedData(String web, WorkUnitKey key);
 }
