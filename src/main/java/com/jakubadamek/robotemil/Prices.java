@@ -2,11 +2,13 @@ package com.jakubadamek.robotemil;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
-
-import org.springframework.util.Assert;
+import java.util.Set;
 
 import jxl.common.Logger;
+
+import org.springframework.util.Assert;
 
 import com.jakubadamek.robotemil.entities.PriceAndOrder;
 
@@ -18,7 +20,7 @@ public class Prices implements Serializable {
     private static final Logger logger = Logger.getLogger(Prices.class);
 	private static final long serialVersionUID = 4924511073557468113L;
 	/** Data: hotel name -> work unit key -> price and order */
-	private Map<String, Map<WorkUnitKey, PriceAndOrder>> data = new HashMap<String, Map<WorkUnitKey,PriceAndOrder>>();
+	private Map<String, Map<DateLosWeb, PriceAndOrder>> data = new HashMap<String, Map<DateLosWeb, PriceAndOrder>>();
 
 	/**
 	 * Adds a price
@@ -28,15 +30,15 @@ public class Prices implements Serializable {
 	 * @param price
 	 * @param order
 	 */
-	public synchronized void addPrice(String hotel, WorkUnitKey key, int price, int order, boolean breakfastIncluded) {
+	public synchronized void addPrice(String hotel, DateLosWeb key, int price, int order, boolean breakfastIncluded) {
 		if(! this.data.containsKey(hotel)) {
-			this.data.put(hotel, new HashMap<WorkUnitKey, PriceAndOrder>());
+			this.data.put(hotel, new HashMap<DateLosWeb, PriceAndOrder>());
 		}
 		PriceAndOrder priceAndOrder = new PriceAndOrder();
 		priceAndOrder.price = price;
 		priceAndOrder.order = order;
 		priceAndOrder.breakfastIncluded = breakfastIncluded;
-		
+		 
 		PriceAndOrder previousPrice = this.data.get(hotel).get(key);
 		if(previousPrice != null) {
 			if(! previousPrice.breakfastIncluded && breakfastIncluded) {
@@ -55,8 +57,8 @@ public class Prices implements Serializable {
 	 */
 	public synchronized void addAll(Prices prices) {
 		for(String hotel : prices.data.keySet()) {
-			Map<WorkUnitKey, PriceAndOrder> map = prices.data.get(hotel);
-			for(WorkUnitKey key : map.keySet()) {
+			Map<DateLosWeb, PriceAndOrder> map = prices.data.get(hotel);
+			for(DateLosWeb key : map.keySet()) {
 				PriceAndOrder priceAndOrder = map.get(key);
 				addPrice(hotel, key, priceAndOrder.price, priceAndOrder.order, priceAndOrder.breakfastIncluded);
 			}
@@ -75,7 +77,7 @@ public class Prices implements Serializable {
 	 * Concurrency: Always lock the object before using getData.
 	 * @return the inner data structure
 	 */
-	public Map<String, Map<WorkUnitKey, PriceAndOrder>> getData() {
+	public Map<String, Map<DateLosWeb, PriceAndOrder>> getData() {
 		return this.data;
 	}
 	
@@ -101,15 +103,33 @@ public class Prices implements Serializable {
 	                return null;
 	            }
 	        }
-	    }
+	    } 
     	return hotelName;
 	}
 	
-	public PriceAndOrder findHotel(String hotelNamePart, WorkUnitKey key) {
+	public PriceAndOrder findHotel(String hotelNamePart, DateLosWeb key) {
 		String hotelName = findHotelName(hotelNamePart);
 	    if(hotelName != null) {
 	        return data.get(hotelName).get(key);
 	    }
 	    return null;
+	}
+	
+	/**
+	 * Retains only those hotels which are required for the hotel list in the webStruct.
+	 * @param webStruct
+	 */
+	public void filterHotelNames(WebStruct webStruct) {
+		Map<String, Map<DateLosWeb, PriceAndOrder>> filtered = new HashMap<String, Map<DateLosWeb,PriceAndOrder>>();
+		Set<String> foundHotelNames = new HashSet<String>();
+		for(String hotel : webStruct.getHotelList()) {
+			foundHotelNames.add(findHotelName(hotel));
+		}
+		for(String foundHotelName : foundHotelNames) {
+			if(data.containsKey(foundHotelName)) {
+				filtered.put(foundHotelName, data.get(foundHotelName));
+			}
+		}
+		data = filtered;
 	}
 }

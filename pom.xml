@@ -45,28 +45,6 @@
 				</dependency>
 			</dependencies>
 		</profile>
-        <profile>
-            <id>protobuf</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.igor-petruk.protobuf</groupId>
-                        <artifactId>protobuf-maven-plugin</artifactId>
-                        <version>0.6.3</version>
-                        <configuration>
-                            <cleanOutputFolder>true</cleanOutputFolder>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
 	</profiles>
 
 	<dependencies>
@@ -76,7 +54,11 @@
 			<dependency> <groupId>org.seleniumhq.webdriver</groupId> <artifactId>webdriver-firefox</artifactId> 
 			<version>0.9.7376</version> </dependency> <dependency> <groupId>org.seleniumhq.webdriver</groupId> 
 			<artifactId>webdriver-support</artifactId> <version>0.9.7376</version> </dependency> -->
-        <dependency><groupId>com.google.protobuf</groupId><artifactId>protobuf-java</artifactId><version>2.5.0</version></dependency>
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-kernel</artifactId>
+			<version>1.9.4</version>
+		</dependency>            
 		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>

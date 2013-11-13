@@ -14,10 +14,10 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlRadioButtonInput;
 import com.gargoylesoftware.htmlunit.html.HtmlSelect;
 import com.jakubadamek.robotemil.App;
+import com.jakubadamek.robotemil.DateLosWeb;
 import com.jakubadamek.robotemil.DiacriticsRemover;
 import com.jakubadamek.robotemil.Prices;
 import com.jakubadamek.robotemil.WorkUnit;
-import com.jakubadamek.robotemil.WorkUnitKey;
 
 /**
  * Ancestor to the parsing classes
@@ -29,7 +29,7 @@ public abstract class HtmlParser {
 	/** date for which prices are searched */
 	protected Date dateFrom;
 	protected DateTime dateTo;
-	protected WorkUnitKey key;
+	protected DateLosWeb key;
 	protected int maxPages;
 	/** prices - the result of parsing */
 	private Prices prices;
@@ -71,14 +71,14 @@ public abstract class HtmlParser {
 	 * @param price
 	 * @param divideByLOS
 	 */
-	protected void addPrice(String aHotel, WorkUnitKey aKey, String price,
+	protected void addPrice(String aHotel, DateLosWeb aKey, String price,
 			boolean divideByLOS) {
 		addPrice(aHotel, aKey, price, divideByLOS, Currency.EUR, true);
 	}
 
 	private double usdEurExchangeRate;
 
-	protected void addPrice(String aHotel, WorkUnitKey aKey, String price,
+	protected void addPrice(String aHotel, DateLosWeb aKey, String price,
 			boolean divideByLOS, Currency currency, boolean breakfastIncluded) {
 		this.order++;
 		String hotel = DiacriticsRemover.removeDiacritics(aHotel.replace(

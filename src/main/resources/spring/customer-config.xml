@@ -8,7 +8,8 @@
     <bean id="app" class="com.jakubadamek.robotemil.App">
         <property name="threadCount" value="4"/>
         <property name="customers" ref="customers"/>
-        <property name="priceService" ref="priceService"/>
+        <property name="jdbcPriceService" ref="jdbcPriceService"/>
+        <property name="httpPriceService" ref="httpPriceService"/>
         <property name="settingsService" ref="settingsService"/>
     </bean>  
 

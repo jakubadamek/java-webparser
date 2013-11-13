@@ -7,8 +7,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
-
 import jxl.Workbook;
 import jxl.biff.EmptyCell;
 import jxl.format.Alignment;
@@ -24,6 +22,8 @@ import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
+
+import org.apache.log4j.Logger;
 
 import com.jakubadamek.robotemil.entities.PriceAndOrder;
 
@@ -192,7 +192,7 @@ public class ExportExcel {
                     String hotel = webStruct.hasHotel(ihotel) ? webStruct.getHotelTexts().get(ihotel).getText() : "";
                     boolean noResult = true;
                     if (hotel.trim().length() > 0) {
-                        PriceAndOrder priceAndOrder = webStruct.getPrices().findHotel(hotel, new WorkUnitKey(date, lengthOfStay));
+                        PriceAndOrder priceAndOrder = webStruct.getPrices().findHotel(hotel, new DateLosWeb(date, lengthOfStay, webStruct));
                         if (priceAndOrder != null) {
                             sheet.addCell(new jxl.write.Number(icol, this.irow + ihotel, priceAndOrder.order,
                                     getCellFormat(date, ihotel, icol, this.irow + ihotel, null)));
@@ -273,7 +273,7 @@ public class ExportExcel {
 			                sheet.addCell(new jxl.write.Number(icol ++, this.irow, lengthOfStay)); 
 			                sheet.addCell(new jxl.write.Label(icol ++, this.irow, webStruct.getParams().getExcelName()));
 			                for (Date date : this.app.getDates()) {
-			                    PriceAndOrder priceAndOrder = webStruct.getPrices().findHotel(hotel, new WorkUnitKey(date, lengthOfStay));
+			                    PriceAndOrder priceAndOrder = webStruct.getPrices().findHotel(hotel, new DateLosWeb(date, lengthOfStay, webStruct));
 			                    if (priceAndOrder != null) {
 			                        sheet.addCell(new jxl.write.Number(icol, this.irow, priceAndOrder.price / 100.0, filterPriceFormat));
 			                    }

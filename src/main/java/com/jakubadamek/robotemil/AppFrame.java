@@ -440,6 +440,7 @@ public class AppFrame
 				cal.setTime(new Date(new Date().getTime() - AppFrame.this.start.getTime()));
 				final Formatter formatter = new Formatter(new StringBuilder(), Locale.getDefault());
 				AppFrame.this.txtDuration.setText(formatter.format("%1$tM:%1$tS", cal).toString());
+				formatter.close();
 			}
 		});
     }

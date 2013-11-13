@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import com.jakubadamek.robotemil.htmlparser.HtmlParser;
 
-/** web struct */
+/** web params initialized by Spring */
 public class WebParams implements Serializable {
     private static final long serialVersionUID = 7941780928540322765L;
     /** label */

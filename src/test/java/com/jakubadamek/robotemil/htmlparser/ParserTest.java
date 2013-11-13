@@ -4,9 +4,9 @@ import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.jakubadamek.robotemil.DateLosWeb;
 import com.jakubadamek.robotemil.WebStruct;
 import com.jakubadamek.robotemil.WorkUnit;
-import com.jakubadamek.robotemil.WorkUnitKey;
 
 public class ParserTest {
 
@@ -22,7 +22,7 @@ public class ParserTest {
 		
 	private void test(HtmlParser parser) throws Exception {
 		WebStruct web = new WebStruct();
-		WorkUnit workUnit = new WorkUnit(new WorkUnitKey(new DateTime().plusDays(2).toDate(), 1), web);
+		WorkUnit workUnit = new WorkUnit(new DateLosWeb(new DateTime().plusDays(2).toDate(), 1, web));
 		workUnit.maxPages = 1;
 		parser.init(workUnit, null);
 		parser.run();

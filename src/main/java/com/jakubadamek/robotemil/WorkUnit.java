@@ -7,9 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /** thread work unit */
 public class WorkUnit {
 	public int maxPages;
-	public WorkUnitKey key;
-	/** web */
-	public final WebStruct web;
+	public DateLosWeb key;
 	/** last response time */
 	public volatile Date lastResponseTime;
 	/** restart immediately */
@@ -19,10 +17,9 @@ public class WorkUnit {
 	/** trial count */
 	public AtomicInteger trials = new AtomicInteger(0);
 	
-	public WorkUnit(WorkUnitKey key, WebStruct web) {
+	public WorkUnit(DateLosWeb key) {
 		super();
 		this.key = key;
-		this.web = web;
 	}
 
 	/**
@@ -31,12 +28,12 @@ public class WorkUnit {
 	 * @return true if equal
 	 */
 	public boolean miniEquals(WorkUnit other) {
-		return this.key.equals(other.key) && this.web == other.web;
+		return this.key.equals(other.key);
 	}
 
     @Override
     public String toString() {
-        return "WorkUnit [date=" + key.getDate() + ", lengthOfStay=" + key.getLengthOfStay() + ", web=" + web + ", lastResponseTime=" + lastResponseTime + ", finished=" + finished
+        return "WorkUnit [date=" + key.getDate() + ", lengthOfStay=" + key.getLengthOfStay() + ", lastResponseTime=" + lastResponseTime + ", finished=" + finished
                 + ", trials=" + trials + "]";
     }	
 }

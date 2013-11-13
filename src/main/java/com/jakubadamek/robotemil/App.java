@@ -22,7 +22,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.jakubadamek.robotemil.services.HttpPriceService;
 import com.jakubadamek.robotemil.services.PriceService;
 import com.jakubadamek.robotemil.services.SettingsService;
 
@@ -43,8 +42,8 @@ public class App implements InitializingBean
     private boolean useCache;
     public WorkUnitsManager workUnitsManager = new WorkUnitsManager(this);
     Customers customers;    
-    public PriceService priceService;
-    public PriceService httpPriceService = new HttpPriceService();
+    public PriceService jdbcPriceService;
+    public PriceService httpPriceService;
     public SettingsService settingsService;
     private List<Integer> lengthsOfStay = new ArrayList<Integer>();
 
@@ -237,7 +236,7 @@ public class App implements InitializingBean
     @Override
     public void afterPropertiesSet() throws Exception {
     	settingsService.createTables();
-    	priceService.createTables();
+    	jdbcPriceService.createTables();
         int index = 0;
         if(getSettingsModel() == null || getSettingsModel().getOurHotels().size() > 0) {
             return;
@@ -302,8 +301,13 @@ public class App implements InitializingBean
 	}
 
     @Required
-	public void setPriceService(PriceService priceService) {
-		this.priceService = priceService;
+	public void setJdbcPriceService(PriceService priceService) {
+		this.jdbcPriceService = priceService;
+	}
+
+    @Required
+	public void setHttpPriceService(PriceService priceService) {
+		this.httpPriceService = priceService;
 	}
 
     @Required
@@ -404,5 +408,14 @@ public class App implements InitializingBean
 
 	public List<Integer> getLengthsOfStay() {
 		return lengthsOfStay;
+	}
+	
+	public WebStruct webStruct(String webExcelName) {
+		for(WebStruct webStruct : getOurHotel().getEnabledWebStructs()) {
+			if(webStruct.getParams().getExcelName().equals(webExcelName)) {
+				return webStruct;
+			}
+		}
+		return null;
 	}
 }

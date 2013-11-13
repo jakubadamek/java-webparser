@@ -1,43 +1,6 @@
 <?php 
 
-require_once 'KLogger.php';
-
-$log = new KLogger ( "log.txt" , KLogger::DEBUG );
-$mainDir = "prices";
-
-function myFile($params) {
-	global $mainDir;
-
-	$date = $params["date"];
-	$los = $params["los"];
-	$web = $params["web"];
-	$today = $params["today"];
-	
-	return joinDir($mainDir, joinDir($today, $date . "-" . $los . "-" . $web . ".json"));
-}
-	
-
-function getPrices() {
-	global $log;
-	$log->LogInfo("store.php called with GET");
-
-	$myFile = myFile($_GET);
-	$log->LogInfo("GET filename " . $myFile);	
-	
-	header('Content-type: text/plain');
-	if (file_exists($myFile)) {
-		readfile($myFile);
-	}
-}
-
-function joinDir($dir, $file) {
-	$lastChar = substr($dir, strlen($dir) - 1, 1);
-	if($lastChar != '/' and $lastChar != '\\') {
-		return $dir . DIRECTORY_SEPARATOR . $file;
-	} else {
-		return $dir . $file;
-	}
-}
+require_once 'config.php';
 
 function listDir($dir) {
 	$retval = array();
@@ -72,13 +35,15 @@ function cleanup($today) {
 function postPrices() {
 	global $log;
 	global $mainDir;
-	$log->LogInfo("store.php called with POST");
 	
 	$crc = $_POST["crc"];
 	$prices = $_POST["prices"];
 	$today = $_POST["today"];
 
+	$log->LogInfo("store.php called with POST crc=".$crc."&today=".$today."&date=".$_POST["date"]);
+
 	$myFile = myFile($_POST);
+    $path = myPath($_POST, $myFile);
 	$subDir = joinDir($mainDir, $today);
 	if(! is_dir($subDir)) {
 		$log->LogInfo("About to create dir " . $subDir);
@@ -88,24 +53,20 @@ function postPrices() {
 	
 	$crc2 = md5($prices);
 	if($crc == $crc2) {
-		$log->LogInfo("CRC is OK. POST filename " . $myFile);	
+		$log->LogInfo("CRC is OK. POST filename " . $path);	
 
-		$fh = fopen($myFile, 'w') or die("can't open file");
+		$fh = fopen($path, 'w') or die("can't open file");
 		fwrite($fh, $prices);
 		fclose($fh);
 		
 		echo "Saved";
 	} else {
 		echo "ERROR";
-		$log->LogInfo("Incorrect CRC for " . $myFile. " " . $crc . " <> " . $crc2);	
+		$log->LogInfo("Incorrect CRC for " . $path. " " . $crc . " <> " . $crc2);	
 	}
 	
 	cleanup($today);
 }
 
-if($_SERVER['REQUEST_METHOD'] == 'GET') {
-	getPrices();
-} else {
-	postPrices();
-}	
+postPrices();
 ?> 
