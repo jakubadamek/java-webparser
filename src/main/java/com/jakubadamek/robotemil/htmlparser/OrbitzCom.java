@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import org.apache.log4j.Logger;
 import org.htmlparser.Node;
 import org.htmlparser.NodeFilter;
 import org.htmlparser.Parser;
@@ -14,6 +13,8 @@ import org.htmlparser.filters.HasParentFilter;
 import org.htmlparser.filters.OrFilter;
 import org.htmlparser.filters.TagNameFilter;
 import org.htmlparser.util.ParserException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Parses booking.com
@@ -21,7 +22,7 @@ import org.htmlparser.util.ParserException;
  * @author Jakub
  */
 public class OrbitzCom extends HtmlParser {
-    private final Logger logger = Logger.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 	private static final String ORBITZ_COM =
 	    "http://www.orbitz.com/shop/hotelsearch" +
 	    "?type=hotel&hotel.typeOfSearch=keyword" +

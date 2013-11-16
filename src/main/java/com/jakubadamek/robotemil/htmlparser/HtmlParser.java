@@ -5,8 +5,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
@@ -25,7 +26,7 @@ import com.jakubadamek.robotemil.WorkUnit;
  * @author Jakub
  */
 public abstract class HtmlParser {
-	private static final Logger logger = Logger.getLogger(HtmlParser.class);
+	private static final Logger logger = LoggerFactory.getLogger(HtmlParser.class);
 	/** date for which prices are searched */
 	protected Date dateFrom;
 	protected DateTime dateTo;
@@ -171,7 +172,6 @@ public abstract class HtmlParser {
 		logger.info("Finished setting " + fieldName + " to " + value);
 	}
 
-	@SuppressWarnings("unused")
 	protected void savePage(HtmlPage page) {
 		try {
 			File htmlFile = new File("backup.html");

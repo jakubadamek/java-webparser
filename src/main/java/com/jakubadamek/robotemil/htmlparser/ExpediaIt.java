@@ -7,8 +7,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
@@ -29,7 +30,7 @@ public class ExpediaIt extends HtmlParser
     private static final int AJAX_WAIT_MILLIS = 3000;
     private static final int AJAX_TRIALS = 3;
 
-    private final Logger logger = Logger.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     
     private static final String EXPEDIA_URL = 
         "http://www.expedia.it/Hotels" +
@@ -66,13 +67,13 @@ public class ExpediaIt extends HtmlParser
     
 	@Override
 	public boolean run() throws FailingHttpStatusCodeException, IOException, InterruptedException {
-	    WebClient webClient = new WebClient(BrowserVersion.FIREFOX_3);
+	    WebClient webClient = new WebClient(BrowserVersion.FIREFOX_17);
 	    try {
-    		webClient.setJavaScriptEnabled(true);
+    		webClient.getOptions().setJavaScriptEnabled(true);
     	    URL url = new URL(MessageFormat.format(EXPEDIA_URL, 
     	            new Object[] { "Praha", this.dateFrom, this.dateTo.toDate() }));
     	    //final URL url = new URL("file:///D:/jakub/Kravinky/robotemil/search.do.htm");
-    	    logger.info(url);
+    	    logger.info("", url);
     	    HtmlPage page = (HtmlPage)webClient.getPage(url);
     	    if(isStop()) return false;
     	    //fillTextField(page, "hotelSearchWizard_inpSearchNear", "Praha");
@@ -149,7 +150,7 @@ public class ExpediaIt extends HtmlParser
                 	            }            
                 	        }
             	        } catch(Exception e) {
-            	            logger.info(e);
+            	            logger.info("", e);
             	        }
             	        if(! pageLoaded) {
                             Thread.sleep(AJAX_WAIT_MILLIS);        	            

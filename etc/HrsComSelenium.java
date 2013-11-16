@@ -7,7 +7,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.openqa.selenium.By;
@@ -38,7 +38,7 @@ import com.thoughtworks.selenium.Selenium;
  */	
 public class HrsComSelenium extends HtmlParser
 {
-    private final Logger logger = Logger.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 	@Override
 	public boolean run() throws FailingHttpStatusCodeException, IOException, InterruptedException {		 
 		WebDriver driver = new FirefoxDriver();

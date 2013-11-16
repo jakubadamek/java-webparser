@@ -7,7 +7,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
@@ -29,26 +30,20 @@ import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
  */	
 public class HrsCom extends HtmlParser
 {
-    private final Logger logger = Logger.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 	@Override
 	public boolean run() throws FailingHttpStatusCodeException, IOException {
-		WebClient webClient = new WebClient(BrowserVersion.FIREFOX_3);
+		WebClient webClient = new WebClient(BrowserVersion.FIREFOX_17);
 		try {
-    		webClient.setJavaScriptEnabled(false);
+    		webClient.getOptions().setJavaScriptEnabled(false);
     	    URL url = new URL("http://www.hrs.com");
-    	    //final URL url = new URL("file:///D:/jakub/Kravinky/robotemil/search.do.htm");
     	    HtmlPage page = (HtmlPage)webClient.getPage(url);
     	    if(isStop()) return false;
-    	    //selectOption(page, "//select[@name='localeString']", "cs");
     
     	    fillTextField(page, "location", "Praha (Praha)");
     	    fillTextField(page, "singleRooms", "1");
     	    fillTextField(page, "doubleRooms", "0");
     	    fillTextField(page, "adults", "1");
-    	    // Toto se stane pri vyberu "Praha (Hlavni mesto)" z kontextove napovedy:
-    	    //fillTextField(page, "suggestedID", "%49370");
-    	    //selectOption(page, "//select[@name='perimeter']", "16");
-    	    //selectOption(page, "//select[@name='localeString']", "de");
     	    Calendar calendar = Calendar.getInstance();
     	    calendar.setTime(this.dateFrom);
     	    DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.ENGLISH);
@@ -61,8 +56,6 @@ public class HrsCom extends HtmlParser
     	    logger.info("Clicking on " + inputSubmit);
     	    page = (HtmlPage) inputSubmit.click();
     	    if(isStop()) return false;
-    	    //savePage(page);
-    	    //if(true) return;
     	    /*savePage(page);
   			Thread.sleep(100000);*/
     
@@ -87,22 +80,6 @@ public class HrsCom extends HtmlParser
     
     	    logger.info("Downloading hotellist. Frames on this page: " + page.getFrames());
     	    if(isStop()) return false;
-    	    //HtmlPage page = (HtmlPage)webClient.getPage("file:///D:/temp/search.do%3bjsessionid=7B1084050944D9BA183E226EB60CD6D7_soubory/showPage_003.htm");
-    	    /*HtmlPage head = (HtmlPage) page.getFrameByName("head").getEnclosedPage();
-    	    if(isStop()) return false;
-    	    for(Object o : head.getByXPath("//div")) {
-    	    	logger.info(((HtmlDivision) o).getTextContent());
-    	    }*/
-    	    //savePage(page);
-    	    //selectOption(page, "//select[@name='currency']", "EUR");
-    	    //sumbitXPath = "//form[@name='currencyForm']/noscript/input";
-    	    //HtmlImageInput inputImage = (HtmlImageInput) page.getByXPath(sumbitXPath).get(0);
-    	    //logger.info("Clicking on " + inputImage);
-    	    //page = (HtmlPage) inputImage.click();
-    	    //sumbitXPath = "//form[@name='currencyForm']";
-    	    //HtmlForm currencyForm = (HtmlForm) page.getByXPath(sumbitXPath).get(0);
-    	    //logger.info("Submitting " + currencyForm);
-    	    //page = (HtmlPage) currencyForm.submit(null);
     
     		logger.info("Downloading hotellist 2. Frames on this page: " + page.getFrames());
     	    // 16.8.2010
@@ -130,9 +107,6 @@ public class HrsCom extends HtmlParser
     				    		if(price1.charAt(i) == '.')
     				    			price += ".";
     				    	}
-    				    	//HtmlTable htmlTable = (HtmlTable) a.getParentNode().getParentNode().getParentNode().getParentNode().getParentNode();
-    				    	//logger.info(htmlTable.getAttribute("id") + " " + a.getCanonicalXPath());
-    			    	    //logger.info(a.getTextContent() + "; " + price);
     			    	    addPrice(a.getTextContent(), key, price, false, Currency.USD, true);
     			    	}
     		    	}

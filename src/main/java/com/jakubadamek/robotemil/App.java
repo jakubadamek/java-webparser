@@ -16,8 +16,9 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -29,14 +30,14 @@ import com.jakubadamek.robotemil.services.SettingsService;
  */
 public class App implements InitializingBean 
 {
-    private static final Logger logger = Logger.getLogger(App.class);
+    private static final Logger logger = LoggerFactory.getLogger(App.class);
     /** restart the same work unit when no response for as long */
     static final int RESTART_AFTER_SECONDS = 900;
     /** concurrent thread count */
     private int threadCount;
     //private static final boolean TEST = false;
     private ResourceBundle bundle = ResourceBundle.getBundle("robotemil");
-    private final String CUSTOMER = System.getProperty("customer", Customer.JALTA.toString());
+    private static String CUSTOMER = Customer.TESTHOTEL.toString();
     enum Customer { JALTA, PERLA, TESTHOTEL, LUNIK }
     private AppFrame appFrame;
     private boolean useCache;
@@ -65,10 +66,17 @@ public class App implements InitializingBean
      */
     public static void main( String[] args ) throws InterruptedException
     {
+    	logger.info("args: " + Arrays.toString(args));
         if(args.length == 0) {
-            runWithGui();
-        } else if(args.length == 1 && args[0].equals("runPeriodically")) {
-            runPeriodically();
+            throw new IllegalArgumentException("At least 1 argument (customer) needed");
+        } else if(args.length == 1) {
+        	if(args[0].equals("runPeriodically")) {
+        		runPeriodically();
+        	} else {
+        		CUSTOMER = args[0];
+            	logger.info("customer: " + CUSTOMER);
+            	runWithGui();
+        	}
         } else if(args.length == 2) {
             runWithoutGui(args);
         } else {

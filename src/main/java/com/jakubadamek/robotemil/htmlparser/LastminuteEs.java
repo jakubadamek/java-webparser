@@ -2,7 +2,6 @@ package com.jakubadamek.robotemil.htmlparser;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
 import org.htmlparser.Node;
 import org.htmlparser.NodeFilter;
 import org.htmlparser.Parser;
@@ -15,6 +14,8 @@ import org.htmlparser.util.ParserException;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Parses lastminute.es
@@ -22,7 +23,7 @@ import org.joda.time.format.DateTimeFormatter;
  * @author Jakub
  */
 public class LastminuteEs extends HtmlParser {
-    private final Logger logger = Logger.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 	private static final String LASTMINUTE_COM =
 		"http://www.es.lastminute.com/trips/hotellist/listInternal" +
 		"?hotelMaxReturnPerPage=25" +

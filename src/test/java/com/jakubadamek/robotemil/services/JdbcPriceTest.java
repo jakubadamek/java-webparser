@@ -5,7 +5,6 @@ import java.util.Date;
 
 import junit.framework.Assert;
 
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,8 +17,7 @@ import com.jakubadamek.robotemil.services.util.DateUtil;
 
 @Configurable(autowire = Autowire.BY_NAME)
 public class JdbcPriceTest extends SpringTransactionalTest {
-    private final Logger logger = Logger.getLogger(getClass());
-	
+
 	private PriceService jdbcPriceService;
 
 	@Before
@@ -35,11 +33,6 @@ public class JdbcPriceTest extends SpringTransactionalTest {
 				"SELECT * FROM " + JdbcPriceService.TABLE_PRICES + " WHERE Web IN ('hrs') AND LengthOfStay IN (1) "
 				+ "AND Date IN (" + date.getTime() + ") AND DaysBefore=(Date - " + new Date().getTime() + ") / " + DateUtil.MILLIS_PER_DAY);
 		logger.info(sql);		
-	}
-	
-	@Test
-	public void testLookup() {
-		
 	}
 	
 	@Test

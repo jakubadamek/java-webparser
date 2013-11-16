@@ -9,7 +9,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jakubadamek.robotemil.services.util.IWebToPrices;
 
@@ -17,7 +18,7 @@ public class WorkUnitsManager {
 	/** max trials for one WorkUnit */
 	private static final int MAX_TRIALS = 5;
 	private static final int MIN_ROWS_CACHE = 25;
-    private final Logger logger = Logger.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	final App app;
 	
@@ -141,16 +142,18 @@ public class WorkUnitsManager {
 			} catch(Exception e) {
 				logger.error("Cache", e);
 			}
-			app.showLog("Nalezeno v cache " + found + " z " + count);
+			app.showLog("V cache nalezeno " + found + " z " + count);
 			
 			count = dateLosWebs.size();
-			found = 0;
-			try {
-				found = app.httpPriceService.lookup(dateLosWebs, iWebToPrices, MIN_ROWS_CACHE);
-			} catch(Exception e) {
-				logger.error("Http", e);
+			if(count > 0) {
+				found = 0;
+				try {
+					found = app.httpPriceService.lookup(dateLosWebs, iWebToPrices, MIN_ROWS_CACHE);
+				} catch(Exception e) {
+					logger.error("Http", e);
+				}
+				app.showLog("Na serveru nalezeno " + found + " z " + count);
 			}
-			app.showLog("Nalezeno na serveru " + found + " z " + count);
 		}
 	}
 

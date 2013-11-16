@@ -2,13 +2,14 @@ package com.jakubadamek.robotemil;
 
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jakubadamek.robotemil.htmlparser.HtmlParser;
 
 public class DownloadTask implements Runnable {
 	
-    private final Logger logger = Logger.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     
 	private WorkUnit workUnit;
 	private final App app;

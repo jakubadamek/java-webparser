@@ -11,7 +11,8 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
@@ -26,7 +27,7 @@ import com.jakubadamek.robotemil.services.util.IWebToPrices;
 
 @Repository
 public class JdbcPriceService implements PriceService {
-    private final Logger logger = Logger.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     public static final String TABLE_PRICES = "Prices16";
 
 	private static final String PRICES_COLUMNS = "Web, DaysBefore, Date, Prices, LengthOfStay";

@@ -10,10 +10,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileUtil {
-    private static final Logger logger = Logger.getLogger(FileUtil.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(FileUtil.class);
 	/**
 	 * Executes a command and shows its output
 	 * @param commandLine
@@ -63,7 +63,7 @@ public class FileUtil {
                     dest = loadFromStream(new FileInputStream(outputPath));
                 }
             } catch (IOException e) {
-                logger.info(e);
+                logger.info("", e);
             }
 
             if (dest == null || !Arrays.equals(source, dest)) {

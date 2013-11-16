@@ -9,7 +9,6 @@ import java.util.Formatter;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -37,11 +36,13 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class AppFrame
 {
-    private final Logger logger = Logger.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 	private static final int MIN_HOTEL_ROWS = 15;
 	private static final int ADDITIONAL_ROWS = 10;
 	private static final int MAX_LENGTH_OF_STAY = 3;
@@ -476,7 +477,7 @@ public class AppFrame
     }
 
 	void displayException(final String msg, final Exception e) {
-		logger.info(e);
+		logger.info("", e);
 		displayMessage(msg + "\n" + e.toString(), app.getBundleString("Interni chyba"));
 	}
 

@@ -26,13 +26,15 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.config.SocketConfig;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.DateTimeFormatterBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Repository;
 
@@ -42,7 +44,7 @@ import com.jakubadamek.robotemil.services.util.IWebToPrices;
 
 @Repository
 public class HttpPriceService implements PriceService {
-    private final Logger logger = Logger.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     //private static final String SERVER = "http://localhost/store/";
     private static final String SERVER = "http://jakubadamek.me.cz/trickbenchmark/store/";
     private static final DateTimeFormatter DATE_TIME_FORMAT = new DateTimeFormatterBuilder()
@@ -73,7 +75,11 @@ public class HttpPriceService implements PriceService {
 	@Override
 	public void persistPrices(Prices prices, DateLosWeb key) {
 		try {			
-		    HttpClient client = new DefaultHttpClient();
+			
+			HttpClient client = HttpClientBuilder.create()
+				.setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(120000).build())
+				.build();
+			
 		    HttpPost post = new HttpPost(SERVER + "store.php");
 		    String pricesString = PricesMarshaller.marshal(prices, key);
 		    

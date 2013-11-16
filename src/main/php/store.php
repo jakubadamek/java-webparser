@@ -18,9 +18,9 @@ function listDir($dir) {
 function cleanup($today) {
 	global $log;
 	global $mainDir;
-	$log->LogInfo("Cleaning all directories older than " . $today);
+	$log->LogInfo("Cleaning all directories older than " . ($today - 2));
 	foreach(listDir($mainDir) as $subdir) {
-		if($subdir < $today) {			
+		if($subdir < ($today - 2)) {			
 			$log->LogInfo("About to delete dir " . $subdir . " with all files");
 			$subdir2 = joinDir($mainDir, $subdir);
 			foreach(listDir($subdir2) as $file) {

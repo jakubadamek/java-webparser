@@ -23,12 +23,13 @@ import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jakubadamek.robotemil.entities.PriceAndOrder;
 
 public class ExportExcel {
-    private final Logger logger = Logger.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     /** days per row in the Excel result */
     private static final int DAYS_PER_ROW = 3;
     private static final int EMPTY_ROWS_EXCEL = 3;
