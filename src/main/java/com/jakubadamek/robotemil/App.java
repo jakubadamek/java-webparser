@@ -37,7 +37,7 @@ public class App implements InitializingBean
     private int threadCount;
     //private static final boolean TEST = false;
     private ResourceBundle bundle = ResourceBundle.getBundle("robotemil");
-    private static String CUSTOMER = Customer.TESTHOTEL.toString();
+    private static String CUSTOMER = Customer.JALTA.toString();
     enum Customer { JALTA, PERLA, TESTHOTEL, LUNIK }
     private AppFrame appFrame;
     private boolean useCache;
@@ -106,18 +106,20 @@ public class App implements InitializingBean
          *       - count of days including the start date
          */
         //if(new Scheduler().isScheduled("automatic " + args[0] + " " + args[1])) {
-            App app = getApp();
-            app.threadCount = 1;
-            app.startDate = new DateTime().plusDays(Integer.valueOf(args[0])).toDate(); 
-            app.dayCount = Integer.valueOf(args[1]);
-            app.useCache = true;
-            app.lengthsOfStay = Arrays.asList(new Integer[] { 1, 2, 3 });
-            for(WebStruct webStruct : app.getOurHotel().getWebStructs()) {
-                webStruct.getParams().setEnabled(true);
-            }
-            logger.info("startDate " + args[0] + " dayCount " + app.dayCount);
-            app.startWork();
-            app.workBody();
+
+    	App app = getApp();
+        app.threadCount = 1;
+        app.startDate = new DateTime().plusDays(Integer.valueOf(args[0])).toDate(); 
+        app.dayCount = Integer.valueOf(args[1]);
+        app.useCache = true;
+        app.lengthsOfStay = Arrays.asList(new Integer[] { 1, 2, 3 });
+        for(WebStruct webStruct : app.getOurHotel().getWebStructs()) {
+            webStruct.getParams().setEnabled(true);
+        }
+        logger.info("customer: " + CUSTOMER + " startDate " + args[0] + " dayCount " + app.dayCount);
+        app.startWork();
+        app.workBody();
+        
         /*} else {
             logger.info(new Date() + " task is not scheduled now");
         }*/
@@ -128,7 +130,7 @@ public class App implements InitializingBean
         int waitMinutes = 15;
         while(true) {
             try {
-                runWithoutGui("0", "10");
+                runWithoutGui("0", "31");
                 Calendar lastRunCalendar = Calendar.getInstance();
                 lastRunCalendar.setTime(lastRun);
                 Calendar nowCalendar = Calendar.getInstance();
