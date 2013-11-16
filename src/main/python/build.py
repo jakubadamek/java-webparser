@@ -1,9 +1,11 @@
-import os, glob, sys
+import os, glob, sys, shutil
 
 skipTests = len(sys.argv) > 1 and sys.argv[1] == "skipTests"
 
 curdir = os.path.abspath(os.curdir)
 os.chdir("../../..")
+if os.path.exists('dist'):
+	shutil.rmtree('dist')
 mvn = "mvn clean assembly:directory"
 if skipTests:
 	mvn += " -DskipTests"

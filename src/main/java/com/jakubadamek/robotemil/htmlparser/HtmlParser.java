@@ -3,8 +3,17 @@ package com.jakubadamek.robotemil.htmlparser;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Date;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.config.SocketConfig;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +36,7 @@ import com.jakubadamek.robotemil.WorkUnit;
  */
 public abstract class HtmlParser {
 	private static final Logger logger = LoggerFactory.getLogger(HtmlParser.class);
+	private static final int CONNECTION_TIMEOUT = 120000;
 	/** date for which prices are searched */
 	protected Date dateFrom;
 	protected DateTime dateTo;
@@ -235,6 +245,54 @@ public abstract class HtmlParser {
 			}
 			throw new IOException("Page " + page + " anchor " + anchorXPath
 					+ " " + e.toString());
+		}
+	}
+
+	private String fetchHtml(InputStream is, String via, long start) {	
+		StringWriter os = null;		
+		String retval = null;
+		try {
+			os = new StringWriter();
+			/*FileOutputStream fos = new FileOutputStream(new File("temp.html")); 
+			IOUtils.copy(is, fos);
+			fos.close();*/
+			IOUtils.copy(is, os);
+			retval = os.toString();
+			return retval;
+		} catch (IOException e) {
+			logger.info("Fetching html via {} timed out after {} ms", via, System.currentTimeMillis() - start, e);
+			return null;
+		} finally {
+			logger.info("Fetching html via {} took {} ms, length {} bytes", 
+					via, System.currentTimeMillis() - start, (retval == null ? 0 : retval.length()));
+			IOUtils.closeQuietly(is);
+			IOUtils.closeQuietly(os);
+		}
+	}
+	
+	protected String fetchHtml1(String url) {
+		long start = System.currentTimeMillis();
+		try {
+			URLConnection urlConnection = new URL(url).openConnection();
+			urlConnection.setConnectTimeout(CONNECTION_TIMEOUT);
+			urlConnection.setReadTimeout(CONNECTION_TIMEOUT);
+			return fetchHtml(urlConnection.getInputStream(), "URLConnection", start);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected String fetchHtml2(String url) {
+		long start = System.currentTimeMillis();
+		try {
+			HttpClient client = HttpClientBuilder.create()
+					.setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(CONNECTION_TIMEOUT).build())
+					.build();
+			HttpGet httpGet = new HttpGet(url);
+			httpGet.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.2; rv:25.0) Gecko/20100101 Firefox/25.0");
+			return fetchHtml(client.execute(httpGet).getEntity().getContent(), "HttpClient", start);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 }

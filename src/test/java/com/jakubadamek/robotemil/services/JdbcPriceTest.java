@@ -28,10 +28,11 @@ public class JdbcPriceTest extends SpringTransactionalTest {
 	@Test
 	public void testLookupSql() {
 		Date date = new DateTime(2010, 4, 4, 12, 0, 0, 0).toDate();
-		String sql = JdbcPriceService.lookupSql(Collections.singletonList(date), Collections.singletonList(1), Collections.singletonList("hrs"));
+		Date now = new Date();
+		String sql = JdbcPriceService.lookupSql(Collections.singletonList(date), Collections.singletonList(1), Collections.singletonList("hrs"), now);
 		Assert.assertEquals(sql, 
 				"SELECT * FROM " + JdbcPriceService.TABLE_PRICES + " WHERE Web IN ('hrs') AND LengthOfStay IN (1) "
-				+ "AND Date IN (" + date.getTime() + ") AND DaysBefore=(Date - " + new Date().getTime() + ") / " + DateUtil.MILLIS_PER_DAY);
+				+ "AND Date IN (" + date.getTime() + ") AND DaysBefore=(Date - " + now.getTime() + ") / " + DateUtil.MILLIS_PER_DAY);
 		logger.info(sql);		
 	}
 	

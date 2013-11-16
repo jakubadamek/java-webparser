@@ -62,7 +62,7 @@ public class LastminuteEs extends HtmlParser {
 				pagedUrl += "&startIndex=" + (ipage * 25 + 1);
 			ipage ++;
 			pageHotels = 0;
-			Parser parser = new Parser(pagedUrl);
+			Parser parser = new Parser(fetchHtml2(pagedUrl));
 		    if(isStop()) return false;
 			for(Node node : parser.extractAllNodesThatMatch(takeAllFilter).toNodeArray()) {
 			    if(isStop()) return false;

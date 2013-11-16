@@ -1,0 +1,9 @@
+<settings>
+  <servers>
+    <server>
+      <id>ftp.jakubadamek.me.cz</id>
+      <username>jakubadamek</username>
+      <password>heslo</password>
+    </server>
+  </servers>
+</settings>

@@ -89,8 +89,15 @@ public class HrsCom extends HtmlParser
     	    if(isStop()) return false;
     	    String hotelXPath = "//td[@class='hn']/a[@class='pu']";
     	    //savePage(page);
+    	    int ihotel = 0;
     	    for(Object o : page.getByXPath(hotelXPath)) {
     		    if(isStop()) return false;
+	    	    if(maxPages != 0) {
+		    	    ihotel ++;
+	    	    	if(maxPages * 50 < ihotel) {
+	    	    		return true;
+	    	    	}
+	    	    }
     	    	HtmlAnchor a = (HtmlAnchor) o;
     	    	if(! a.getTextContent().contains("Podrobnosti")) {
     		    	List<?> anchors = a.getByXPath("../../td/div/div[@class='hp']/a");

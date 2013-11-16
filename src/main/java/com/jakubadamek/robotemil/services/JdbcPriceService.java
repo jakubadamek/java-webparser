@@ -118,7 +118,7 @@ public class JdbcPriceService implements PriceService {
 		logger.info("Deleted " + deleted + " rows");
 	}
 
-	public static String lookupSql(List<Date> dates, List<Integer> loses, List<String> webs) {
+	public static String lookupSql(List<Date> dates, List<Integer> loses, List<String> webs, Date now) {
 		StringBuilder sql = new StringBuilder("SELECT * FROM " + TABLE_PRICES + " WHERE Web IN (");
 		for(String web : webs) {
 			sql.append("'").append(web).append("',");
@@ -134,7 +134,7 @@ public class JdbcPriceService implements PriceService {
 			sql.append(date.getTime()).append(",");
 		}
 		sql.deleteCharAt(sql.length() - 1);
-		sql.append(") AND DaysBefore=(Date - ").append(new Date().getTime()).append(") / ").append(DateUtil.MILLIS_PER_DAY);
+		sql.append(") AND DaysBefore=(Date - ").append(now.getTime()).append(") / ").append(DateUtil.MILLIS_PER_DAY);
 		return sql.toString();
 	}
 	
@@ -158,7 +158,7 @@ public class JdbcPriceService implements PriceService {
 		};
 		
 		return jdbcTemplate.query(
-				lookupSql(dates, loses, webs),
+				lookupSql(dates, loses, webs, new Date()),
 				rowMapper).size(); 
 	}
 	
