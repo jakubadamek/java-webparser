@@ -87,7 +87,7 @@ public abstract class HtmlParser {
 		addPrice(aHotel, aKey, price, divideByLOS, Currency.EUR, true);
 	}
 
-	private double usdEurExchangeRate;
+	private static double usdEurExchangeRate;
 
 	protected void addPrice(String aHotel, DateLosWeb aKey, String price,
 			boolean divideByLOS, Currency currency, boolean breakfastIncluded) {
