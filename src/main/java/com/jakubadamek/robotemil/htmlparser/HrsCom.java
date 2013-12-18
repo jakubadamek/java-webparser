@@ -67,13 +67,15 @@ public class HrsCom extends HtmlParser
     		    if(isStop()) return	false;
     	    	HtmlAnchor a = (HtmlAnchor) o;
     	    	//logger.info(a.getTextContent());
-    	    	if(a.getTextContent().startsWith("Praha (Hl") || a.getTextContent().startsWith("Praha (Prag")) {
+    	    	if(a.getTextContent().startsWith("Praha (Hl") || a.getTextContent().startsWith("Praha (Prag")
+    	    			|| a.getTextContent().startsWith("Praha (Pr")) {
     	    	    logger.info("Clicking on " + a);
         	    	page = (HtmlPage) a.click();
     	    		prahaFound = true;
     	    	}
     	    	anchorTexts += a.getTextContent() + " ";
     	    }
+    	    logger.info("link for Praha found? {}", prahaFound);
     	    if(! prahaFound) {
     	    	//throw new RuntimeException("Praha not found in " + anchorTexts);
     	    }
