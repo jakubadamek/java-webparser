@@ -113,7 +113,7 @@ public class ExpediaIt extends HtmlParser
         	    	List<?> prices = hotelAnchor.getByXPath("../../../..//span[@class='avgRatePrice']/nobr");
         	    	if(prices.size() > 0) {
         		    	Object price = prices.get(0);
-        		    	String price1 = ((DomNode) price).getTextContent().replace("€", "");
+        		    	String price1 = ((DomNode) price).getTextContent().replace("â‚¬", "");
         		    	addPrice(hotelName, key, price1, false);
         	    	} else {
         	    	    addPrice(hotelName, key, null, false);

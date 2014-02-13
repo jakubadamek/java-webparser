@@ -26,7 +26,7 @@ public class ParserTest {
 	}
 	
 	private static boolean checkNoDiacritics(String withDiacritics) {
-		String allowed = "ก";
+		String allowed = "ยก";
 		for(int i=0; i < withDiacritics.length(); i ++) {
 			char c = withDiacritics.charAt(i);
 			if(c >= 128 && allowed.indexOf(c) == -1) {
