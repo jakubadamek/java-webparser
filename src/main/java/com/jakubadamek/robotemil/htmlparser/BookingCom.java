@@ -70,12 +70,11 @@ public class BookingCom extends HtmlParser {
 			ipage ++;
 			pageHotels = 0;
 			Document doc = Jsoup.parse(fetchHtml2(pagedUrl));
-			/*Jsoup.connect(pagedUrl)
-				.userAgent("Mozilla/5.0 (Windows NT 6.2; rv:25.0) Gecko/20100101 Firefox/25.0")
-				.timeout(CONNECTION_TIMEOUT)
-				.get();*/
 		    if(isStop()) return false;
 		    boolean firstHotel = true;
+		    for(Element meta : doc.select("meta")) {
+		    	logger.info("Meta: " + meta);
+		    }
 			for(Element div : doc.select("div.sr_item_content")) {
 				String price = null;
 				String hotel = "";

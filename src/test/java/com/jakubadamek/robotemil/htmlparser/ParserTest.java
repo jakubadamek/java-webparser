@@ -24,7 +24,18 @@ public class ParserTest {
 	public void testHrsCom() throws Exception {
 		test(new HrsCom());
 	}
-		
+	
+	private static boolean checkNoDiacritics(String withDiacritics) {
+		String allowed = "¡";
+		for(int i=0; i < withDiacritics.length(); i ++) {
+			char c = withDiacritics.charAt(i);
+			if(c >= 128 && allowed.indexOf(c) == -1) {
+				return false;
+			} 
+		}
+		return true;
+	}
+	
 	private void test(HtmlParser parser) throws Exception {
 		WebStruct web = new WebStruct();
 		WorkUnit workUnit = new WorkUnit(new DateLosWeb(new DateTime().plusDays(2).toDate(), 1, web));
@@ -32,5 +43,8 @@ public class ParserTest {
 		parser.init(workUnit, null);
 		parser.run();
 		Assert.assertTrue(parser.getPrices().size() > 3);
+		for(String hotel : parser.getPrices().getData().keySet()) {
+			Assert.assertTrue(hotel, checkNoDiacritics(hotel));
+		}
 	}
 }

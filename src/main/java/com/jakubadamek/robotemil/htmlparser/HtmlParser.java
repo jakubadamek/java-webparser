@@ -254,9 +254,9 @@ public abstract class HtmlParser {
 		try {
 			os = new StringWriter();
 			/*FileOutputStream fos = new FileOutputStream(new File("temp.html")); 
-			IOUtils.copy(is, fos);
+			IOUtils.copy(is, fos, "UTF8");
 			fos.close();*/
-			IOUtils.copy(is, os);
+			IOUtils.copy(is, os, "UTF8");
 			retval = os.toString();
 			return retval;
 		} catch (IOException e) {

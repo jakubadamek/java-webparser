@@ -67,8 +67,7 @@ public class HrsCom extends HtmlParser
     		    if(isStop()) return	false;
     	    	HtmlAnchor a = (HtmlAnchor) o;
     	    	//logger.info(a.getTextContent());
-    	    	if(a.getTextContent().startsWith("Praha (Hl") || a.getTextContent().startsWith("Praha (Prag")
-    	    			|| a.getTextContent().startsWith("Praha (Pr")) {
+    	    	if(a.getTextContent().startsWith("Praha (Hl") || a.getTextContent().startsWith("Praha (Pr")) {
     	    	    logger.info("Clicking on " + a);
         	    	page = (HtmlPage) a.click();
     	    		prahaFound = true;
