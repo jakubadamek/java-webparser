@@ -94,6 +94,9 @@ public abstract class HtmlParser {
 		this.order++;
 		String hotel = DiacriticsRemover.removeDiacritics(aHotel.replace(
 				"&amp;", "&"));
+		if(hotel.trim().length() == 0) {
+			return;
+		}
 		final String logRow = getClass().getSimpleName() + " " + this.order
 				+ " " + hotel + " " + price + " " + key;
 		logger.info(logRow);
@@ -102,11 +105,15 @@ public abstract class HtmlParser {
 		}
 		Double priceDouble = null;
 		if (price != null) {
-			price = price.replaceAll(",", "");
-			if (divideByLOS) {
-				priceDouble = Double.valueOf(price) / aKey.getLengthOfStay();
-			} else {
-				priceDouble = Double.valueOf(price);
+			try {
+				price = price.replaceAll(",", "");
+				if (divideByLOS) {
+					priceDouble = Double.valueOf(price) / aKey.getLengthOfStay();
+				} else {
+					priceDouble = Double.valueOf(price);
+				}
+			} catch(NumberFormatException e) {
+				logger.error("Error while processing " + aHotel + " price " + price, e);
 			}
 		}
 		if (priceDouble != null && currency != Currency.EUR) {

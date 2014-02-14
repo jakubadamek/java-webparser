@@ -38,7 +38,7 @@ public class LastminuteEs extends HtmlParser {
 	    DateTimeFormatter dateFormat = DateTimeFormat.forPattern("yyyy-MM-dd");
 	    url += "&checkInDate=" + dateFormat.print(new DateTime(this.dateFrom));
 	    url += "&checkOutDate=" + dateFormat.print(this.dateTo);
-		logger.debug(url);
+		logger.info(url);
 		NodeFilter hotelNameFilter = 
 			new AndFilter(
 					new TagNameFilter("h3"),
@@ -59,7 +59,7 @@ public class LastminuteEs extends HtmlParser {
 			String priceDecimal = "";
 			String pagedUrl = url;
 			if(ipage > 0)
-				pagedUrl += "&startIndex=" + (ipage * 25 + 1);
+				pagedUrl += "&startIndex=" + (ipage * 25);
 			ipage ++;
 			pageHotels = 0;
 			Parser parser = new Parser(fetchHtml2(pagedUrl));

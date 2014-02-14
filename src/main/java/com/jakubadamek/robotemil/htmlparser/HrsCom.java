@@ -88,7 +88,7 @@ public class HrsCom extends HtmlParser
     			page = (HtmlPage) page.getFrameByName("hotellist").getEnclosedPage();
     		}
     	    if(isStop()) return false;
-    	    String hotelXPath = "//td[@class='hn']/a[@class='pu']";
+    	    String hotelXPath = "//a[@class='pu']";
     	    //savePage(page);
     	    int ihotel = 0;
     	    for(Object o : page.getByXPath(hotelXPath)) {
@@ -100,22 +100,26 @@ public class HrsCom extends HtmlParser
 	    	    	}
 	    	    }
     	    	HtmlAnchor a = (HtmlAnchor) o;
+    	    	String hotel = a.getTextContent();
     	    	if(! a.getTextContent().contains("Podrobnosti")) {
     		    	List<?> anchors = a.getByXPath("../../td/div/div[@class='hp']/a");
     		    	if(anchors.size() > 0) {
     			    	Object anchor = anchors.get(0);
     			    	String price1 = ((DomNode) anchor).getTextContent();
+    			    	String price2 = null;
     			    	if(price1.contains("Sgl.")) {
-    				    	price1 = price1.substring(price1.indexOf("Sgl.") + 4);
-    				    	//logger.info(price1);
-    				    	String price = "";
-    				    	for(int i=0; i < price1.length(); i ++) {
-    				    		if(Character.isDigit(price1.charAt(i)))
-    				    			price += price1.charAt(i);
-    				    		if(price1.charAt(i) == '.')
-    				    			price += ".";
+    				    	price2 = price1.substring(price1.indexOf("Sgl.") + 4);
+    			    	} else if(price1.contains("Dbl.")) {
+    			    		price2 = price1.substring(price1.indexOf("Dbl.") + 4);
+    			    	}
+    			    	if(price2 != null) {
+    				    	StringBuilder price = new StringBuilder();
+    				    	for(int i=0; i < price2.length(); i ++) {
+    				    		char c = price2.charAt(i);
+    				    		if(Character.isDigit(c) || c == '.')
+    				    			price.append(c);
     				    	}
-    			    	    addPrice(a.getTextContent(), key, price, false, Currency.USD, true);
+    			    	    addPrice(hotel, key, price.toString(), false, Currency.USD, true);
     			    	}
     		    	}
     	    	}
