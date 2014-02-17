@@ -48,12 +48,12 @@ public class HrsCom extends HtmlParser
     	    calendar.setTime(this.dateFrom);
     	    DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.ENGLISH);
     	    fillTextField(page, "stayPeriod.start.date", dateFormat.format(calendar.getTime()));
-    	    logger.info(dateFormat.format(calendar.getTime()));
+    	    logger.debug(dateFormat.format(calendar.getTime()));
     	    calendar.setTime(this.dateTo.toDate());
     	    fillTextField(page, "stayPeriod.end.date", dateFormat.format(calendar.getTime()));
     	    String sumbitXPath = "//input[@name='submitBasicSearch']";
     	    HtmlSubmitInput inputSubmit = (HtmlSubmitInput) page.getByXPath(sumbitXPath).get(0);
-    	    logger.info("Clicking on " + inputSubmit);
+    	    logger.debug("Clicking on " + inputSubmit);
     	    page = (HtmlPage) inputSubmit.click();
     	    if(isStop()) return false;
     	    /*savePage(page);
@@ -68,21 +68,20 @@ public class HrsCom extends HtmlParser
     	    	HtmlAnchor a = (HtmlAnchor) o;
     	    	//logger.info(a.getTextContent());
     	    	if(a.getTextContent().startsWith("Praha (Hl") || a.getTextContent().startsWith("Praha (Pr")) {
-    	    	    logger.info("Clicking on " + a);
+    	    	    logger.debug("Clicking on " + a);
         	    	page = (HtmlPage) a.click();
     	    		prahaFound = true;
     	    	}
     	    	anchorTexts += a.getTextContent() + " ";
     	    }
-    	    logger.info("link for Praha found? {}", prahaFound);
+    	    logger.debug("link for Praha found? {}", prahaFound);
     	    if(! prahaFound) {
     	    	//throw new RuntimeException("Praha not found in " + anchorTexts);
     	    }
     
-    	    logger.info("Downloading hotellist. Frames on this page: " + page.getFrames());
+    	    logger.debug("Downloading hotellist. Frames on this page: " + page.getFrames());
     	    if(isStop()) return false;
     
-    		logger.info("Downloading hotellist 2. Frames on this page: " + page.getFrames());
     	    // 16.8.2010
     		if(page.getFrames().toString().contains("hotellist")) {
     			page = (HtmlPage) page.getFrameByName("hotellist").getEnclosedPage();

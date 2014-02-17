@@ -297,7 +297,7 @@ public class App implements InitializingBean
 		            			bestMatch = hotelName;
 		            		}
 		            	}
-		            	logger.info(web.getParams().getLabel() + " " + hotel + " best matches " + bestMatch + " distance " + minWordDistance);
+		            	logger.debug(web.getParams().getLabel() + " " + hotel + " best matches " + bestMatch + " distance " + minWordDistance);
 	            	}
 	                //web.getHotelList().add(DiacriticsRemover.removeDiacritics(bestMatch).trim());
 	            }

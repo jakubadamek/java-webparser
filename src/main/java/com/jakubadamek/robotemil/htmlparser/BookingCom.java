@@ -72,9 +72,6 @@ public class BookingCom extends HtmlParser {
 			Document doc = Jsoup.parse(fetchHtml2(pagedUrl));
 		    if(isStop()) return false;
 		    boolean firstHotel = true;
-		    for(Element meta : doc.select("meta")) {
-		    	logger.info("Meta: " + meta);
-		    }
 			for(Element div : doc.select("div.sr_item_content")) {
 				String price = null;
 				String hotel = "";
@@ -114,7 +111,7 @@ public class BookingCom extends HtmlParser {
 				}
 			}
 			offset += pageHotels;
-			logger.info("*** " + pageHotels + " hotels " + key + " " + pagedUrl);
+			logger.info("*** " + pageHotels + " of " + offset + " hotels " + key + " " + pagedUrl);
 			if(pageHotels == 0) {
 				trials ++;
 			} else {

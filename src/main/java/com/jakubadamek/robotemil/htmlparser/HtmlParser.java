@@ -99,7 +99,7 @@ public abstract class HtmlParser {
 		}
 		final String logRow = getClass().getSimpleName() + " " + this.order
 				+ " " + hotel + " " + price + " " + key;
-		logger.info(logRow);
+		logger.debug(logRow);
 		if (this.app != null) {
 			// this.app.showLog(logRow);
 		}
@@ -174,7 +174,7 @@ public abstract class HtmlParser {
 
 	protected void fillTextField(HtmlPage page, String fieldName, String value)
 			throws IOException {
-		logger.info("Setting " + fieldName + " to " + value);
+		logger.debug("Setting " + fieldName + " to " + value);
 		String xPath = "//input[@name='" + fieldName + "']";
 		HtmlInput input = null;
 		try {
@@ -186,7 +186,7 @@ public abstract class HtmlParser {
 						+ " " + e.toString());
 			}
 		}
-		logger.info("Finished setting " + fieldName + " to " + value);
+		logger.debug("Finished setting " + fieldName + " to " + value);
 	}
 
 	protected void savePage(HtmlPage page) {
@@ -270,7 +270,7 @@ public abstract class HtmlParser {
 			logger.info("Fetching html via {} timed out after {} ms", via, System.currentTimeMillis() - start, e);
 			return null;
 		} finally {
-			logger.info("Fetching html via {} took {} ms, length {} bytes", 
+			logger.debug("Fetching html via {} took {} ms, length {} bytes", 
 					via, System.currentTimeMillis() - start, (retval == null ? 0 : retval.length()));
 			IOUtils.closeQuietly(is);
 			IOUtils.closeQuietly(os);

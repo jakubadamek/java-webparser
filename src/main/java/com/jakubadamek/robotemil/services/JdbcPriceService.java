@@ -115,7 +115,9 @@ public class JdbcPriceService implements PriceService {
 				key.getWeb(),
 				DateUtil.daysBefore(key.getDate(), new Date()), 
 				key.getLengthOfStay());
-		logger.info("Deleted " + deleted + " rows");
+		if(deleted > 0) {
+			logger.info("Deleted " + deleted + " rows");
+		}
 	}
 
 	public static String lookupSql(List<Date> dates, List<Integer> loses, List<String> webs, Date now) {

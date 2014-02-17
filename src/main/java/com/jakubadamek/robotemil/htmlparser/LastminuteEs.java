@@ -84,7 +84,7 @@ public class LastminuteEs extends HtmlParser {
 					}
 				}
 			}
-			logger.info("*** " + pageHotels + " hotels");
+			logger.debug("*** " + pageHotels + " hotels");
 		}
 		return true;
 	}	

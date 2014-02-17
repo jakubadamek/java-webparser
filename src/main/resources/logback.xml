@@ -18,9 +18,10 @@
     </encoder>
   </appender>
   
-  <logger name="com.jakubadamek.robotemil.htmlparser.HrsCom" level="DEBUG"/>
+  <logger name="com.jakubadamek.robotemil.htmlparser.HrsCom" level="INFO"/>
+  <logger name="com.jakubadamek.robotemil" level="INFO"/>
 
-  <root level="INFO">
+  <root level="WARN">
     <appender-ref ref="FILE" />
     <appender-ref ref="CONSOLE" />
   </root>

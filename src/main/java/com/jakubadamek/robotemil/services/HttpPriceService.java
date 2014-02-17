@@ -96,7 +96,7 @@ public class HttpPriceService implements PriceService {
 			HttpResponse response = client.execute(post);
 			StringWriter writer = new StringWriter();
 			IOUtils.copy(response.getEntity().getContent(), writer, "UTF-8");
-			logger.info("Send JSON response: " + writer.toString());
+			logger.info("Received JSON response in persistPrices: " + writer.toString().trim());
 		} catch(Exception e) {
 			logger.error("", e);
 		}
