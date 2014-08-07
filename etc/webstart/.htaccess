@@ -1,0 +1,2 @@
+RewriteEngine on
+RewriteRule ^(.*).jnlp$ $1.php
