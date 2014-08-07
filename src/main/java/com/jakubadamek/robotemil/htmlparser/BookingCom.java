@@ -69,7 +69,7 @@ public class BookingCom extends HtmlParser {
 			String pagedUrl = url + ";offset=" + offset;
 			ipage ++;
 			pageHotels = 0;
-			Document doc = Jsoup.parse(fetchHtml2(pagedUrl));
+			Document doc = Jsoup.parse(fetchHtml(pagedUrl));
 		    if(isStop()) return false;
 		    boolean firstHotel = true;
 			for(Element div : doc.select("div.sr_item_content")) {
@@ -81,14 +81,14 @@ public class BookingCom extends HtmlParser {
 				if(aHotelName != null) {
 					hotel = aHotelName.text().trim();
 					// A B means B is any descendant of A
-					Element elPrice = div.select("td.roomPrice strong.price").first();
+					Element elPrice = div.select("strong.price").first();
 					if(elPrice != null) {
-						price = elPrice.ownText();
+						price = elPrice.text();
 					}
 				}
 			    if(isStop()) return false;
 				if(price == null) {
-					logger.error("Error parsing hotel " + hotel);
+					logger.error("Error parsing hotel " + hotel + " url " + url + " price is null");
 					//FileUtils.writeStringToFile(new File("error.html"), doc.toString());
 				} else {
 					price = price.replace(HTML_EURO, "").replace(CHAR_EURO, "").replace("&nbsp;", "").trim();

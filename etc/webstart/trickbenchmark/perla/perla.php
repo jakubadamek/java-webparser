@@ -2,7 +2,7 @@
 <jnlp
   spec="1.0+"
   codebase="http://jakubadamek.me.cz/trickbenchmark"
-  href="perla/perla.php">
+  href="perla/perla.jnlp">
   <information>
     <title>Trick Benchmark</title>
     <vendor>Jakub Adámek</vendor>

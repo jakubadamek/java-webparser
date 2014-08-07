@@ -38,7 +38,7 @@ public class ParserTest {
 	
 	private void test(HtmlParser parser) throws Exception {
 		WebStruct web = new WebStruct();
-		WorkUnit workUnit = new WorkUnit(new DateLosWeb(new DateTime().plusDays(2).toDate(), 1, web));
+		WorkUnit workUnit = new WorkUnit(new DateLosWeb(new DateTime().plusDays(1).toDate(), 1, web));
 		workUnit.maxPages = 1;
 		parser.init(workUnit, null);
 		parser.run();

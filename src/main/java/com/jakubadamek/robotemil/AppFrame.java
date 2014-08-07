@@ -165,7 +165,10 @@ public class AppFrame
         this.useCache = new Button(row4, SWT.CHECK);
         this.useCache.setFont(biggerFont);
         this.useCache.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        this.useCache.setSelection(true);
+        this.useCache.setSelection(false);
+        
+        // hide the cache row
+        row4.setVisible(false);
         
         // new row: enabled webs
         Composite rowEnabledWebs = new Composite(cmp, SWT.NONE);

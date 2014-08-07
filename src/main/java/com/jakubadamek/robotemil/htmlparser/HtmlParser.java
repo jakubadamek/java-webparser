@@ -255,7 +255,7 @@ public abstract class HtmlParser {
 		}
 	}
 
-	private String fetchHtml(InputStream is, String via, long start) {	
+	private static String fetchHtml(InputStream is, String via, long start) {	
 		StringWriter os = null;		
 		String retval = null;
 		try {
@@ -289,7 +289,7 @@ public abstract class HtmlParser {
 		}
 	}
 
-	protected String fetchHtml2(String url) {
+	public static String fetchHtml(String url) {
 		long start = System.currentTimeMillis();
 		try {
 			HttpClient client = HttpClientBuilder.create()
