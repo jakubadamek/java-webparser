@@ -5,8 +5,8 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import jxl.common.Logger;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
@@ -20,7 +20,7 @@ import com.jakubadamek.robotemil.WebStruct;
 public class JdbcSettingsService implements SettingsService {
 
     private static final String LENGTHS_OF_STAY = "lengthsOfStay";
-	private static final Logger logger = Logger.getLogger(JdbcSettingsService.class);
+	private static final Logger logger = LoggerFactory.getLogger(JdbcSettingsService.class);
 	private static final String WEB_ENABLED = ".enabled";
     private SimpleJdbcTemplate jdbcTemplate;
 
@@ -86,8 +86,13 @@ public class JdbcSettingsService implements SettingsService {
 	@Override
 	public List<Integer> readLengthsOfStay() {
 		List<Integer> retval = new ArrayList<Integer>();
-		for(String los : readSetting(LENGTHS_OF_STAY, "1").split(" ")) {
-			retval.add(Integer.valueOf(los));
+		String lengthsOfStay = readSetting(LENGTHS_OF_STAY, "1");
+		if(lengthsOfStay.length() > 0) {
+			for(String los : lengthsOfStay.split(" ")) {
+				retval.add(Integer.valueOf(los));
+			}
+		} else {
+			retval.add(1);
 		}
 		return retval;
 	}
