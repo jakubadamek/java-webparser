@@ -38,7 +38,7 @@ public class App implements InitializingBean
     //private static final boolean TEST = false;
     private ResourceBundle bundle = ResourceBundle.getBundle("robotemil");
     private static String CUSTOMER = Customer.JALTA.toString();
-    enum Customer { JALTA, PERLA, TESTHOTEL, LUNIK }
+    enum Customer { JALTA, PERLA, TESTHOTEL, LUNIK, LIPA }
     private AppFrame appFrame;
     private boolean useCache;
     public WorkUnitsManager workUnitsManager = new WorkUnitsManager(this);

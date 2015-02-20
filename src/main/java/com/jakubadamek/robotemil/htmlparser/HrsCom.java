@@ -41,6 +41,7 @@ public class HrsCom extends HtmlParser
     	    if(isStop()) return false;
     
     	    fillTextField(page, "location", "Praha (Praha)");
+    	    
     	    fillTextField(page, "singleRooms", "1");
     	    fillTextField(page, "doubleRooms", "0");
     	    fillTextField(page, "adults", "1");
@@ -51,8 +52,9 @@ public class HrsCom extends HtmlParser
     	    logger.debug(dateFormat.format(calendar.getTime()));
     	    calendar.setTime(this.dateTo.toDate());
     	    fillTextField(page, "stayPeriod.end.date", dateFormat.format(calendar.getTime()));
-    	    String sumbitXPath = "//input[@name='submitBasicSearch']";
-    	    HtmlSubmitInput inputSubmit = (HtmlSubmitInput) page.getByXPath(sumbitXPath).get(0);
+    	    selectOption(page, "//select[@name='perimeter']", "32");
+    	    String submitXPath = "//input[@name='submitBasicSearch']";
+    	    HtmlSubmitInput inputSubmit = (HtmlSubmitInput) page.getByXPath(submitXPath).get(0);
     	    logger.debug("Clicking on " + inputSubmit);
     	    page = (HtmlPage) inputSubmit.click();
     	    if(isStop()) return false;
@@ -68,7 +70,7 @@ public class HrsCom extends HtmlParser
     	    	HtmlAnchor a = (HtmlAnchor) o;
     	    	//logger.info(a.getTextContent());
     	    	if(a.getTextContent().startsWith("Praha (Hl") || a.getTextContent().startsWith("Praha (Pr")) {
-    	    	    logger.debug("Clicking on " + a);
+    	    	    logger.debug("Clicking on " + a.getTextContent() + " " + a);
         	    	page = (HtmlPage) a.click();
     	    		prahaFound = true;
     	    	}

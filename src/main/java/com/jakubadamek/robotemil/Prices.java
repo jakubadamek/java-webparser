@@ -80,31 +80,55 @@ public class Prices implements Serializable {
 	public Map<String, Map<DateLosWeb, PriceAndOrder>> getData() {
 		return this.data;
 	}
+
+	private interface HotelNameMatcher {
+		boolean matches(String hotelName);
+	}
 	
-	public String findHotelName(String hotelNamePart) {
+	public String findHotelName(final String hotelNamePart) {
 		Assert.notNull(hotelNamePart);
 		
-		// first look for exact match
-	    for(String hotel : this.data.keySet()) {
-	        if(hotel.toLowerCase().equals(hotelNamePart.toLowerCase())) {
-	        	return hotel;
-	        }
-	    }
-	    // next look for partial match
-        String hotelName = null;
-        boolean found = false;
-	    for(String hotel : this.data.keySet()) {
-	        if(hotel.toLowerCase().contains(hotelNamePart.toLowerCase())) {
-	            if(! found) {
+		HotelNameMatcher[] matchers = new HotelNameMatcher[] {
+			// first look for exact match
+			new HotelNameMatcher() {
+				@Override
+				public boolean matches(String hotel) {
+					return hotel.toLowerCase().equals(hotelNamePart.toLowerCase());
+				}
+			},
+		    // next look for partial match from start
+			new HotelNameMatcher() {
+				@Override
+				public boolean matches(String hotel) {
+					return hotel.toLowerCase().startsWith(hotelNamePart.toLowerCase());
+				}
+			},
+		    // next look for partial match anywhere
+			new HotelNameMatcher() {
+				@Override
+				public boolean matches(String hotel) {
+					return hotel.toLowerCase().contains(hotelNamePart.toLowerCase());
+				}
+			}						
+		};
+		
+		for(HotelNameMatcher matcher : matchers) {
+	        String hotelName = null;
+	        int matchCount = 0;
+		    for(String hotel : this.data.keySet()) {
+		        if(matcher.matches(hotel)) {
+		        	if (hotelName != null) {
+		        		logger.info("Hotel name conflict: " + hotelName + " vs " + hotel);
+		        	}
 	                hotelName = hotel;
-	                found = true;
-	            } else {
-                    logger.info("Duplicit hotelNamePart: " + hotelNamePart + " = " + hotelName + " x " + hotel);
-	                return null;
-	            }
-	        }
-	    } 
-    	return hotelName;
+		        	matchCount ++;
+		        }
+		    }
+		    if(matchCount == 1) {
+		    	return hotelName;
+		    }
+		}
+    	return null;
 	}
 	
 	public PriceAndOrder findHotel(String hotelNamePart, DateLosWeb key) {

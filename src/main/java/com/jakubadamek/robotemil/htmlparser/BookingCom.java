@@ -20,6 +20,9 @@ public class BookingCom extends HtmlParser {
 	private static final int MAX_TRIALS = 3;
 	private static final String HTML_EURO = "&#x20AC;";
 	private static final String CHAR_EURO = "\u20ac";
+	private static final String[] CITIES = new String[] {
+		"-553173", // Praha
+	};
 	private static final String BOOKING_COM =
 		"http://www.booking.com/searchresults.en-us.html?" +
 		"class_interval=1;" +
@@ -29,7 +32,7 @@ public class BookingCom extends HtmlParser {
 		"redirected_from_landmark=0;" +
 		"review_score_group=empty;score_min=0;" +
 		"si=ai%2Cco%2Cci%2Cre%2Cdi;src=index;ss_all=0;;" +
-		"city=-553173;origin=disamb;srhash=2002341665;srpos=1;rows=50;selected_currency=EUR";
+		"origin=disamb;srhash=2002341665;srpos=1;rows=50;selected_currency=EUR;city=";
 	
 	/** Should the class care about breakfast? */
 	protected boolean careAboutBreakfast;
@@ -40,7 +43,16 @@ public class BookingCom extends HtmlParser {
 
 	@Override
 	public boolean run() throws ParserException, IOException {
-		String url = BOOKING_COM;
+		for (String city : CITIES) {
+			if (! runCity(city)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public boolean runCity(String city) {		
+		String url = BOOKING_COM + city;
 	    Calendar calendar = Calendar.getInstance();
 	    calendar.setTime(this.dateFrom);
 	    //checkin_monthday=22;checkin_year_month=2008-8;" +
@@ -69,7 +81,9 @@ public class BookingCom extends HtmlParser {
 			String pagedUrl = url + ";offset=" + offset;
 			ipage ++;
 			pageHotels = 0;
+			String html = fetchHtml(pagedUrl);
 			Document doc = Jsoup.parse(fetchHtml(pagedUrl));
+			savePage(html);
 		    if(isStop()) return false;
 		    boolean firstHotel = true;
 			for(Element div : doc.select("div.sr_item_content")) {

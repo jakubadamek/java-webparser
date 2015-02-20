@@ -34,7 +34,7 @@ public class DownloadTask implements Runnable {
 			HtmlParser htmlParser = webStruct.getParams().getParserClass().newInstance();
 			htmlParser.init(this.workUnit, this.app);
 			if(htmlParser.run()) {
-				if(htmlParser.getPrices().size() > 25) {
+				if(htmlParser.getPrices().size() > 5) {
 					webStruct.getPrices().addAll(htmlParser.getPrices());
 					app.jdbcPriceService.persistPrices(htmlParser.getPrices(), this.workUnit.key);
 					app.httpPriceService.persistPrices(htmlParser.getPrices(), this.workUnit.key);
@@ -44,7 +44,8 @@ public class DownloadTask implements Runnable {
 	                logger.info("Latch count down - read from WEB " + htmlParser.getPrices().size() + " records");
 					this.app.workUnitsManager.getLatch().countDown();					
 				} else {
-					this.app.showLog("Chyba, nacteno pouze " + workUnitDesc + " zaznamu");
+					this.app.showLog("Chyba " + workUnitDesc + ", nacteno pouze "
+									+ htmlParser.getPrices().size() + " zaznamu");
 					workUnit.restartNow = true;
 				}
 			} else {

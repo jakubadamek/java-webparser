@@ -80,6 +80,25 @@
                         </property>
                     </bean>                    
                 </entry>
+                <!-- entry key="LIPA">
+                    <bean class="com.jakubadamek.robotemil.SettingsModel">
+                        <property name="customer" value="Lipa"/>
+                        <property name="appTitle" value="Trick Benchmark"/>
+                        <property name="excelFile" value="trick_benchmark"/>
+                        <property name="ourHotelNames">
+                            <list>
+                                <value>Lipa</value>
+                            </list>
+                        </property>
+                        <property name="webStructs">
+                            <list>
+                                <ref bean="bookingCom"/>
+                                <ref bean="lastminuteEs"/>
+                                <ref bean="hrsCom"/>
+                            </list>
+                        </property>
+                    </bean>                    
+                </entry -->
                 <entry key="TESTHOTEL">
 				    <bean class="com.jakubadamek.robotemil.SettingsModel">
 				        <property name="customer" value="Test Hotel"/>
