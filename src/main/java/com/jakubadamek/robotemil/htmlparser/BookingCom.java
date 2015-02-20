@@ -81,12 +81,10 @@ public class BookingCom extends HtmlParser {
 			String pagedUrl = url + ";offset=" + offset;
 			ipage ++;
 			pageHotels = 0;
-			String html = fetchHtml(pagedUrl);
 			Document doc = Jsoup.parse(fetchHtml(pagedUrl));
-			savePage(html);
 		    if(isStop()) return false;
 		    boolean firstHotel = true;
-			for(Element div : doc.select("div.sr_item_content")) {
+			for(Element div : doc.select("div.sr_item")) {
 				String price = null;
 				String hotel = "";
 				boolean breakfastIncluded = false;
